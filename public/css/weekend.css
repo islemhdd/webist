@@ -1,0 +1,124 @@
+/* @import url(principale.css); */
+.parent{
+    background-color: white!important;
+    border-radius: 20px;
+}
+.companie{
+    background-color: #00AFB9;
+    height: 7%;
+    border-radius: 20px 20px 0 0;
+}
+table{
+    width: 100%;
+    color: white;
+    position: relative;
+    top: 20%;
+    font-size: 1.25em;
+    margin: 3%;
+}
+.item4
+{
+    background-color: #D9D9D9;
+    width: 70%;
+     height: 7%;
+     position: relative;
+     left: 15%;
+     border-radius: 20px;
+}
+.item4 a{
+    position: relative;
+    top: 10px ;
+}
+.list{
+    background-color: aquamarine;
+    width: 52.25%;
+    position: relative;
+    bottom: 4em;
+}
+li{
+    list-style: none;
+}
+li a{
+    text-decoration: none;
+}
+.list{
+    display:none
+}
+.comp01:hover  .list01  {
+    display: block;
+    position: relative;
+    top: 0.2em;
+}
+.comp02:hover  .list02  {
+    display: block;
+    position: relative;
+    top: 0.2em;
+}
+.comp03:hover  .list03  {
+    display: block;
+    position: relative;
+    top: 0.2em;
+}
+.comp04:hover  .list04  {
+    display: block;
+    position: relative;
+    top: 0.2em;
+}
+.comp05:hover  .list05  {
+    display: block;
+    position: relative;
+    top: 0.2em;
+}
+.comp06:hover  .list06  {
+    display: block;
+    position: relative;
+    top: 0.2em;
+}
+.marque tr:first-child{
+    background-color: #FF8FAB !important;
+    color: white !important;
+}
+.marque tr:nth-child(even){
+    background-color:#D9D9D9;
+    color: black;
+}
+.marque tr:nth-child(odd){
+    background-color: white;
+    color: black;
+}
+.marque{
+    background-color:white;
+    height: 80vh;
+    border-radius: 20px;
+    width: 100%;
+    overflow: auto;
+    position: relative;
+    top: 10%;
+}
+.table{
+    width: 100%;
+    position: relative;
+    top: 3%;
+    max-width: 100%;
+    margin: 0;
+}
+tr{
+    height: 30px;
+ }
+ input{
+   margin-left: 40%;
+ }
+ .choix{
+    position: relative;
+    right: 10%;
+    bottom: -4%;
+    text-align: center;
+ }
+ .choix a{
+    text-decoration: none;
+    color: #FF8FAB;
+    font-size: 1.25em;
+ }
+
+
+
