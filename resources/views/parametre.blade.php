@@ -1,6 +1,6 @@
 <x-base title="parametre">
     <x-slot:css>
-        <link rel="stylesheet" href="css/parametre.css">
+        <link rel="stylesheet" href="/css/parametre.css">
     </x-slot>
     <div class="parent">
         <div class="partiehaut"><img src="profile.jpg" alt=""></div>

@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('sections', function (Blueprint $table) {
             $table->id();
+
+            $table->enum("num", [1, 2, 3]);
+            $table->enum("companie", [1, 2, 3, 4, 5, 6]);
+            $table->enum("bat", [1, 2, 3]);
+
             $table->foreignId("officer_id")->constrained("officers");
 
             $table->timestamps();

@@ -11,7 +11,7 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Register any application services.
      */
-    public $DE;
+
     public function register(): void
     {
         // $this->DE = Student::find(2022001);

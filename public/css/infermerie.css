@@ -1,4 +1,7 @@
 @import url(principale.css);
+*{
+    color:"red"!important;
+}
 .parent{background-color: white !important;
 border-radius: 30px;
 }

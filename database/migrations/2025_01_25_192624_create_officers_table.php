@@ -19,6 +19,7 @@ return new class extends Migration
             $table->timestamp("deleted_at")->nullable();
             $table->timestamps();
             $table->foreignId('role')->constrained("roles")->default(1);
+            $table->rememberToken();
         });
     }
 

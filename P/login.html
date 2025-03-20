@@ -18,22 +18,23 @@
         <label for="nu">nom d'utilisateur</label><br><br>
     <input type="text" name="nomutilisateur" id="nu"><br><br><br>
     <label for="password">mot de passe</label><br><br>
-    <input type="password" name="motdepasse" id="password"><span id="togglePassword" class="eye-icon"><i class="fa-regular fa-eye eye-icon"></i></span> 
-    <script>
-        document.getElementById("togglePassword").addEventListener("click", function () {
-            let passwordInput = document.getElementById("password");
-
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text"; // Afficher le mot de passe
-                this.classList.replace("fa-eye", "fa-eye-slash"); // Changer l'icône
-            } else {
-                passwordInput.type = "password"; // Cacher le mot de passe
-                this.classList.replace("fa-eye-slash", "fa-eye"); // Revenir à l'icône d'origine
-            }
-        });
-    </script><br><br><br><br>
+    <input type="password" name="motdepasse" id="password"><span id="togglePassword" class="eye-icon"><i class="fa-regular fa-eye eye-icon"></i></span>
+       <br><br><br><br>
     <input type="submit" value="login">
     </form>
 </div>
+<script>
+    document.getElementById("togglePassword").addEventListener("click", function () {
+        let passwordInput = document.getElementById("password");
+
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text"; // Afficher le mot de passe
+            this.classList.replace("fa-eye", "fa-eye-slash"); // Changer l'icône
+        } else {
+            passwordInput.type = "password"; // Cacher le mot de passe
+            this.classList.replace("fa-eye-slash", "fa-eye"); // Revenir à l'icône d'origine
+        }
+    });
+</script>
 </body>
 </html>

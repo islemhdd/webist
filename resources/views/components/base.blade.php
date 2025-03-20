@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="logo.png">
+    <link rel="shortcut icon" href="/logo.png">
     <link rel="stylesheet" href="/css/css/all.min.css">
     <title>wibist:{{ $title }}</title>
     {{ $css }}{{-- the title of the page --}}
@@ -16,25 +16,40 @@
 </head>
 
 <body>
+
     <div class="side_bar">
-        <img src="logo.png" alt="">
-        <div class="item1"><a href="login.html"><i class="fa-solid fa-arrow-right-from-bracket"></i>déconnexion</a>
-        </div>
-        <div class="item1"><a href="{{ route('principale') }}"><i class="fa-solid fa-house"></i>principale</a>
+        <img src="/logo.png" alt="">
+
+        <div class="item1"><a href="{{ route('principale', compact('id')) }}"><i
+                    class="fa-solid fa-house"></i>principale</a>
+            {{-- {{ dd(1) }} --}}
 
         </div>
-        <div class="item2"><a href="{{ route('parametre') }}"><i class="fa-solid fa-gear"></i>paramètre</a></div>
-        <div class="item3"><a href="{{ route('cons') }}"><i class="fa-solid fa-list-ul"></i>consigné</a></div>
-        <div class="item4"><a href="{{ route('weekends') }}"><i class="fa-solid fa-calendar-days"></i>week-end </a>
+        <div class="item2"><a href="{{ route('parametre', compact('id')) }}"><i
+                    class="fa-solid fa-gear"></i>paramètre</a></div>
+        <div class="item3"><a href="{{ route('cons', compact('id')) }}"><i class="fa-solid fa-list-ul"></i>consigné</a>
         </div>
-        <div class="item5"><a href="{{ route('infermerie') }}"><i class="fa-solid fa-heart"></i>infermerie</a></div>
-        <div class="item6"><a href=""><i class="fa-solid fa-graduation-cap"></i>étudiants </a></div>
-        <div class="item7"><a href="#hidden-div" class="clickable-div" id="toggleButton"><i
-                    class="fa-solid fa-plus"></i>ordre</a></div>
+        @if ($id > 1)
+            <div class="item4"><a href="{{ route('weekends', compact('id')) }}"><i
+                        class="fa-solid fa-calendar-days"></i>week-end </a>
+            </div>
+            <div class="item5"><a href="{{ route('infermerie', compact('id')) }}"><i
+                        class="fa-solid fa-heart"></i>infermerie</a></div>
+            <div class="item6"><a href=""><i class="fa-solid fa-graduation-cap"></i>étudiants </a></div>
+            <div class="item7"><a href="#hidden-div" class="clickable-div" id="toggleButton"><i
+                        class="fa-solid fa-plus"></i>ordre</a></div>
+            <div class="item1">
+                <a href="{{ route('showLoginForm') }}"><i
+                        class="fa-solid fa-arrow-right-from-bracket"></i>déconnexion</a>
+            </div>
+        @endif
+        <div class="item1">
+            <a href="{{ route('logout') }}"><i class="fa-solid fa-arrow-right-from-bracket"></i>déconnexion</a>
+        </div>
     </div>
     <nav>
 
-        <img src="profile.jpg" alt="">
+        <img src="/profile.jpg" alt="">
         <div class="nom_utilisateure">
             <p></p>
         </div>

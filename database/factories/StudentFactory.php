@@ -23,8 +23,7 @@ class StudentFactory extends Factory
             "grade" => fake()->randomElement([1, 2, 3]),
             "password" => Hash::make(fake()->word("usser")),
             "deleted_at" => null,
-            "price" => fake()->numberBetween(200, 1000),
-            "pac" => fake()->numerify("#######")
+            "consigned" => fake()->randomElement([0, 1])
         ];
     }
 }

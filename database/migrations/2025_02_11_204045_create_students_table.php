@@ -22,6 +22,7 @@ return new class extends Migration
             $table->timestamp("deleted_at")->nullable();
 
             $table->foreignId("section_id")->constrained("sections");
+            $table->rememberToken();
             $table->boolean("consigned")->nullable();
         });
     }

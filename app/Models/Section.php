@@ -9,6 +9,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Section extends Model
 {
     protected $guarded = [];
+    protected $primaryKey = ['id', 'companie', 'num', 'bat'];
+    public function code(): int
+    {
+        return $this->bat * 100 + $this->companie * 10
+            + $this->num;
+    }
+
     public function officer(): BelongsTo
     {
         return $this->belongsTo(Officer::class);

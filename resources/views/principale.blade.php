@@ -4,7 +4,7 @@
             <h2>infermerie </h2>
             <div class="nbinf"></div>
             <div class="nbhos"></div>
-            <img src="infermerie.jpg" alt="">
+            <img src="/infermerie.jpg" alt="">
             <div class="button">
                 <a href="infermerie.html">voire plus</a>
             </div>
@@ -18,14 +18,15 @@
         </div>
         <div class="cons">
             <h2>liste consigné</h2>
+            {{-- debut de la list consinie --}}
             <div class="nomcons"></div>
             <div class="button">
                 <a href="cons.html">voire plus</a>
             </div>
         </div>
-        <img src="page1.jpg" alt="">
+        <img src="/page1.jpg" alt="">
         <div class="eleve">
-            <img src="rechercheleve.jpg" alt="">
+            <img src="/rechercheleve.jpg" alt="">
             <form action="profile.html" method="post">
                 <label for="nom">nom</label>
                 <br>

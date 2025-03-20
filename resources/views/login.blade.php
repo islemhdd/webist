@@ -1,63 +1,70 @@
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
+
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/auth/style.css">
-    <title>Login</title>
 
+    <link rel="stylesheet" href="/css/login.css">
+    <link rel="stylesheet" href="/css/css/all.min.css">
+    {{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"> --}}
+    <link rel="shortcut icon" href="logo.png">
+    <title>wibist:login</title>
 </head>
-<style>
-    .errors {
-
-        color: red;
-        font-size: 14px;
-        margin-top: 10px;
-        margin-bottom: 10px;
-        text-align: left;
-
-        padding: 5px;
-        border: 1px solid red;
-
-        border-radius: 5px;
-        background-color: rgba(255, 0, 0, 0.2);
-        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
-        transition: all 0.3s ease-in-out;
-
-        display: block;
-
-
-        transition: all 0.3s ease-in-out;
-
-
-
-
-
-
-    }
-</style>
 
 <body>
-
-    <div class="container">
-        <h2>login</h2>
-        <form action="{{ route('Authlogin') }}" method="POST">
+    <img class="login" src="this.jpg" alt="">
+    <img src="logo.png" alt="" class="logo">
+    <div class="input">
+        <form action="{{ route('login') }}" method="POST">
             @csrf
-            <input type="id" name="id" placeholder="give us ur id" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <button type="submit">Login</button>
+            <br><br>
+            <label for="nu">ID</label>
+            <br><br>
+            <input type="tel"pattern="[0-9]*" maxlenght="7" name="id" id="nu"><br><br><br>
+            <label for="password">mot de passe</label><br><br>
+
+            <input type="password" name="password" id="password">
+            <span id="togglePassword" class="eye-icon"><i class="fa-regular fa-eye eye-icon"></i></span>
+
+
+            {{-- <script>
+                document.getElementById("togglePassword").addEventListener("click", function() {
+                    let passwordInput = document.getElementById("password");
+
+                    if (passwordInput.type === "password") {
+                        passwordInput.type = "text"; // Afficher le mot de passe
+                        this.classList.replace("fa-eye", "fa-eye-slash"); // Changer l'icône
+                    } else {
+                        passwordInput.type = "password"; // Cacher le mot de passe
+                        this.classList.replace("fa-eye-slash", "fa-eye"); // Revenir à l'icône d'origine
+                    }
+                });
+            </script> --}}
+            {{-- tmskhir hada --}}
+            <br><br><br><br>
+            <input type="submit" value="login">
         </form>
-        <p>dont have an acount? <a href="{{ route('signupForm') }}">signup</a></p>
-
-        @if ($errors->any())
-            <div class="errors " style="color: red; font-size: 14px; margin-top: 10px;  ">
-                @foreach ($errors->all() as $error)
-                    <p>{{ $error }}</p>
-                @endforeach
-            </div>
-        @endif
-
     </div>
+    <script>
+        document.getElementById("togglePassword").addEventListener("click", function() {
+            let passwordInput = document.getElementById("password");
+            let icon = this.querySelector("i");
+
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text"; // Afficher le mot de passe
+                icon.classList.replace("fa-eye", "fa-eye-slash"); // Changer l'icône
+            } else {
+                passwordInput.type = "password"; // Cacher le mot de passe
+                icon.classList.replace("fa-eye-slash", "fa-eye"); // Revenir à l'icône d'origine
+            }
+        });
+    </script>
+
 
 </body>
 

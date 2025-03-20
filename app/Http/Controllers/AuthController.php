@@ -11,35 +11,51 @@ class AuthController extends Controller
 {
     public function showLoginForm()
     {
-        return view('auth.login'); // A single login page for all users
+        return view('login'); // A single login page for all users
     }
 
     public function login(Request $request)
+
     {
-        $credentials = $request->only('id', 'password');
 
-        // Try logging in as an officer
-        if (Auth::guard('officer')->attempt($credentials)) {
-            $officer = Auth::guard('officer')->user();
+        // dd($request->input('password'));
 
-            request()->session()->regenerate();
-            return redirect()->route('officer.dashboard', $officer->id);
+
+
+        $credentials = $request->validate([
+            'id' => ['required'],
+            'password' => ['required', 'min:8'],
+        ]);
+        // s
+
+
+
+
+        if ($credentials['id'] < 2000000) {
+            if (Auth::guard('officer')->attempt($credentials, true)) {
+                $officer = Auth::guard('officer')->user();
+
+                request()->session()->regenerate();
+                return redirect()->route('principale', $officer->id);
+            }
+        } else {
+
+            // Try logging in as a student
+            if (Auth::guard('student')->attempt($credentials, true)) {
+
+                return redirect()->route('posts.index');
+            }
         }
 
-        // Try logging in as a student
-        if (Auth::guard('student')->attempt($credentials)) {
-
-            return redirect()->route('posts.index');
-        }
-
-        return back()->withErrors(['id' => 'Invalid credentials']);
+        return 1;
     }
 
     public function logout(Request $request)
     {
+
         Auth::guard('officer')->logout();
         Auth::guard('student')->logout();
 
-        return redirect('/login');
+        return redirect()->route("showLoginForm");
     }
 }

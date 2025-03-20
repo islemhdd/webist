@@ -1,3 +1,6 @@
+*{
+    font-family: sans-serif, arial, helvetica;
+}
 body{
     background-color:#D9D9D9;
     width: 100%;
@@ -278,4 +281,3 @@ body{
      left: 15%;
      border-radius: 20px;
   }
- 

@@ -1,6 +1,6 @@
 <x-base title="infermerie">
     <x-slot:css>
-        <link rel="stylesheet" href="css/infermerie.css">
+        <link rel="stylesheet" href="/css/infermerie.css">
 
     </x-slot>
 
@@ -9,14 +9,16 @@
         <div class="form">
             <h2>information èleve</h2>
             <form action="" method="post">
-                <label for="nomm">nom</label><br>
+                {{-- <label for="nomm">nom</label><br>
                 <input type="text" id="nomm" name="nomm"><br>
                 <label for="prenomm">prenom</label><br>
                 <input type="text" name="prenomm" id="prenomm"><br>
                 <label for="medcin">medecin</label><br>
-                <input type="text" name="medecin" id="medecin"><br>
+                <input type="text" name="medecin" id="medecin"><br> --}}
+                <label for="matricule">nom</label><br>
+                <input type="text" id="nomm" name="id">
                 <label for="td">temps de depart</label><br>
-                <input type="time" name="td" id="td"><br><br>
+                <input type="time" name="td" id="td">
                 <input type="submit" value="inserer" id="submit">
                 <input type="submit" value="modefier" id="submit">
                 <input type="reset" value="effacer" id="submit">
