@@ -1,0 +1,54 @@
+@import url(principale.css);
+.parent{
+    background-color: white;
+    border-radius: 20px;
+}
+h2{
+    text-align: center; 
+}
+.form{
+    background-color: #CEEAF7;
+    border-radius: 20px 20px 0 0;
+    height: 50%;
+}
+.form input,label{
+    position: relative;
+    left: 25%;
+}
+.form #submit{
+   width: 10%;
+   position: relative;
+   left: 19%;
+}
+.searche{
+    position: relative;
+    left: -23%;
+    top: 15%;
+}
+table{
+    width: 100%;
+    position: relative;
+    top: 3%;
+    
+}
+tr:first-child{
+    background-color: #FF8FAB !important;
+}
+tr:nth-child(even){
+    background-color:#D9D9D9;
+}
+tr:nth-child(odd){
+    background-color: white;
+}
+tr{
+   height: 30px;
+}
+.conss{
+    background-color:white;
+    height: 40%;
+    border-radius: 20px;
+    width: 80%;
+    position: relative;
+    left: 10%;
+    overflow: auto;
+}
