@@ -1,0 +1,22 @@
+header {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.header-content {
+    background-color: var(--bg-secondary);
+}
+
+.header-title {
+    color: var(--text-primary);
+}
+
+.header-nav a {
+    color: var(--text-secondary);
+}
+
+.header-nav a:hover {
+    background-color: var(--hover-color);
+    color: var(--accent-primary);
+}

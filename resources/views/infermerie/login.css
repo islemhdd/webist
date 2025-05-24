@@ -1,0 +1,132 @@
+body{
+    display: flex;
+    flex-direction: row;
+height: 100vh;
+margin: 0;
+padding: 0;
+overflow-y: hidden;
+}
+.gauch{
+    width: 50%;
+    background-color:#266df0;
+}
+.droit{
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+/*justify-content: center;*/
+}
+form div{
+    margin: 2%;
+    padding-bottom: 3%;
+    position: relative;
+    left: 10%;
+}
+div i{
+    position: relative;
+    right: 9%;
+}
+form{
+
+    height:45%;
+    width: 55%;
+    background-color:white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  border: none;
+    border-radius: 20px;
+   position: relative;
+   bottom: 15%;
+    padding:2%
+}
+.button{
+    margin: 3%;
+    margin-top: 8%;
+    width: 50%;
+    border: 1.6px;
+    height: 3em;
+    padding: 0.5em;
+    border-radius: 15px;
+    position: relative;
+    left: 9%;
+
+    background-color: #ACE4EC;
+
+}
+input{
+        height: 3EM;
+        width: 70%;
+        border-radius: 15px;
+        padding-left: 5%;
+        border: none;
+        background-color: #dfdfdf;
+
+    }
+
+
+img{
+    height: 50%;
+    width:70%;
+    border: none;
+    border-radius: 360px;
+    position: relative;
+    left: 12%;
+
+}
+.gauch div{
+    padding-top:2%;
+    padding-left:5%;
+    height: 10%;
+    width: 35%;
+    background-color: white;
+    border-radius: 10PX;
+    display: flex;
+    align-items: center;
+    justify-content:center;
+
+
+}
+.gch1{
+     position: relative;
+     left: 14%;
+     top: 8%;
+}
+.dr1{
+  position: relative;
+  left:48%;
+ top: 13%;
+}
+.gch2{
+    position: relative;
+    left: 14%;
+    top:18%;
+
+}
+.dr2{
+    position: relative;
+    left:48%;
+    top: 23%;
+}
+.gaush p{
+   position: relative;
+
+   margin-left: 3%;
+}
+
+
+
+h2{
+    position: relative;
+    top:30% ;
+
+    text-align: center;
+   /* font-size:55 PX; */
+
+}
+.fin2{
+    position: relative;
+    top:32% ;
+    text-align: center;
+    font-size: 15PX;
+
+}
