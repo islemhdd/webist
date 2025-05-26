@@ -30,7 +30,8 @@ class Student extends Model
         'matricule',
         'nom',
         'prenom',
-        'section_id'
+        'section_id',
+        'grade'
     ];
 
     /**

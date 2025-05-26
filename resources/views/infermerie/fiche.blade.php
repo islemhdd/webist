@@ -17,7 +17,7 @@
             </div>
             <div class="section aa">
                 <label>Section:</label>
-                <p>{{ $Studentsection_id }}</p>
+                <p>{{ $Student->section_id }}</p>
             </div>
         </div>
     </div>

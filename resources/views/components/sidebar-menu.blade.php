@@ -7,7 +7,10 @@
     $user = auth()->user();
 
     $officer = $user->isOfficer();
+    if($officer)
     $officerid = $officer->id;
+    else
+    $officerid =$user->id;
 
 @endphp
 
@@ -59,6 +62,7 @@
     </a>
 
 
+
     {{-- Menu de rendez-vous sous-menu des exemptions --}}
     <div x-data="{ rdvOpen: false }" class="relative">
         <button @click="rdvOpen = !rdvOpen"
@@ -80,8 +84,24 @@
                 <span class="ml-3">Liste des exemptions</span>
             </a>
         </div>
+        {{-- Statistiques --}}
+    <a href="{{ route('statistics.index') }}"
+        class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+        <i class="fa-solid fa-chart-pie w-5 h-5"></i>
+        <span class="ml-3">Statistiques</span>
+    </a>
 
     </div>
+
+    {{-- Déconnexion --}}
+    <form method="POST" action="{{ route('logout') }}" class="mt-auto">
+        @csrf
+        <button type="submit"
+            class="w-full flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <i class="fa-solid fa-sign-out-alt w-5 h-5"></i>
+            <span class="ml-3">Déconnexion</span>
+        </button>
+    </form>
 @else
     {{-- Principale --}}
     <a href="{{ route('principale', ['id' => $officerid]) }}"
