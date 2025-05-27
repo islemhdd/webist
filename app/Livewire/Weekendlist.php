@@ -46,10 +46,13 @@ class Weekendlist extends Component
      */
     public function selector($choice)
     {
+        $query = Student::where('grade', $this->bat);
+
         if (in_array($choice, ['ven', 'sam', '48h', '36h'])) {
-            $this->students = Student::where('choix', $choice)->get();
+            $this->students = $query->where('choix', $choice)->get();
+            // dd($this->students);
         } else {
-            $this->students = Student::all();
+            $this->students = $query->get();
         }
     }
 

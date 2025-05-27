@@ -48,7 +48,8 @@
                     </thead>
                     <tbody class="divide-y dark:divide-gray-700">
                         @forelse($patients as $patient)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                                data-patient-id="{{ $patient->id }}">
                                 <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
                                     {{ $patient->matricule }}
                                 </td>
@@ -69,11 +70,10 @@
                                 </td>
                                 @if (!$patient->valider)
                                     <td class="px-4 py-3 text-sm text-right space-x-3">
-                                        <button onclick="deletePatient('{{ $patient->id }}')"
+                                        <button type="button" onclick="deletePatient('{{ $patient->id }}')"
                                             class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 transition-colors">
                                             <i class="fas fa-trash"></i>
                                         </button>
-
                                     </td>
                                 @endif
                             </tr>
@@ -118,9 +118,8 @@
                 </div>
 
                 <!-- Form -->
-                <form id="addPatientForm"
-                    action="{{ route('brigade.list_patients.add_patients', ['id' => $officer->id]) }}" method="POST"
-                    class="space-y-6">
+                <form id="addPatientForm" action="{{ route('brigade.add_patients', ['id' => $officer->id]) }}"
+                    method="POST" class="space-y-6">
                     @csrf
                     <div>
                         <label for="matricule" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -164,19 +163,32 @@
     <div id="deleteConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
         <div class="fixed inset-0 flex items-center justify-center">
             <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-6 w-full max-w-sm mx-4">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Confirmer la suppression
-                </h3>
-                <p class="text-gray-500 dark:text-gray-400">Êtes-vous sûr de vouloir supprimer ce patient ?</p>
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        Confirmer la suppression
+                    </h3>
+                    <button type="button" onclick="hideDeleteConfirmModal()"
+                        class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
 
-                <form id="deletePatientForm" method="POST" class="mt-6 flex justify-end space-x-3">
+                <p class="text-gray-500 dark:text-gray-400 mb-6">Êtes-vous sûr de vouloir supprimer ce patient ?</p>
+
+                <form id="deletePatientForm" action=" " method="POST" class="mt-6 flex justify-end space-x-3">
                     @csrf
                     @method('DELETE')
+                    <input type="hidden" name="matricule" id="deleteMatricule" value="">
                     <button type="button" onclick="hideDeleteConfirmModal()"
-                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm
+                            hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600
+                            dark:hover:bg-gray-600 transition-colors">
                         Annuler
                     </button>
                     <button type="submit"
-                        class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent
+                            rounded-lg shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2
+                            focus:ring-offset-2 focus:ring-red-500 transition-colors">
                         Supprimer
                     </button>
                 </form>
@@ -194,8 +206,12 @@
         }
 
         function deletePatient(id) {
+            const row = document.querySelector(`tr[data-patient-id="${id}"]`);
+            const matricule = row.querySelector('td').textContent.trim();
+
             document.getElementById('deleteConfirmModal').classList.remove('hidden');
-            document.getElementById('deletePatientForm').action = `/patients/${id}`;
+            document.getElementById('deletePatientForm').action = `/delete-patient`;
+            document.getElementById('deleteMatricule').value = matricule;
         }
 
         function hideDeleteConfirmModal() {
@@ -215,7 +231,7 @@
             }, 3000);
         }
 
-        // Add form submission handler
+        // Add form submission handler for the add patient form only
         document.getElementById('addPatientForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 

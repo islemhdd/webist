@@ -31,6 +31,13 @@
                                 </td>
                             </tr>
                         @else
+                            <!-- New Report Button -->
+                            <div class="flex justify-start mt-8">
+                                <a href="{{ route('report.create', ['id' => $officer->id]) }}"
+                                    class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors shadow-md">
+                                    Nouveau Rapport
+                                </a>
+                            </div>
                             @foreach ($reports as $report)
                                 <tr onclick="window.location='{{ route('report.show', ['id' => $officer->id, 'report_id' => $report->id]) }}'"
                                     class="
@@ -56,7 +63,8 @@
                                     <td class="px-4 py-4 text-sm text-gray-900 dark:text-gray-100">
                                         {{ $report->student->section->code() }}
                                     </td>
-                                    <td class="px-4 py-4 text-sm last:rounded-r-lg">
+                                    <td
+                                        class="@if ($report->refused) text-red-500 @elseif($report->status == 'DONE') text-green-400 @else text-gray-100 @endif e px-4 py-4 text-sm last:rounded-r-lg">
                                         {{ $report->status }}
                                     </td>
                                 </tr>
@@ -66,13 +74,7 @@
                 </table>
             </div>
 
-            <!-- New Report Button -->
-            <div class="flex justify-center mt-8">
-                <a href="{{ route('report.create', ['id' => $officer->id]) }}"
-                    class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors shadow-md">
-                    Nouveau Rapport
-                </a>
-            </div>
+
 
         </div>
 

@@ -91,17 +91,19 @@ class PatientController extends Controller
         $request->validate([
             'matricule' => ['required', 'exists:students,matricule'],
         ]);
+
         $pateint = new Patient(["matricule" => $request->input("matricule")]);
         $pateint->save();
-
+        return response()->json($pateint, 201);
         return redirect()->back()->with('success', 'Patient ajouté avec succès.');
     }
-    public function delete(Officer $id, Request $request)
+    public function delete(Request $request)
     {
-        $officer = $id;
+
         $request->validate([
             'matricule' => ['required', 'exists:students,matricule'],
         ]);
+
         $pateint = Patient::where("matricule", $request->input("matricule"))->first();
         if ($pateint && !$pateint->valide) {
             $pateint->delete();

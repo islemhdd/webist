@@ -4,40 +4,40 @@
         <div class="mb-8">
             <form action="" class="flex gap-2 max-w-md mx-auto">
                 <input type="text" id="recherch" name="recherch"
-                    class="w-full px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-pink-400 focus:border-transparent"
+                    class="w-full px-4 py-2 rounded-full border border-gray-600 bg-gray-700/50 text-gray-100 focus:ring-2 focus:ring-pink-400 focus:border-transparent placeholder-gray-400"
                     placeholder="trouvez l'étudiant">
                 <button type="submit"
-                    class="px-4 py-2 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition-colors">
+                    class="px-4 py-2 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition-colors shadow-md">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
             </form>
         </div>
 
         <!-- Report Content Card -->
-        <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-8 mb-8">
+        <div class="bg-gray-800/50 backdrop-blur-sm rounded-3xl shadow-lg p-8 mb-8">
             <!-- Header -->
             <div class="text-center mb-8 space-y-2">
-                <h1 class="text-xl font-bold text-gray-900 dark:text-gray-100">
+                <h1 class="text-xl font-bold text-white">
                     الــجمــهــوريــــــــة الجــــزائــريـــــــة الــديــمــقـراطيـــــــة الــــشعبيــــــة
                 </h1>
                 <div class="flex justify-between items-start">
                     <div class="space-y-1 text-right">
-                        <p class="text-gray-600 dark:text-gray-400">وزارة الـدفـــــــاع الوطنــــــــي</p>
-                        <p class="text-gray-600 dark:text-gray-400">أركـــــــــــــــــــــــــــــــــــــــان</p>
-                        <p class="text-gray-600 dark:text-gray-400">الجيـش الوطـــــني الشــــــعبـي</p>
-                        <p class="text-gray-600 dark:text-gray-400">المدرسـة الوطنية التحــضيريـة</p>
-                        <p class="text-gray-600 dark:text-gray-400">لــدراســــــــــات المهـنـــــــدس</p>
-                        <p class="text-gray-600 dark:text-gray-400">بــــــــــــــــاجي مختــــــــــــــار</p>
-                        <p class="text-gray-600 dark:text-gray-400">قـســـــــــــــــم الـتعـــليـــــــــــم</p>
-                        <p class="text-gray-600 dark:text-gray-400">لــــــــــــــواء الـطلـبــــــــــــــة</p>
-                        <p class="text-gray-600 dark:text-gray-400">الكتيبــــــــــــــــة <span></span></p>
+                        <p class="text-gray-300">وزارة الـدفـــــــاع الوطنــــــــي</p>
+                        <p class="text-gray-300">أركـــــــــــــــــــــــــــــــــــــــان</p>
+                        <p class="text-gray-300">الجيـش الوطـــــني الشــــــعبـي</p>
+                        <p class="text-gray-300">المدرسـة الوطنية التحــضيريـة</p>
+                        <p class="text-gray-300">لــدراســــــــــات المهـنـــــــدس</p>
+                        <p class="text-gray-300">بــــــــــــــــاجي مختــــــــــــــار</p>
+                        <p class="text-gray-300">قـســـــــــــــــم الـتعـــليـــــــــــم</p>
+                        <p class="text-gray-300">لــــــــــــــواء الـطلـبــــــــــــــة</p>
+                        <p class="text-gray-300">الكتيبــــــــــــــــة <span></span></p>
                     </div>
                     <img src="/img/enpei.png" alt="ENPEI" class="w-32 h-32 object-contain">
                 </div>
             </div>
 
             <!-- Report Number -->
-            <div class="text-right mb-6 text-gray-700 dark:text-gray-300">
+            <div class="text-right mb-6 text-gray-200">
                 <p>رقم : <span
                         class="font-semibold">{{ $report->id }}</span>/{{ $report->created_at->format('Y') }}/ك{{ $report->student->grade }}/
                     ل ط / ق ت / م. و. ت. د .م</p>
@@ -45,50 +45,42 @@
 
             <!-- Report Info -->
             <div class="space-y-4 mb-8 text-right">
-                <p class="text-gray-700 dark:text-gray-300">الرويبة في: <span
-                        class="font-semibold">{{ $report->created_at }}</span></p>
-                <p class="text-gray-700 dark:text-gray-300">الإسم واللقـب: <span
-                        class="font-semibold">{{ $report->student->nom }}</span></p>
-                <p class="text-gray-700 dark:text-gray-300">السريــة: <span
-                        class="font-semibold">{{ $report->student->companie() }}</span></p>
+                <p class="text-gray-200">الرويبة في: <span
+                        class="font-semibold text-white">{{ $report->created_at }}</span></p>
+                <p class="text-gray-200">الإسم واللقـب: <span
+                        class="font-semibold text-white">{{ $report->student->nom }}</span></p>
+                <p class="text-gray-200">السريــة: <span
+                        class="font-semibold text-white">{{ $report->student->companie() }}</span></p>
             </div>
 
             <!-- Report Content -->
             <div class="mb-8">
-                <h2 class="text-right mb-4 text-gray-900 dark:text-gray-100">{{ $report->title }}</h2>
-                <p class="text-gray-700 dark:text-gray-300 text-right leading-relaxed">{{ $report->corps }}</p>
+                <h2 class="text-right mb-6 text-2xl font-bold text-white border-b border-gray-700/50 pb-4">
+                    {{ $report->title }}</h2>
+                <p class="text-gray-200 text-right leading-relaxed px-4">{{ $report->corps }}</p>
             </div>
 
             <!-- Avis Section -->
-            @if ($report->refused)
-                <div class="border-t dark:border-gray-700 pt-6">
-                    <div class="bg-red-50 dark:bg-red-900/20 rounded-xl p-6">
-                        <div class="flex items-center mb-4">
-                            <i class="fa-solid fa-circle-xmark text-red-500 text-xl mr-3"></i>
-                            <h3 class="text-lg font-semibold text-red-700 dark:text-red-400">
-                                Rapport refusé au niveau: {{ $report->status }}
-                            </h3>
-                        </div>
-                        <div class="pl-8">
-                            <h4 class="text-md font-medium text-gray-900 dark:text-gray-100 mb-2">Motif du refus:</h4>
-                            <p class="text-gray-700 dark:text-gray-300 bg-white/50 dark:bg-gray-800/50 rounded-lg p-4">
-                                {{ $report->motif }}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            @else
-                <div class="space-y-6">
-                    @foreach (['CC', 'CBt', 'CBr', 'DIV', 'MED', 'DG'] as $role)
-                        @if (!(!$report->is_medical && $role == 'MED'))
-                            {{-- ? if the report is not medical , we dont display the med avis --}}
+            <div class="space-y-6">
+                @php
+                    $roles = ['CC', 'CBt', 'CBr', 'DIV', 'MED', 'DG'];
+                    $stopped = false;
+                @endphp
+
+                @foreach ($roles as $role)
+                    @if (!(!$report->is_medical && $role == 'MED'))
+                        @php
+                            $avis = 'Avis' . $role;
+                            if ($report->refused && $report->status === $role) {
+                                $stopped = true;
+                            }
+                        @endphp
+
+                        @if (!$report->refused || !$stopped)
                             <div class="border-t dark:border-gray-700 pt-4">
                                 <h3 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100">
                                     {{ $role }}:
                                 </h3>
-                                @php
-                                    $avis = 'Avis' . $role;
-                                @endphp
 
                                 @if ($officer->role->name == $role)
                                     @if (empty($report->$avis))
@@ -121,7 +113,7 @@
                                 @else
                                     @if (!empty($report->$avis))
                                         <div
-                                            class="p-4 bg-gray-50 {{ $role === 'DG' ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-gray-700' }} dark:bg-gray-700 rounded-xl">
+                                            class="p-4 {{ $role === 'DG' ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-gray-700' }} rounded-xl">
                                             <p class="text-gray-700 dark:text-gray-300">{{ $report->$avis }}</p>
                                         </div>
                                     @else
@@ -130,12 +122,34 @@
                                         </div>
                                     @endif
                                 @endif
-
                             </div>
                         @endif
-                    @endforeach
-                </div>
-            @endif
+
+                        @if ($report->refused && $report->status === $role)
+                            <div class="border-t dark:border-gray-700 pt-6">
+                                <div class="bg-red-50 dark:bg-red-900/20 rounded-xl p-6">
+                                    <div class="flex items-center mb-4">
+                                        <i class="fa-solid fa-circle-xmark text-red-500 text-xl mr-3"></i>
+                                        <h3 class="text-lg font-semibold text-red-700 dark:text-red-400">
+                                            Rapport refusé au niveau: {{ $role }}
+                                        </h3>
+                                    </div>
+                                    <div class="pl-8">
+                                        <h4 class="text-md font-medium text-gray-900 dark:text-gray-100 mb-2">Motif du
+                                            refus:
+                                        </h4>
+                                        <p
+                                            class="text-gray-700 dark:text-gray-300 bg-white/50 dark:bg-gray-800/50 rounded-lg p-4">
+                                            {{ $report->motif }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            @break
+                        @endif
+                    @endif
+                @endforeach
+            </div>
         </div>
 
         <!-- set avis -->

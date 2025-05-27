@@ -7,7 +7,11 @@
     $user = auth()->user();
 
     $officer = $user->isOfficer();
-    $officerid = $officer->id;
+    if ($officer) {
+        $officerid = $officer->id;
+    } else {
+        $officerid = $user->id;
+    }
 
 @endphp
 
@@ -98,10 +102,10 @@
     </a>
 
     {{-- Consigné --}}
-    <a href="{{ route('cons', ['id' => $officerid]) }}"
+    <a href="{{ route('sanctions.index', ['id' => $officerid]) }}"
         class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
         <i class="fa-solid fa-user-lock w-5 h-5"></i>
-        <span class="ml-3">Consigné</span>
+        <span class="ml-3">Sancions</span>
     </a>
 
     @if ($officer->role->name == 'CC' || $officer->role->name == 'CBt')
@@ -142,14 +146,8 @@
             </div>
         </div>
 
-        <a href="{{ route('cons', ['id' => $officerid]) }}"
-            class=" flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors orange-500">
-            <i class="fa-solid fa-graduation-cap w-5 h-5"></i>
-            <span class="ml-3">Étudiants</span>
-        </a>
-
         {{-- ? Étudiants :m3mbalich wach hada --}}
-        <a href="#"
+        <a href="{{ route('cons', ['id' => $officerid]) }}"
             class=" flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors orange-500">
             <i class="fa-solid fa-graduation-cap w-5 h-5"></i>
             <span class="ml-3">Étudiants</span>
@@ -191,12 +189,12 @@
         </div>
     </div>
     {{-- Déconnexion --}}
-    <form method="POST" action="{{ route('logout') }}" class="mt-auto">
-        @csrf
-        <button type="submit"
-            class="w-full flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-            <i class="fa-solid fa-sign-out-alt w-5 h-5"></i>
-            <span class="ml-3">Déconnexion</span>
-        </button>
-    </form>
 @endif
+<form method="POST" action="{{ route('logout') }}" class="mt-auto">
+    @csrf
+    <button type="submit"
+        class="w-full flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+        <i class="fa-solid fa-sign-out-alt w-5 h-5"></i>
+        <span class="ml-3">Déconnexion</span>
+    </button>
+</form>

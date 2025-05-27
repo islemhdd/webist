@@ -61,7 +61,8 @@ class DashbaordController extends Controller
                 $query->select('id')
                     ->from('sections')
                     ->where('officer_id', $officer->id);
-            })->orderBy('section_id', 'ASC')->get();
+            })->where('consigned', 0)
+                ->orderBy('section_id', 'ASC')->get();
         } elseif ($officer->role->name == 'CBt') { // chef de bataillon{
             $lockResult = DB::select("SELECT status FROM list_lock WHERE id = 3");
             $locked = $lockResult[0]->status == 1 ? 'locked' : '';

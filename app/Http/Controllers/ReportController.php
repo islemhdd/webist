@@ -22,7 +22,7 @@ class ReportController extends Controller
     {
         $officer = Officer::find($id);
 
-        $reports = $officer->reports;
+        $reports = $officer->reports()->orderBy('created_at', 'desc')->get();
 
 
 

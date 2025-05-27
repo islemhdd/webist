@@ -10,6 +10,7 @@ use App\Http\Controllers\PatientController;
 use App\Http\Controllers\FicheController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\SanctionController;
 use Illuminate\Support\Facades\Hash;
 
 // Routes de connexion
@@ -64,11 +65,14 @@ Route::get('/brigade/principale', fn() => view('brigade.principale'));
 
 Route::post('/add-to-list-infermerie/{id}', [
     PatientController::class,
-    'list'
-])->name('brigade.list_patients.add_patients');
+    'add'
+])->name('brigade.add_patients');
 
 Route::get('/list-infermerie/{id}', [PatientController::class, 'list'])
     ->name('brigade.list_patients');
+Route::DELETE('/delete-patient', [PatientController::class, 'delete'])
+    ->name('brigade.delete_patient');
+
 
 Route::controller(DashbaordController::class)
     ->prefix('{id}')
@@ -83,6 +87,16 @@ Route::controller(DashbaordController::class)
             Route::get("infermerie", "infermerie")->name("infermerie");
         }
     );
+
+Route::middleware('auth')->group(function () {
+    Route::controller(SanctionController::class)->group(function () {
+        Route::get('{id}/sanctions', 'index')->name('sanctions.index');
+        Route::get('{id}/sanctions/create', 'create')->name('sanctions.create');
+        Route::post('{id}/sanctions', 'store')->name('sanctions.store');
+        Route::put('{id}/sanctions/{sanction}', 'update')->name('sanctions.update');
+        Route::delete('{id}/sanctions/{sanction}', 'destroy')->name('sanctions.destroy');
+    });
+});
 
 Route::prefix('{id}')->controller(ReportController::class)->group(function () {
 
@@ -105,4 +119,4 @@ Route::get("test1", function () {
     return dd(Hash::make("123456789"));
 });
 
-Route::resource('patients', PatientController::class);
+// Route::resource('patients', PatientController::class);

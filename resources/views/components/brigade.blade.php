@@ -29,7 +29,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/header.css') }}">
     <link rel="stylesheet" href="/css/{{ $css }}.css">
-    {{-- @vite('resources/css/app.css') --}}
+    @vite('resources/css/app.css')
+    @vite('resources/js/app.js')
+
 
     <!-- Scripts -->
     {{-- <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script> --}}

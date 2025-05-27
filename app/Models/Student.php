@@ -120,4 +120,8 @@ class Student extends Model
     {
         return $this->hasMany(Consigne::class, "student_id", "matricule");
     }
+    public function sanctions(): HasMany
+    {
+        return $this->hasMany(Sanction::class, "matricule", "matricule");
+    }
 }

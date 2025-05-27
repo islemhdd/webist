@@ -59,9 +59,10 @@
                         </thead>
                         <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                             @foreach ($students as $student)
-                                <div @if ($lock) style="opacity:0.5;" @endif>
-                                    <livewire:studentssortie :lock="$lock" :student="$student" />
-                                </div>
+                                <tr @if ($lock) style="opacity:0.5;" @endif>
+                                    <livewire:studentssortie :wire:key="'student-'.$student->matricule"
+                                        :lock="$lock" :student="$student" />
+                                </tr>
                             @endforeach
                         </tbody>
                     </table>

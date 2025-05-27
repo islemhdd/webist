@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
@@ -202,11 +203,7 @@ class Officer extends User
         else
             return false;
     }
-    // public function Reports(): Collection
-    // {
-    //     // $reports = Report::whereIn('student_id', Student::whereIn('section_id', $this->sections()->pluck('id'))->pluck('id'))->get();
-    //     // return $reports;
-    // }²
+
     public function unreadNotifications()
     {
         return $this->notifications()->whereNull('read_at');
@@ -234,13 +231,62 @@ class Officer extends User
             ->get();
     }
 
-    public function patients()
+    public function patients(): Builder
     {
         $patients = Patient::join('students', 'patients.matricule', '=', 'students.matricule')
             ->join('sections', 'students.section_id', '=', 'sections.id')
             ->where('sections.officer_id', $this->id)
-            ->select('patients.*') // Pour retourner des objets Patient
-            ->get();
+            ->select('patients.*');
+
         return $patients;
+    }
+    /**
+     * filter it next or use ->get() on it
+     *
+     * @return Builder
+     */
+    public function officerSanctions(): Builder
+    {
+        $query = Sanction::join('students', 'sanctions.matricule', '=', 'students.matricule');
+
+        // Filter by officer role
+        if ($this->role->name === "CC") {
+            $query->join('sections', 'students.section_id', '=', 'sections.id')
+                ->where('sections.officer_id', $this->id);
+        } elseif ($this->role->name === "CBt") {
+            $query->where('students.grade', $this->bat);
+        }
+
+        // Calculate relevant dates
+        $today = Carbon::today();
+        $nextThursday = $today->copy()->next(Carbon::THURSDAY);
+        $nextFriday = $today->copy()->next(Carbon::FRIDAY);
+        $nextSaturday = $today->copy()->next(Carbon::SATURDAY);
+
+        // Filter sanctions based on their type and dates
+        $query->where(function ($q) use ($today, $nextThursday, $nextFriday, $nextSaturday) {
+            // Active "arret" sanctions
+            $q->where(function ($sub) use ($today) {
+                $sub->where('sanctions.type', 'arret')
+                    ->where('sanctions.date_fin', '>=', $today);
+            })
+                // Active "consigne" sanctions for next weekend
+                ->orWhere(function ($sub) use ($nextThursday, $nextFriday, $nextSaturday) {
+                    $sub->where('sanctions.type', 'consigne')
+                        ->where(function ($dates) use ($nextThursday, $nextFriday, $nextSaturday) {
+                            $dates->whereDate('sanctions.date_debut', '<=', $nextSaturday)
+                                ->whereDate('sanctions.date_fin', '>=', $nextThursday);
+                        });
+                })
+                // Include all "avert" and "blame" sanctions
+                ->orWhere(function ($sub) {
+                    $sub->whereIn('sanctions.type', ['avert', 'blame']);
+                });
+        });
+
+        return $query->selectRaw("sanctions.*,
+                                CONCAT(students.nom, ' ', students.prenom) as full_name,
+                                CASE WHEN sanctions.date_fin >= CURRENT_DATE THEN 1 ELSE 0 END as is_active")
+            ->orderByDesc('sanctions.created_at');
     }
 }
