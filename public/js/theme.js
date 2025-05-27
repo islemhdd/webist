@@ -1,29 +1,26 @@
-// Initialisation des éléments
-const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
-const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
-const themeToggleBtn = document.getElementById('theme-toggle');
+// Initialisation du thème au chargement de la page
+document.addEventListener('DOMContentLoaded', function() {
+    // Vérifie les préférences sauvegardées dans localStorage
+    const darkMode = localStorage.getItem('darkMode');
 
-// Fonction pour mettre à jour les icônes et les classes
-function updateTheme(isDark) {
-    // Toujours utiliser le mode clair
-    isDark = false;
+    // Vérifie la préférence système
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-    // Mettre à jour les icônes
-    themeToggleDarkIcon.classList.toggle('hidden', isDark);
-    themeToggleLightIcon.classList.toggle('hidden', !isDark);
+    // Si un mode est déjà sauvegardé ou si l'utilisateur préfère le mode sombre
+    if (darkMode === 'enabled' || (!darkMode && prefersDark)) {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
 
-    // Mettre à jour le thème
-    document.documentElement.setAttribute('data-theme', 'light');
-    localStorage.setItem('theme', 'light');
-
-    // Mettre à jour les classes pour Tailwind
-    document.documentElement.classList.remove('dark');
-}
-
-// Initialisation du thème (toujours en mode clair)
-updateTheme(false);
-
-// Gestion du clic sur le bouton (désactivé pour rester en mode clair)
-themeToggleBtn.addEventListener('click', () => {
-    updateTheme(false);
+    // Surveille les changements de préférence système
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        if (localStorage.getItem('darkMode') === null) {
+            if (e.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+    });
 });

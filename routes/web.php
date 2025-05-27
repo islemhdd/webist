@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ConvoncuController;
 use App\Http\Controllers\DashbaordController;
 use App\Http\Controllers\ListeRdvController;
@@ -11,10 +12,19 @@ use App\Http\Controllers\FicheController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SanctionController;
+use App\Http\Controllers\StatisticsController;
 use Illuminate\Support\Facades\Hash;
 
+// Routes publiques des pages home
+Route::get('/', [HomeController::class, 'index'])->name('home.index');
+Route::get('/about', [HomeController::class, 'about'])->name('home.about');
+Route::get('/services', [HomeController::class, 'services'])->name('home.services');
+Route::get('/contact', [HomeController::class, 'contact'])->name('home.contact');
+Route::post('/contact', [HomeController::class, 'sendContact'])->name('home.contact.send');
+Route::get('/api/statistics', [HomeController::class, 'getStatistics'])->name('home.statistics');
+
 // Routes de connexion
-Route::get('/', [AuthController::class, 'index'])->name('login');
+Route::get('/login', [AuthController::class, 'index'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 
 // Route de déconnexion (POST uniquement)
@@ -51,8 +61,27 @@ Route::get('/infermerie/create_exemption', [ExemptionController::class, 'create'
 Route::get('/infermerie/liste_patient', [PatientController::class, 'index'])
     ->name('patients.index')->middleware('auth');
 
+Route::get('/patients/{id}/validate', [PatientController::class, 'showValidationForm'])
+    ->name('patients.validate-form')->middleware('auth');
+
+// Route pour les statistiques (MED role uniquement)
+Route::get('/infermerie/statistics', [StatisticsController::class, 'index'])
+    ->name('statistics.index')->middleware('auth');
+
+Route::get('/infermerie/statistics/filter', [StatisticsController::class, 'filter'])
+    ->name('statistics.filter')->middleware('auth');
+
 Route::post('/patients/{id}/valider', [PatientController::class, 'valider'])
     ->name('patients.valider')->middleware('auth');
+
+Route::post('/patients/{id}/validate-with-diagnosis', [PatientController::class, 'validateWithDiagnosis'])
+    ->name('patients.validate-with-diagnosis')->middleware('auth');
+
+Route::post('/patients/{id}/soft-delete', [PatientController::class, 'softDelete'])
+    ->name('patients.soft-delete')->middleware('auth');
+
+Route::put('/patients/{id}/medical-info', [PatientController::class, 'updateMedicalInfo'])
+    ->name('patients.update-medical-info')->middleware('auth');
 
 Route::get('/fiche/{matricule}', [FicheController::class, 'show'])
     ->name('fiche.show')->middleware('auth');
@@ -119,4 +148,4 @@ Route::get("test1", function () {
     return dd(Hash::make("123456789"));
 });
 
-// Route::resource('patients', PatientController::class);
+Route::resource('patients', PatientController::class);

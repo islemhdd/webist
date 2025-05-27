@@ -11,13 +11,11 @@
         </div>
 
         <!-- Switch thème -->
-        <button x-data="{ dark: localStorage.getItem('theme') === 'dark' }"
-            @click="dark = !dark;
-                    localStorage.setItem('theme', dark ? 'dark' : 'light');
-                    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')"
-            class="text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 rounded-lg text-sm p-2.5">
-            <i class="fas fa-sun text-xl" :class="{ 'hidden': dark }"></i>
-            <i class="fas fa-moon text-xl" :class="{ 'hidden': !dark }"></i>
+        <button id="theme-toggle" type="button" class="theme-toggle text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
+            <!-- Icône Soleil (mode clair) -->
+            <i class="fas fa-sun text-xl text-yellow-500 hidden theme-toggle-light-icon"></i>
+            <!-- Icône Lune (mode sombre) -->
+            <i class="fas fa-moon text-xl text-blue-500 hidden theme-toggle-dark-icon"></i>
         </button>
 
         <!-- Notifications -->

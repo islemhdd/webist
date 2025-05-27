@@ -17,7 +17,7 @@ class AuthController extends Controller
     {
         // Valide les champs
         $credentials = $request->validate([
-            'username' => ['required', 'string', 'exists:users,username'],
+            'username' => ['required'],
             'password' => ['required'],
         ]);
 
@@ -25,10 +25,9 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {  // Utilisation de Auth::attempt sans spécifier de guard
             $request->session()->regenerate();
 
-
             if (Auth::user()->role->name != 'MED')
                 return redirect()->route('principale', ['id' => auth()->user()->isOfficer()->id]);
-            return redirect()->route('liste_convoncu');
+            return redirect()->route('statistics.index');
         }
 
         return back()

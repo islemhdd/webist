@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Convoncu;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use phpDocumentor\Reflection\Types\Null_;
 
 class ConvoncuController extends Controller
 {
     public function show(Request $request)
     {
-        $query = Convoncu::query();
+       $query = Convoncu::whereNull('psy');
+
 
         // Join with Students table to get student information
         $convoncus = $query->join('Students', 'convoncus.matricule', '=', 'Students.matricule')
@@ -25,15 +27,15 @@ class ConvoncuController extends Controller
     public function update(Request $request, $matricule)
     {
         $validated = $request->validate([
-            'psy' => 'nullable|string',
-            'medGen' => 'nullable|string',
-            'chirDent' => 'nullable|string',
-            'avisSpe' => 'nullable|string',
+            'psy' => 'required|string',
+            'medGen' => 'required|string',
+            'chirDent' => 'required|string',
+            'avisSpe' => 'required|string',
         ]);
 
         $convoncu = Convoncu::where('matricule', $matricule)->firstOrFail();
         $convoncu->update($validated);
 
-        return redirect()->back()->with('success', 'Fiche médicale mise à jour avec succès');
+        return redirect()->route('liste_convoncu')->with('success', 'Fiche médicale mise à jour avec succès');
     }
 }

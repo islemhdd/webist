@@ -30,7 +30,8 @@ class Student extends Model
         'matricule',
         'nom',
         'prenom',
-        'section_id'
+        'section_id',
+        'grade'
     ];
 
     /**
@@ -116,10 +117,10 @@ class Student extends Model
     }
 
 
-    public function consigne(): HasMany
-    {
-        return $this->hasMany(Consigne::class, "student_id", "matricule");
-    }
+    // public function consigne(): HasMany
+    // {
+    //     return $this->hasMany(Consigne::class, "student_id", "matricule");
+    // }
     public function sanctions(): HasMany
     {
         return $this->hasMany(Sanction::class, "matricule", "matricule");

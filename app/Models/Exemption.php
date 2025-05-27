@@ -10,8 +10,6 @@ class Exemption extends Model
     public $timestamps = true;
     protected $fillable = [
         'matricule',
-        'nom',
-        'prenom',
         'motif',
         'date_debut',
         'date_fin'

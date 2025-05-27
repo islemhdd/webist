@@ -1,27 +1,12 @@
 @props(['css'])
 <!DOCTYPE html>
-<html lang="en" class="h-full" x-data
-    :class="{
-        'dark': localStorage.getItem('color-theme') === 'dark' || (!localStorage.getItem('color-theme') && window
-            .matchMedia('(prefers-color-scheme: dark)').matches)
-    }">
-
-
-
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="shortcut icon" href="/logo.png">
     <title>wibist:{{ $css }}</title>
-
-    <!-- Theme initialization -->
-    <script>
-        if (localStorage.getItem('color-theme') === 'dark' || (!localStorage.getItem('color-theme') && window.matchMedia(
-                '(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        }
-    </script>
 
 
     <!-- Styles -->
@@ -36,6 +21,7 @@
     <!-- Scripts -->
     {{-- <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script> --}}
     <script src="{{ asset('js/theme.js') }}" defer></script>
+    <script src="{{ asset('js/dark-mode.js') }}" defer></script>
     @livewireStyles
 </head>
 

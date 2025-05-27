@@ -89,7 +89,7 @@
                                 </div>
                                 <div>
                                     <span class="text-sm text-gray-500 dark:text-gray-400">Section:</span>
-                                    <p class="text-gray-900 dark:text-gray-300">{{ $rdvsection_id }}</p>
+                                    <p class="text-gray-900 dark:text-gray-300">{{ $rdv->section_id }}</p>
                                 </div>
                             </div>
                         </div>

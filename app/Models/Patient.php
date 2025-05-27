@@ -10,14 +10,58 @@ class Patient extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['matricule', 'validated_at'];
+    protected $fillable = ['matricule', 'valider', 'validated_at', 'motif_suppression', 'type_medecin', 'avis_medecin'];
 
     protected $casts = [
-        'valider' => 'boolean',
+        'valider' => 'integer',
         'validated_at' => 'datetime',
     ];
     public function Student()
     {
         return $this->belongsTo(Student::class, 'matricule', 'matricule');
+    }
+
+    // Helper methods for validation states
+    public function isNotValidated()
+    {
+        return $this->valider === 0;
+    }
+
+    public function isValidated()
+    {
+        return $this->valider === 1;
+    }
+
+    public function isDeleted()
+    {
+        return $this->valider === 2;
+    }
+
+    public function getValidationStatusText()
+    {
+        switch ($this->valider) {
+            case 0:
+                return 'Non validé';
+            case 1:
+                return 'Validé';
+            case 2:
+                return 'Supprimé';
+            default:
+                return 'Inconnu';
+        }
+    }
+
+    public function getValidationStatusClass()
+    {
+        switch ($this->valider) {
+            case 0:
+                return 'badge-warning';
+            case 1:
+                return 'badge-success';
+            case 2:
+                return 'badge-danger';
+            default:
+                return 'badge-secondary';
+        }
     }
 }
