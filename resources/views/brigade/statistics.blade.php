@@ -370,7 +370,7 @@
                             customDiv.classList.remove('bg-blue-500', 'border-blue-500', 'shadow-lg',
                                 'transform', 'scale-105');
                             customDiv.querySelector('span').classList.add('text-gray-700',
-                            'dark:text-gray-300');
+                                'dark:text-gray-300');
                             customDiv.querySelector('span').classList.remove('text-white');
                         }
                     });

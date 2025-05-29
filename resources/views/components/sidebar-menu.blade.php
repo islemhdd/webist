@@ -115,7 +115,7 @@
     </form>
 @else
     {{-- Statistiques --}}
-    <a href="{{ route('statistics.index') }}"
+    <a href="{{ route('brigade.statistics', ['id' => auth()->user()->id]) }}"
         class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
         <i class="fa-solid fa-chart-pie w-5 h-5"></i>
         <span class="ml-3">Statistiques</span>

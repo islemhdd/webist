@@ -21,6 +21,8 @@ class StatisticsController extends Controller
             ->where('valider', 1)->count();
         $invalidPatientsToday = Patient::whereDate('created_at', $today)
             ->where('valider', 0)->count();
+        $deletedPatientsToday = Patient::whereDate('created_at', $today)
+            ->where('valider', 2)->count();
 
         // Récupérer les statistiques des rendez-vous pour aujourd'hui
         $consultationRdvToday = ListeRdv::whereDate('date', $today)

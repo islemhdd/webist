@@ -164,6 +164,9 @@ class PatientController extends Controller
                     break;
             }
         }
+
+        $query->orderBy("created_at", "desc");
+
         $patients = $query->get();
 
         return view('brigade.liste_patient', compact('patients', 'officer'));
