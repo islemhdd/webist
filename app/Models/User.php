@@ -37,9 +37,13 @@ class User extends Authenticatable
      */
     public function isOfficer(): Officer|null
     {
-        if ($this->role->name == 'MED')
-            return null;
-        $officer = new Officer($this->getAttributes());
-        return $officer;
+        // Check if user has an officer role (not Medecin or other non-officer roles)
+        if (in_array($this->role->name, ['Chef de compagnie', 'Chef de batallaint', 'Chef de brigade', 'Chef division', 'Directeur général'])) {
+            $officer = new Officer($this->getAttributes());
+            return $officer;
+        }
+
+        // Return null for non-officer roles like Medecin, Directeur des etudes, etc.
+        return null;
     }
 }

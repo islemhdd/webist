@@ -71,7 +71,7 @@
         </form>
 
         <div class="flex justify-center mt-8">
-            @if ($role == 'CBt')
+            @if ($role == 'Chef de batallaint')
                 <button id="click" wire:click="lockFire()"
                     class="px-6 py-2 rounded-full bg-purple-300 text-white font-semibold hover:bg-purple-400 transition">
                     Verrouiller la liste

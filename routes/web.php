@@ -13,6 +13,9 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SanctionController;
 use App\Http\Controllers\StatisticsController;
+use App\Http\Controllers\DEController;
+use App\Http\Controllers\RHPController;
+use App\Http\Controllers\ExpulsionController;
 use Illuminate\Support\Facades\Hash;
 
 // Routes publiques des pages home
@@ -149,3 +152,31 @@ Route::get("test1", function () {
 });
 
 Route::resource('patients', PatientController::class);
+
+// Temporary test routes for debugging (remove in production)
+Route::get('/test-de-dashboard', [DEController::class, 'dashboard'])->name('test.de.dashboard');
+Route::get('/test-de-statistics', [DEController::class, 'getStatisticsData'])->name('test.de.statistics');
+
+// DE (Director of Studies) Routes
+Route::middleware('auth')->prefix('de')->name('de.')->group(function () {    // Dashboard
+    Route::get('/', [DEController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard', [DEController::class, 'dashboard'])->name('dashboard');
+
+    // AJAX endpoint for filtered statistics
+    Route::get('/statistics-data', [DEController::class, 'getStatisticsData'])->name('statistics.data');
+
+    // Statistics
+    Route::get('/statistics', [DEController::class, 'statistics'])->name('statistics');
+
+    // RHP Management
+    Route::resource('rhp', RHPController::class);
+    Route::get('/rhp/week', [RHPController::class, 'weekView'])->name('rhp.week');
+
+    // Infirmary Absences
+    Route::get('/infirmerie', [DEController::class, 'infirmerie'])->name('infirmerie.index');
+    Route::post('/infirmerie/validate/{patient}', [DEController::class, 'validateRHP'])->name('infirmerie.validate');
+
+    // Class Expulsions
+    Route::resource('expulsions', ExpulsionController::class);
+    Route::get('/expulsions/{expulsion}/edit', [ExpulsionController::class, 'edit'])->name('expulsions.edit');
+});

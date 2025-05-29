@@ -19,12 +19,12 @@ use Illuminate\Support\Facades\DB;
 use stdClass;
 use Symfony\Component\Security\Core\Role\Role;
 
-define("DIV", "DIV");
-define("CBt", "CBt");
-define("CBr", "CBr");
-define("CC", "CC");
-define("MED", "MED");
-define("DG", "DG");
+define("CHEF_DIVISION", "Chef division");
+define("CHEF_DE_BATALLAIN", "Chef de batallaint");
+define("CHEF_DE_BRIGADE", "Chef de brigade");
+define("CHEF_DE_COMPAGNIE", "Chef de compagnie");
+define("MEDECIN", "Medecin");
+define("DIRECTEUR_GENERAL", "Directeur général");
 
 class Officer extends User
 
@@ -69,98 +69,94 @@ class Officer extends User
     public function officerNotify(Report $report)
     {
         switch ($this->role->name) {
-            case MED:
-                if ($report->status === MED) {
+            case MEDECIN:
+                if ($report->status === MEDECIN) {
                     // Find a DIV officer from database
                     $div = Officer::whereHas('role', function ($query) {
-                        $query->where('name', DIV);
+                        $query->where('name', CHEF_DIVISION);
                     })->first();
 
                     if ($div) {
                         $div->notify(new ReportArival($report));
-                        $report->status = DIV;
-                        $report->owner->notify(new ReportPassed($report));
+                        $report->status = CHEF_DIVISION;
+                        $report->destination = $div->id;
+                        $report->owner->notify(new ReportPassed());
                     }
                 }
                 break;
 
-            case CC:
-                // Find CBt with same battalion
+            case CHEF_DE_COMPAGNIE:
+                // Find Chef de batallain with same battalion
                 $cbt = Officer::whereHas('role', function ($query) {
-                    $query->where('name', CBt);
+                    $query->where('name', CHEF_DE_BATALLAIN);
                 })->where('bat', $this->bat)->first();
 
                 if ($cbt) {
                     $cbt->notify(new ReportArival($report));
-                    $report->status = CBt;
+                    $report->status = CHEF_DE_BATALLAIN;
                     $report->destination = $cbt->id;
-                    $report->owner->notify(new ReportPassed($report));
+                    $report->owner->notify(new ReportPassed());
                 }
                 break;
 
-            case CBt:
-                // Find CBr from database
+            case CHEF_DE_BATALLAIN:
+                // Find Chef de brigade from database
                 $cbr = Officer::whereHas('role', function ($query) {
-                    $query->where('name', CBr);
+                    $query->where('name', CHEF_DE_BRIGADE);
                 })->first();
 
                 if ($cbr) {
-                    $report->status = CBr;
+                    $report->status = CHEF_DE_BRIGADE;
                     $cbr->notify(new ReportArival($report));
                     $report->destination = $cbr->id;
-                    $report->owner->notify(new ReportPassed($report));
+                    $report->owner->notify(new ReportPassed());
                 } else {
-                    throw new \Exception("No CBr found");
+                    throw new \Exception("No Chef de brigade found");
                 }
                 break;
-            case CBr:
+            case CHEF_DE_BRIGADE:
                 // Find DIV officer from database
                 $div = Officer::whereHas('role', function ($query) {
-                    $query->where('name', DIV);
+                    $query->where('name', CHEF_DIVISION);
                 })->first();
 
                 if ($div) {
-                    $report->status = DIV;
+                    $report->status = CHEF_DIVISION;
                     $div->notify(new ReportArival($report));
                     $report->destination = $div->id;
-                    $report->owner->notify(new ReportPassed($report));
+                    $report->owner->notify(new ReportPassed());
                 } else {
                     throw new \Exception("No DIV found");
                 }
                 break;
-            case DIV:
-
-
+            case CHEF_DIVISION:
 
                 if ($report->is_medical) {
 
                     $med = Officer::whereHas('role', function ($query) {
-                        $query->where('name', MED);
+                        $query->where('name', MEDECIN);
                     })->first();
 
                     if ($med) {
                         $med->notify(new ReportArival($report));
-                        $report->status = MED;
+                        $report->status = MEDECIN;
                         $report->destination = $med->id;
-                        $report->owner->notify(new ReportPassed($report));
+                        $report->owner->notify(new ReportPassed());
                     }
                 } else {
                     $dg = Officer::whereHas('role', function ($query) {
-                        $query->where('name', DG);
+                        $query->where('name', DIRECTEUR_GENERAL);
                     })->first();
                     if ($dg) {
                         $dg->notify(new ReportArival($report));
-                        $report->status = DG;
+                        $report->status = DIRECTEUR_GENERAL;
                         $report->destination = $dg->id;
                         $report->owner->notify(new ReportPassed($report));
                     }
                 }
                 break;
 
-
-
-
-            case DG:
+            case DIRECTEUR_GENERAL:
                 // Inform owner with DesitionMade
                 $report->status = "DONE";
                 $report->owner->notify(new DesitionMade($report));
@@ -190,18 +186,18 @@ class Officer extends User
     {
 
         $ROLES = [
-            'DG' => 5,
-            'DIV' => 4,
-            'CBr' => 3,
-            'CBt' => 2,
-            'CC' => 1,
-            'MED' => 0
+            'Directeur général' => 5,            // Directeur général
+            'Chef division' => 4,           // Chef division
+            'Chef de brigade' => 3,           // Chef de brigade
+            'Chef de batallaint' => 2,           // Chef de batallaint
+            'Chef de compagnie' => 1,            // Chef de compagnie
+            'Medecin' => 0            // Medecin
         ];
-        if ($this->role->name != "MED")
-
+        if ($this->role->name != "Medecin") {
             return $ROLES[$this->role->name] > $ROLES[$officer->role->name];
-        else
+        } else {
             return false;
+        }
     }
 
     public function unreadNotifications()
@@ -250,10 +246,10 @@ class Officer extends User
         $query = Sanction::join('students', 'sanctions.matricule', '=', 'students.matricule');
 
         // Filter by officer role
-        if ($this->role->name === "CC") {
+        if ($this->role->name === "Chef de compagnie") {
             $query->join('sections', 'students.section_id', '=', 'sections.id')
                 ->where('sections.officer_id', $this->id);
-        } elseif ($this->role->name === "CBt") {
+        } elseif ($this->role->name === "Chef de batallaint") {
             $query->where('students.grade', $this->bat);
         }
 

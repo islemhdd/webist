@@ -125,4 +125,16 @@ class Student extends Model
     {
         return $this->hasMany(Sanction::class, "matricule", "matricule");
     }
+
+    // Relationship with patients table
+    public function patients(): HasMany
+    {
+        return $this->hasMany(Patient::class, 'matricule', 'matricule');
+    }
+
+    // Relationship with expulsions table
+    public function expulsions(): HasMany
+    {
+        return $this->hasMany(Expulsion::class, 'student_id', 'id');
+    }
 }

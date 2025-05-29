@@ -63,12 +63,12 @@
             <!-- Avis Section -->
             <div class="space-y-6">
                 @php
-                    $roles = ['CC', 'CBt', 'CBr', 'DIV', 'MED', 'DG'];
+                    $roles = ['Chef de compagnie', 'Chef de batallaint', 'Chef de brigade', 'Chef division', 'Medecin', 'Directeur général'];
                     $stopped = false;
                 @endphp
 
                 @foreach ($roles as $role)
-                    @if (!(!$report->is_medical && $role == 'MED'))
+                    @if (!(!$report->is_medical && $role == 'Medecin'))
                         @php
                             $avis = 'Avis' . $role;
                             if ($report->refused && $report->status === $role) {
@@ -88,7 +88,7 @@
                                             <div class="space-y-2">
                                                 <textarea id="avisText" name="avis{{ strtolower($role) }}"
                                                     class="w-full p-4 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-pink-400 focus:border-transparent @error('avis') border-red-500 dark:border-red-500 @enderror"
-                                                    rows="4" placeholder="{{ $role == 'DG' ? 'donner votre decision' : 'votre avis' }}"></textarea>
+                                                    rows="4" placeholder="{{ $role == 'Directeur général' ? 'donner votre decision' : 'votre avis' }}"></textarea>
                                                 @error('avis')
                                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                                 @enderror
@@ -106,14 +106,14 @@
                                         </form>
                                     @else
                                         <div
-                                            class="p-4 rounded-xl {{ $role === 'DG' ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-gray-700' }}">
+                                            class="p-4 rounded-xl {{ $role === 'Directeur général' ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-gray-700' }}">
                                             <p class="text-gray-700 dark:text-gray-300">{{ $report->$avis }}</p>
                                         </div>
                                     @endif
                                 @else
                                     @if (!empty($report->$avis))
                                         <div
-                                            class="p-4 {{ $role === 'DG' ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-gray-700' }} rounded-xl">
+                                            class="p-4 {{ $role === 'Directeur général' ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-gray-700' }} rounded-xl">
                                             <p class="text-gray-700 dark:text-gray-300">{{ $report->$avis }}</p>
                                         </div>
                                     @else
@@ -156,7 +156,7 @@
         @php
             $avis = 'Avis' . $officer->role->name;
         @endphp
-        @if ($report->$avis == null && $officer->role->name != 'MED')
+        @if ($report->$avis == null && $officer->role->name != 'Medecin')
             <!-- Confirm Modal -->
             <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm hidden z-50">
                 <div class="fixed inset-0 flex items-center justify-center">

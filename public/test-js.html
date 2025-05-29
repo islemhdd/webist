@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DE Dashboard JavaScript Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        .error { color: red; }
+        .success { color: green; }
+        #console-output { background: #f5f5f5; padding: 10px; height: 200px; overflow-y: auto; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>DE Dashboard JavaScript Test</h1>
+
+    <div class="test-section">
+        <h2>Chart.js Loading Test</h2>
+        <div id="chart-test">
+            <canvas id="testChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Filter Test</h2>
+        <input type="text" id="search-input" placeholder="Search..." />
+        <input type="radio" name="grade_filter" value="all" checked /> All
+        <input type="radio" name="grade_filter" value="1" /> Grade 1
+        <button onclick="testFiltering()">Test Filtering</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Console Output</h2>
+        <div id="console-output"></div>
+    </div>
+
+    <script>
+        // Override console.log to capture output
+        const originalLog = console.log;
+        const originalError = console.error;
+        const consoleOutput = document.getElementById('console-output');
+
+        function logToConsole(message, type = 'log') {
+            const div = document.createElement('div');
+            div.className = type === 'error' ? 'error' : 'success';
+            div.textContent = new Date().toLocaleTimeString() + ': ' + message;
+            consoleOutput.appendChild(div);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            logToConsole(args.join(' '));
+        };
+
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            logToConsole(args.join(' '), 'error');
+        };
+
+        // Test Chart.js
+        console.log('Testing Chart.js initialization...');
+
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js is not loaded!');
+        } else {
+            console.log('Chart.js loaded successfully');
+
+            // Create a test chart
+            try {
+                const ctx = document.getElementById('testChart').getContext('2d');
+                const testChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Validated', 'Pending'],
+                        datasets: [{
+                            data: [8, 4],
+                            backgroundColor: ['#10B981', '#F59E0B'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+                console.log('Test chart created successfully');
+            } catch (error) {
+                console.error('Error creating test chart:', error);
+            }
+        }
+
+        // Test filtering function
+        function testFiltering() {
+            console.log('Testing filtering functionality...');
+
+            const searchValue = document.getElementById('search-input').value;
+            const gradeRadio = document.querySelector('input[name="grade_filter"]:checked');
+            const selectedGrade = gradeRadio ? gradeRadio.value : 'all';
+
+            console.log('Filter values:', { searchValue, selectedGrade });
+
+            // Simulate AJAX call structure
+            const params = new URLSearchParams();
+            if (searchValue && searchValue.trim() !== '') {
+                params.append('matricule', searchValue.trim());
+            }
+            if (selectedGrade && selectedGrade !== 'all') {
+                params.append('grade', selectedGrade);
+            }
+
+            const url = `de/statistics-data?${params.toString()}`;
+            console.log('Would send request to URL:', url);
+
+            // Simulate response data
+            const mockData = {
+                infirmary: {
+                    validated: Math.floor(Math.random() * 10),
+                    non_validated: Math.floor(Math.random() * 5),
+                    total: 0
+                },
+                expulsions: {
+                    'Bagarre': 1,
+                    'Retard': 2
+                },
+                total_expulsions: 3
+            };
+            mockData.infirmary.total = mockData.infirmary.validated + mockData.infirmary.non_validated;
+
+            console.log('Mock response data:', mockData);
+        }
+
+        console.log('JavaScript test page loaded successfully');
+    </script>
+</body>
+</html>

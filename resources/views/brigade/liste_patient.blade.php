@@ -11,7 +11,7 @@
                 </button>
             </div>
             <div class="mb-6">
-                <form method="GET" action="{{ route('patients.index') }}" class="flex items-center space-x-4">
+                <form method="GET" action="{{ route('brigade.list_patients', ['id' => $officer->id]) }}" class="flex items-center space-x-4">
                     <label for="filter-validation" class="text-gray-700 dark:text-gray-300">Trier par :</label>
                     <select name="validation" id="filter-validation"
                         class="form-select rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"

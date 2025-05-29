@@ -145,26 +145,31 @@ class PatientController extends Controller
     public function list(Officer $id, Request $request)
     {
         $officer = $id;
-        $patients = $officer->patients();
-        $query = Patient::query();
+
+        // Commencer avec les patients de l'officier (la relation fait déjà le join avec students et sections)
+        $query = $officer->patients();
 
         // Filter by validation status if specified
         if ($request->filled('validation')) {
             switch ($request->validation) {
                 case '1': // Validé
-                    $query->where('valider', 1);
+                    $query->where('patients.valider', 1);
                     break;
                 case '0': // Non validé
-                    $query->where('valider', 0);
+                    $query->where('patients.valider', 0);
                     break;
                 case '2': // Supprimé
-                    $query->where('valider', 2);
+                    $query->where('patients.valider', 2);
                     break;
                 default: // Tout
                     break;
             }
         }
-        $patients = $query->get();
+
+        // Sélectionner les colonnes nécessaires (le join est déjà fait dans la relation patients())
+        $patients = $query->select('patients.*', 'students.nom', 'students.prenom', 'students.section_id')
+            ->orderBy('patients.created_at', 'desc')
+            ->get();
 
         return view('brigade.liste_patient', compact('patients', 'officer'));
     }
@@ -178,7 +183,12 @@ class PatientController extends Controller
 
         $pateint = new Patient(["matricule" => $request->input("matricule")]);
         $pateint->save();
-        return response()->json($pateint, 201);
+
+        // Retourner JSON pour les requêtes AJAX
+        if (request()->expectsJson()) {
+            return response()->json($pateint, 201);
+        }
+
         return redirect()->back()->with('success', 'Patient ajouté avec succès.');
     }
 

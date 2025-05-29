@@ -9,32 +9,78 @@ use App\Models\Convoncu;
 use App\Models\Exemption;
 use App\Models\Student;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class StatisticsController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $today = Carbon::today();
+        // Déterminer la date à utiliser (par défaut aujourd'hui)
+        if ($request->filled('date_debut') && $request->filled('date_fin')) {
+            $dateDebut = Carbon::parse($request->date_debut);
+            $dateFin = Carbon::parse($request->date_fin);
+        } elseif ($request->filled('date_debut')) {
+            $dateDebut = Carbon::parse($request->date_debut);
+            $dateFin = $dateDebut->copy();
+        } elseif ($request->filled('date_fin')) {
+            $dateFin = Carbon::parse($request->date_fin);
+            $dateDebut = $dateFin->copy();
+        } else {
+            $dateDebut = Carbon::today();
+            $dateFin = Carbon::today();
+        }
 
-        // Récupérer les statistiques des patients pour aujourd'hui
-        $validPatientsToday = Patient::whereDate('created_at', $today)
-            ->where('valider', 1)->count();
-        $invalidPatientsToday = Patient::whereDate('created_at', $today)
-            ->where('valider', 0)->count();
+        // Filtre par matricule si spécifié
+        $matriculeFilter = $request->filled('search_matricule') ? $request->search_matricule : null;
 
-        // Récupérer les statistiques des rendez-vous pour aujourd'hui
-        $consultationRdvToday = ListeRdv::whereDate('date', $today)
-            ->where('motif', 'consultation')->count();
-        $urgenceRdvToday = ListeRdv::whereDate('date', $today)
-            ->where('motif', 'urgences')->count();
+        // Récupérer les statistiques des patients
+        $validPatientsQuery = Patient::whereBetween(\DB::raw('DATE(created_at)'), [$dateDebut->format('Y-m-d'), $dateFin->format('Y-m-d')])
+            ->where('valider', 1);
+        $invalidPatientsQuery = Patient::whereBetween(\DB::raw('DATE(created_at)'), [$dateDebut->format('Y-m-d'), $dateFin->format('Y-m-d')])
+            ->where('valider', 0);
 
-        // Récupérer les statistiques des convocations (totales, pas seulement aujourd'hui)
-        $convocationsWithPsy = Convoncu::whereNotNull('psy')->count();
-        $convocationsWithoutPsy = Convoncu::whereNull('psy')->count();
+        if ($matriculeFilter) {
+            $validPatientsQuery->where('matricule', 'LIKE', '%' . $matriculeFilter . '%');
+            $invalidPatientsQuery->where('matricule', 'LIKE', '%' . $matriculeFilter . '%');
+        }
 
-        // Récupérer les statistiques des exemptions par motif pour aujourd'hui
-        $exemptionsToday = Exemption::whereDate('date_debut', $today)
-            ->selectRaw('motif, COUNT(*) as count')
+        $validPatientsToday = $validPatientsQuery->count();
+        $invalidPatientsToday = $invalidPatientsQuery->count();
+
+        // Récupérer les statistiques des rendez-vous
+        $consultationRdvQuery = ListeRdv::whereBetween(\DB::raw('DATE(date)'), [$dateDebut->format('Y-m-d'), $dateFin->format('Y-m-d')])
+            ->where('motif', 'consultation');
+        $urgenceRdvQuery = ListeRdv::whereBetween(\DB::raw('DATE(date)'), [$dateDebut->format('Y-m-d'), $dateFin->format('Y-m-d')])
+            ->where('motif', 'urgences');
+
+        if ($matriculeFilter) {
+            $consultationRdvQuery->where('matricule', 'LIKE', '%' . $matriculeFilter . '%');
+            $urgenceRdvQuery->where('matricule', 'LIKE', '%' . $matriculeFilter . '%');
+        }
+
+        $consultationRdvToday = $consultationRdvQuery->count();
+        $urgenceRdvToday = $urgenceRdvQuery->count();
+
+        // Récupérer les statistiques des convocations
+        $convocationsWithPsyQuery = Convoncu::whereNotNull('psy');
+        $convocationsWithoutPsyQuery = Convoncu::whereNull('psy');
+
+        if ($matriculeFilter) {
+            $convocationsWithPsyQuery->where('matricule', 'LIKE', '%' . $matriculeFilter . '%');
+            $convocationsWithoutPsyQuery->where('matricule', 'LIKE', '%' . $matriculeFilter . '%');
+        }
+
+        $convocationsWithPsy = $convocationsWithPsyQuery->count();
+        $convocationsWithoutPsy = $convocationsWithoutPsyQuery->count();
+
+        // Récupérer les statistiques des exemptions par motif
+        $exemptionsTodayQuery = Exemption::whereBetween(\DB::raw('DATE(date_debut)'), [$dateDebut->format('Y-m-d'), $dateFin->format('Y-m-d')]);
+
+        if ($matriculeFilter) {
+            $exemptionsTodayQuery->where('matricule', 'LIKE', '%' . $matriculeFilter . '%');
+        }
+
+        $exemptionsToday = $exemptionsTodayQuery->selectRaw('motif, COUNT(*) as count')
             ->groupBy('motif')
             ->get();
 

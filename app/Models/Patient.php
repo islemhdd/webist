@@ -10,7 +10,7 @@ class Patient extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['matricule', 'valider', 'validated_at', 'motif_suppression', 'type_medecin', 'avis_medecin'];
+    protected $fillable = ['matricule', 'valider', 'validated_at', 'motif_suppression', 'type_medecin', 'avis_medecin', 'valider_rhp'];
 
     protected $casts = [
         'valider' => 'integer',

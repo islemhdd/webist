@@ -51,7 +51,7 @@ class DashbaordController extends Controller
 
         $locked = [];
 
-        if ($officer->role->name == 'CC') // chef companie
+        if ($officer->role->name == 'Chef de compagnie') // chef companie
         {
             $isCC = true;
             $lockResult = DB::select("SELECT status FROM list_lock WHERE id = $officer->bat"); //!officer->bat
@@ -63,7 +63,7 @@ class DashbaordController extends Controller
                     ->where('officer_id', $officer->id);
             })->where('consigned', 0)
                 ->orderBy('section_id', 'ASC')->get();
-        } elseif ($officer->role->name == 'CBt') { // chef de bataillon{
+        } elseif ($officer->role->name == 'Chef de batallaint') { // chef de bataillon{
             $lockResult = DB::select("SELECT status FROM list_lock WHERE id = 3");
             $locked = $lockResult[0]->status == 1 ? 'locked' : '';
             $students = Student::where('grade', $officer->bat)->get();
@@ -77,5 +77,14 @@ class DashbaordController extends Controller
             'students' => $students,
             'lock' => $locked
         ]);
+    }
+
+    public function infermerie(Officer $id)
+    {
+        $officer = $id;
+
+        // Cette méthode redirige vers la liste des patients de l'officier
+        // selon le système existant
+        return redirect()->route('brigade.list_patients', ['id' => $officer->id]);
     }
 }

@@ -7,23 +7,16 @@
     $user = auth()->user();
 
     $officer = $user->isOfficer();
-<<<<<<< HEAD
     if ($officer) {
         $officerid = $officer->id;
     } else {
         $officerid = $user->id;
     }
-=======
-    if($officer)
-    $officerid = $officer->id;
-    else
-    $officerid =$user->id;
->>>>>>> a6a6555749544caae8e337b2560012a6f7947423
 
 @endphp
 
 
-@if ($officer == null) {{-- ? un medcin :  --}}
+@if ($officer == null && $user->role->name == 'Medecin') {{-- ? un medcin :  --}}
     {{-- * Menu de rendez-vous avec sous-menu  --}}
 
     <div x-data="{ rdvOpen: false }" class="relative">
@@ -102,14 +95,51 @@
     </div>
 
     {{-- Déconnexion --}}
-    <form method="POST" action="{{ route('logout') }}" class="mt-auto">
+    {{-- <form method="POST" action="{{ route('logout') }}" class="mt-auto">
         @csrf
         <button type="submit"
             class="w-full flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
             <i class="fa-solid fa-sign-out-alt w-5 h-5"></i>
             <span class="ml-3">Déconnexion</span>
         </button>
-    </form>
+    </form> --}}
+@elseif ($user->role->name == 'Directeur des etudes') {{-- ? Director of Studies :  --}}
+    {{-- Dashboard --}}
+    <a href="{{ route('de.dashboard') }}"
+        class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+        <i class="fa-solid fa-chart-bar w-5 h-5"></i>
+        <span class="ml-3">Tableau de bord</span>
+    </a>
+
+    {{-- RHP Management --}}
+    <a href="{{ route('de.rhp.index') }}"
+        class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+        <i class="fa-solid fa-calendar-alt w-5 h-5"></i>
+        <span class="ml-3">Gestion RHP</span>
+    </a>
+
+    {{-- Absences Menu with dropdown --}}
+    <div x-data="{ absencesOpen: false }" class="relative">
+        <button @click="absencesOpen = !absencesOpen"
+            class="flex items-center w-full p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <i class="fa-solid fa-user-injured w-5 h-5"></i>
+            <span class="ml-3">Absences</span>
+            <i class="fa-solid fa-chevron-down ml-auto" :class="{ 'rotate-180': absencesOpen }"></i>
+        </button>
+
+        <div x-show="absencesOpen" class="pl-4 mt-1 space-y-1">
+            <a href="{{ route('de.infirmerie.index') }}"
+                class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                <i class="fa-solid fa-hospital w-5 h-5"></i>
+                <span class="ml-3">Infirmerie</span>
+            </a>
+            <a href="{{ route('de.expulsions.index') }}"
+                class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                <i class="fa-solid fa-door-open w-5 h-5"></i>
+                <span class="ml-3">Exclusions de classe</span>
+            </a>
+        </div>
+    </div>
 @else
     {{-- Principale --}}
     <a href="{{ route('principale', ['id' => $officerid]) }}"
@@ -132,7 +162,8 @@
         <span class="ml-3">Sancions</span>
     </a>
 
-    @if ($officer->role->name == 'CC' || $officer->role->name == 'CBt')
+    @if ($officer->role->name == 'Chef de compagnie' || $officer->role->name == 'Chef de batallaint')
+        {{-- Liste des étudiants --}}
         {{-- Week-end --}}
         <a href="{{ route('weekends', ['id' => $officerid]) }}"
             class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
