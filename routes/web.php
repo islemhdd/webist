@@ -13,6 +13,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SanctionController;
 use App\Http\Controllers\StatisticsController;
+use App\Http\Controllers\BrigadeStatisticsController;
 use Illuminate\Support\Facades\Hash;
 
 // Routes publiques des pages home
@@ -108,7 +109,7 @@ Route::controller(DashbaordController::class)
     ->group(
         function () {
 
-            Route::get("principale", "principale")->name("principale");
+            // Route::get("principale", "principale")->name("principale");
             Route::get("cons", "cons")->name("cons");
             Route::get("parametre", "parametre")->name("parametre");
             // Route::get("logout", "logout")->name("logout");
@@ -116,6 +117,10 @@ Route::controller(DashbaordController::class)
             Route::get("infermerie", "infermerie")->name("infermerie");
         }
     );
+
+// Brigade Statistics Routes
+Route::get('{id}/statistics', [BrigadeStatisticsController::class, 'index'])->name('brigade.statistics');
+Route::get('{id}/statistics/filter', [BrigadeStatisticsController::class, 'filter'])->name('brigade.statistics.filter');
 
 Route::middleware('auth')->group(function () {
     Route::controller(SanctionController::class)->group(function () {

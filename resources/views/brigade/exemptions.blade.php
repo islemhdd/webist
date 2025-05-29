@@ -3,28 +3,15 @@
         <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-6">
             <!-- Header with Add Button -->
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Liste des Patients</h2>
-                <button onclick="showAddPatientModal()"
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Liste des exemptions</h2>
+                <button onclick="showAddexemptionModal()"
                     class="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors shadow-md flex items-center gap-2">
                     <i class="fas fa-plus"></i>
-                    <span>Ajouter Patient</span>
+                    <span>Ajouter exemption</span>
                 </button>
             </div>
-            <div class="mb-6">
-                <form method="GET" action="{{ route('patients.index') }}" class="flex items-center space-x-4">
-                    <label for="filter-validation" class="text-gray-700 dark:text-gray-300">Trier par :</label>
-                    <select name="validation" id="filter-validation"
-                        class="form-select rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
-                        onchange="this.form.submit()">
-                        <option value="" {{ request('validation') === null ? 'selected' : '' }}>Tout</option>
-                        <option value="1" {{ request('validation') === '1' ? 'selected' : '' }}>Validé</option>
-                        <option value="0" {{ request('validation') === '0' ? 'selected' : '' }}>Non validé
-                        </option>
-                    </select>
-                </form>
-            </div>
 
-            <!-- Patients Table -->
+            <!-- exemptions Table -->
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead class="bg-gray-50 dark:bg-gray-700">
@@ -34,58 +21,30 @@
                                 Matricule</th>
                             <th
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Nom</th>
+                                Nom et prenom</th>
+
+
                             <th
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Prénom</th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Section</th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                État</th>
+                                cause</th>
 
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-800">
-                        @foreach ($patients as $patient)
+                        @foreach ($exemptions as $exemption)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                                    {{ $patient->student->matricule }}
+                                    {{ $exemption->student->matricule }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                                    {{ $patient->student->nom }}
+                                    {{ $exemption->student->nom }} {{ $exemption->student->prenom }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                                    {{ $patient->student->prenom }}
+                                    {{ $exemption->student->nom }} {{ $exemption->student->prenom }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                                    {{ $patient->student->section_id }}
+                                    {{ $exemption->motifs }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if ($patient->valider === 1)
-                                        <span
-                                            class="px-2 py-1 inline-flex text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300">
-                                            Validé
-                                        </span>
-                                    @elseif($patient->valider === 0)
-                                        <span
-                                            class="px-2 py-1 inline-flex text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300">
-                                            En attente
-                                        </span>
-                                    @else
-                                        <span
-                                            class="px-2 py-1 inline-flex text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300">
-                                            Supprimé
-                                        </span>
-                                        @if ($patient->motif_suppression)
-                                            <div class="text-xs text-red-600 dark:text-red-400 mt-1">
-                                                Motif: {{ Str::limit($patient->motif_suppression, 30) }}
-                                            </div>
-                                        @endif
-                                    @endif
-                                </td>
-
                             </tr>
                         @endforeach
                     </tbody>
@@ -97,16 +56,16 @@
     <!-- Error Message -->
 
 
-    <!-- Add Patient Modal -->
-    <div id="addPatientModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+    <!-- Add exemption Modal -->
+    <div id="addexemptionModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
         <div class="fixed inset-0 flex items-center justify-center">
             <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-6 w-full max-w-md mx-4">
                 <!-- Modal Header -->
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                        Ajouter un Patient
+                        Ajouter un exemption
                     </h3>
-                    <button onclick="hideAddPatientModal()"
+                    <button onclick="hideAddexemptionModal()"
                         class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
                         <i class="fas fa-times"></i>
                     </button>
@@ -121,7 +80,7 @@
                 </div>
 
                 <!-- Form -->
-                <form id="addPatientForm" action="{{ route('brigade.add_patients', ['id' => $officer->id]) }}"
+                <form id="addexemptionForm" action="{{ route('brigade.add_exemptions', ['id' => $officer->id]) }}"
                     method="POST" class="space-y-6">
                     @csrf
                     <div>
@@ -142,7 +101,7 @@
 
                     <!-- Form Actions -->
                     <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <button type="button" onclick="hideAddPatientModal()"
+                        <button type="button" onclick="hideAddexemptionModal()"
                             class="px-4 py-2 text-sm font-medium text-gray-700 bg-white
                                border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50
                                dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600
@@ -176,9 +135,9 @@
                     </button>
                 </div>
 
-                <p class="text-gray-500 dark:text-gray-400 mb-6">Êtes-vous sûr de vouloir supprimer ce patient ?</p>
+                <p class="text-gray-500 dark:text-gray-400 mb-6">Êtes-vous sûr de vouloir supprimer ce exemption ?</p>
 
-                <form id="deletePatientForm" action=" " method="POST" class="mt-6 flex justify-end space-x-3">
+                <form id="deleteexemptionForm" action=" " method="POST" class="mt-6 flex justify-end space-x-3">
                     @csrf
                     @method('DELETE')
                     <input type="hidden" name="matricule" id="deleteMatricule" value="">
@@ -199,21 +158,21 @@
         </div>
     </div>
 
-    <script>
-        function showAddPatientModal() {
-            document.getElementById('addPatientModal').classList.remove('hidden');
+    {{-- <script>
+        function showAddexemptionModal() {
+            document.getElementById('addexemptionModal').classList.remove('hidden');
         }
 
-        function hideAddPatientModal() {
-            document.getElementById('addPatientModal').classList.add('hidden');
+        function hideAddexemptionModal() {
+            document.getElementById('addexemptionModal').classList.add('hidden');
         }
 
-        function deletePatient(id) {
-            const row = document.querySelector(`tr[data-patient-id="${id}"]`);
+        function deleteexemption(id) {
+            const row = document.querySelector(`tr[data-exemption-id="${id}"]`);
             const matricule = row.querySelector('td').textContent.trim();
 
             document.getElementById('deleteConfirmModal').classList.remove('hidden');
-            document.getElementById('deletePatientForm').action = `/delete-patient`;
+            document.getElementById('deleteexemptionForm').action = `/delete-exemption`;
             document.getElementById('deleteMatricule').value = matricule;
         }
 
@@ -234,8 +193,8 @@
             }, 3000);
         }
 
-        // Add form submission handler for the add patient form only
-        document.getElementById('addPatientForm').addEventListener('submit', async function(e) {
+        // Add form submission handler for the add exemption form only
+        document.getElementById('addexemptionForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const form = e.target;
@@ -266,41 +225,20 @@
         }); <
         script >
             // Validation Modal Functions
-            function showAddPatientModal() {
-                const modal = document.getElementById('addPatientModal');
-                if (modal) modal.classList.remove('hidden');
+            function openValidationModal(exemptionId) {
+                document.getElementById('validationModal').classList.remove('hidden');
+                document.getElementById('validationForm').action = `/exemptions/${exemptionId}/validate-with-diagnosis`;
             }
-
-        function hideAddPatientModal() {
-            const modal = document.getElementById('addPatientModal');
-            if (modal) {
-                modal.classList.add('hidden');
-                // Optionnel : reset les erreurs et le formulaire
-                document.getElementById('errorMessage').style.display = 'none';
-                document.getElementById('addPatientForm').reset();
-            }
-        }
-
-        function openValidationModal(patientId) {
-            const modal = document.getElementById('validationModal');
-            if (modal) {
-                modal.classList.remove('hidden');
-                document.getElementById('validationForm').action = `/patients/${patientId}/validate-with-diagnosis`;
-            }
-        }
 
         function closeValidationModal() {
-            const modal = document.getElementById('validationModal');
-            if (modal) {
-                modal.classList.add('hidden');
-                document.getElementById('avis_medecin').value = '';
-            }
+            document.getElementById('validationModal').classList.add('hidden');
+            document.getElementById('avis_medecin').value = '';
         }
 
         // Delete Modal Functions
-        function openDeleteModal(patientId) {
+        function openDeleteModal(exemptionId) {
             document.getElementById('deleteModal').classList.remove('hidden');
-            document.getElementById('deleteForm').action = `/patients/${patientId}/soft-delete`;
+            document.getElementById('deleteForm').action = `/exemptions/${exemptionId}/soft-delete`;
         }
 
         function closeDeleteModal() {
@@ -320,5 +258,5 @@
             }
         }
     </script>
-    </script>
+    </script> --}}
 </x-brigade>

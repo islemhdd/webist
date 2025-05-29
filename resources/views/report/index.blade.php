@@ -3,27 +3,27 @@
         <div class="bg-white dark:bg-gray-800 rounded-3xl shadow p-6">
             <!-- Reports Table -->
             <div class="overflow-x-auto rounded-2xl">
-                <table class="min-w-full">
-                    <thead>
+                <table class="w-full shadow-md rounded-sm">
+                    <thead class="bg-grey-700 ">
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-300 uppercase">
+                            <th class=" px-4 py-4 text-left text-xs font-bold text-white dark:text-gray-300 uppercase">
                                 Matricule
                             </th>
-                            <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-300 uppercase">
+                            <th class="px-4 py-4 text-left text-xs font-bold text-white dark:text-gray-300 uppercase">
                                 Nom
                             </th>
-                            <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-300 uppercase">
+                            <th class="px-4 py-4 text-left text-xs font-bold text-white dark:text-gray-300 uppercase">
                                 Prenom
                             </th>
-                            <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-300 uppercase">
+                            <th class="px-4 py-4 text-left text-xs font-bold text-white dark:text-gray-300 uppercase">
                                 Section
                             </th>
-                            <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-300 uppercase">
+                            <th class="px-4 py-4 text-left text-xs font-bold text-white dark:text-gray-300 uppercase">
                                 Status
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y-0 divide-transparent">
+                    <tbody class="divide-y-0  divide-gray-200">
                         @if ($reports->isEmpty())
                             <tr>
                                 <td colspan="5" class="text-center py-4 text-gray-500">
@@ -32,10 +32,10 @@
                             </tr>
                         @else
                             <!-- New Report Button -->
-                            <div class="flex justify-start mt-8">
+                            <div class="flex justify-end mt-5 mb-9 mr-3 ">
                                 <a href="{{ route('report.create', ['id' => $officer->id]) }}"
-                                    class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors shadow-md">
-                                    Nouveau Rapport
+                                    class="px-6 py-2 rounded-md font-semibold   text-blue-500 bg-blue-100 dark:bg-blue-900 dark:text-blue-300 hover:bg-blue-200 transition shadow-lg">
+                                    Nouveau Rapport +
                                 </a>
                             </div>
                             @foreach ($reports as $report)
@@ -44,27 +44,23 @@
                                         cursor-pointer transition-all duration-200 ease-in-out
                                         transform hover:-translate-y-px
                                         mb-3 rounded-lg shadow-sm
-                                        @if ($report->refused) bg-amber-50 dark:bg-amber-900/10 hover:bg-amber-100/80 dark:hover:bg-amber-900/20
-                                        @elseif ($report->status === 'DONE')
-                                            bg-indigo-50 dark:bg-indigo-900/10 hover:bg-indigo-100/80 dark:hover:bg-indigo-900/20
-                                        @else
-                                            bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/70 @endif
-                                    ">
 
-                                    <td class="px-4 py-4 text-sm text-gray-900 dark:text-gray-100 first:rounded-l-lg">
+                                            bg-grey-700">
+
+                                    <td class="px-4 py-4 text-sm text-gray-900 dark:text-white first:rounded-l-lg">
                                         {{ $report->student->matricule }}
                                     </td>
-                                    <td class="px-4 py-4 text-sm text-gray-900 dark:text-gray-100">
+                                    <td class="px-4 py-4 text-sm text-gray-900 dark:text-white">
                                         {{ $report->student->nom }}
                                     </td>
-                                    <td class="px-4 py-4 text-sm text-gray-900 dark:text-gray-100">
+                                    <td class="px-4 py-4 text-sm text-gray-900 dark:text-white">
                                         prenom
                                     </td>
-                                    <td class="px-4 py-4 text-sm text-gray-900 dark:text-gray-100">
+                                    <td class="px-4 py-4 text-sm text-gray-900 dark:text-white">
                                         {{ $report->student->section->code() }}
                                     </td>
                                     <td
-                                        class="@if ($report->refused) text-red-500 @elseif($report->status == 'DONE') text-green-400 @else text-gray-100 @endif e px-4 py-4 text-sm last:rounded-r-lg">
+                                        class="@if ($report->refused) text-red-500 @elseif($report->status == 'DONE') text-green-500 @else text-gray-100 @endif e px-4 py-4 text-sm last:rounded-r-lg">
                                         {{ $report->status }}
                                     </td>
                                 </tr>

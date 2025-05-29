@@ -16,6 +16,9 @@ class brigade extends Component
      */
     public function __construct(public Officer $officer)
     {
+        if (! auth()->user()) {
+            return redirect()->route('login');
+        }
         $this->officer = auth()->user()->isOfficer();
     }
 

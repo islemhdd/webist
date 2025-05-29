@@ -18,13 +18,7 @@
                         placeholder="Entrez le matricule" wire:model="mat">
                 </div>
 
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nom de
-                        l'étudiant :</label>
-                    <input type="text" id="name"
-                        class=" indent-2 mt-1 h-8 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-300 shadow-sm sm:text-sm cursor-not-allowed"
-                        placeholder="Nom complet" wire:model="studentName" readonly>
-                </div>
+
             </div>
 
             {{-- Report Information --}}
@@ -37,30 +31,10 @@
                         placeholder="Entrez le titre du rapport" wire:model="title">
                 </div>
 
-                {{-- Medical Checkbox --}}
-                <div class="flex items-center space-x-3">
-                    <input type="checkbox" id="isMedical"
-                        class=" indent-2 h-8 w-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-500 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
-                        wire:model.live="isMedical">
-                    <label for="isMedical" class="text-sm font-medium text-gray-700 dark:text-gray-300">Rapport
-                        médical</label>
-                </div>
+
 
                 {{-- Medical Speciality (Only shown if isMedical is true) --}}
-                @if ($isMedical)
-                    <div class="mt-4">
-                        <label for="speciality"
-                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">Spécialité
-                            médicale:</label>
-                        <select id="speciality"
-                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                            wire:model="destination">
-                            <option value="">Sélectionnez une spécialité</option>
-                            <option value="dentiste">Dentiste</option>
-                            <option value="medecin">Médecin Principal</option>
-                        </select>
-                    </div>
-                @endif
+
 
                 <div>
                     <label for="corps" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Contenu du

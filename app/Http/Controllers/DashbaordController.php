@@ -12,27 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class DashbaordController extends Controller
 {   //hadoma ghir ll officers mazal madrtch ta3 les etudiantes
-    public function cons(Officer $id)
-    {
-        $nextThursday = Carbon::now()->next(Carbon::THURSDAY);
 
-        $consignedStudents = Student::with('consigne')
-            ->where('consigned', 1)
-            ->whereHas('section', function ($query) use ($id) {
-                $query->where('officer_id', $id->id);
-            })
-            ->whereHas('consigne', function ($query) use ($nextThursday) {
-                $query->where('start', '>=', $nextThursday);
-            })
-            ->paginate(10); //the start is this weekende
-
-
-
-
-
-
-        return view('brigade.consigne', compact($consignedStudents));
-    }
 
     public function parametre($id)
     {
@@ -40,6 +20,7 @@ class DashbaordController extends Controller
     }
     public function principale($id)
     {
+        dd(1);
         return view('brigade.principale');
     }
 

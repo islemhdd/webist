@@ -7,18 +7,21 @@
     $user = auth()->user();
 
     $officer = $user->isOfficer();
-<<<<<<< HEAD
+    if (!$user) {
+        return redirect()->route('home');
+    }
+
     if ($officer) {
         $officerid = $officer->id;
     } else {
         $officerid = $user->id;
     }
-=======
-    if($officer)
-    $officerid = $officer->id;
-    else
-    $officerid =$user->id;
->>>>>>> a6a6555749544caae8e337b2560012a6f7947423
+
+    if ($officer) {
+        $officerid = $officer->id;
+    } else {
+        $officerid = $user->id;
+    }
 
 @endphp
 
@@ -93,11 +96,11 @@
             </a>
         </div>
         {{-- Statistiques --}}
-    <a href="{{ route('statistics.index') }}"
-        class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-        <i class="fa-solid fa-chart-pie w-5 h-5"></i>
-        <span class="ml-3">Statistiques</span>
-    </a>
+        <a href="{{ route('statistics.index') }}"
+            class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <i class="fa-solid fa-chart-pie w-5 h-5"></i>
+            <span class="ml-3">Statistiques</span>
+        </a>
 
     </div>
 
@@ -111,11 +114,11 @@
         </button>
     </form>
 @else
-    {{-- Principale --}}
-    <a href="{{ route('principale', ['id' => $officerid]) }}"
+    {{-- Statistiques --}}
+    <a href="{{ route('statistics.index') }}"
         class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-        <i class="fa-solid fa-house w-5 h-5"></i>
-        <span class="ml-3">Principale</span>
+        <i class="fa-solid fa-chart-pie w-5 h-5"></i>
+        <span class="ml-3">Statistiques</span>
     </a>
 
     {{-- Paramètre --}}

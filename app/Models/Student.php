@@ -125,4 +125,8 @@ class Student extends Model
     {
         return $this->hasMany(Sanction::class, "matricule", "matricule");
     }
+    public function exemption(): HasMany
+    {
+        return $this->hasMany(Exemption::class, "matricule", "matricule");
+    }
 }
