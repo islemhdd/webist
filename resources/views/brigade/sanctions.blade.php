@@ -1,4 +1,5 @@
 <x-brigade css="list sanctions">
+
     <div class="max-w-7xl mx-auto py-8 px-4" x-data="{
         sanctions: [],
         loading: true,
@@ -7,26 +8,29 @@
         async fetchSanctions() {
             this.loading = true;
             try {
+
                 const params = new URLSearchParams();
                 if (this.type) params.append('type', this.type);
                 if (this.status) params.append('status', this.status);
-    
-                const response = await fetch(`/sanctions/{{ auth()->user()->id }}?${params.toString()}`, {
+
+                const response = await fetch(`/{{ $id->id }}/sanctions/?${params.toString()}`, {
                     headers: {
                         'Accept': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 });
-    
+
                 if (!response.ok) throw new Error('Erreur réseau');
-    
+
                 this.sanctions = await response.json();
+
             } catch (error) {
                 console.error('Erreur:', error);
                 this.sanctions = [];
             } finally {
                 this.loading = false;
             }
+
         }
     }" @sanctions-updated="fetchSanctions"
         x-init="fetchSanctions">
@@ -191,9 +195,9 @@
                 const url = this.modalType === 'create' ?
                     `/sanctions/{{ auth()->user()->id }}` :
                     `/sanctions/{{ auth()->user()->id }}/` + this.formData.id;
-    
+
                 const method = this.modalType === 'create' ? 'POST' : 'PUT';
-    
+
                 const response = await fetch(url, {
                     method,
                     headers: {
@@ -202,12 +206,12 @@
                     },
                     body: JSON.stringify(this.formData)
                 });
-    
+
                 if (!response.ok) {
                     const error = await response.json();
                     throw new Error(error.message || 'Une erreur est survenue');
                 }
-    
+
                 this.showModal = false;
                 this.formData = {
                     matricule: '',
@@ -346,9 +350,9 @@
                         'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
                     }
                 });
-    
+
                 if (!response.ok) throw new Error('Erreur lors de la suppression');
-    
+
                 this.showDeleteModal = false;
                 this.sanctionToDelete = null;
                 this.$dispatch('sanctions-updated');
@@ -395,4 +399,8 @@
             </div>
         </div>
     </div>
+    <script>
+        Alpine.start();
+    </script>
+
 </x-brigade>

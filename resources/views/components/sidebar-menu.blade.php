@@ -142,7 +142,7 @@
     </div>
 @else
     {{-- Principale --}}
-    <a href="{{ route('principale', ['id' => $officerid]) }}"
+    <a href="{{ route('brigade.statistics',["id"=>$officerid]) }}"
         class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
         <i class="fa-solid fa-house w-5 h-5"></i>
         <span class="ml-3">Principale</span>

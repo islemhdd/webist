@@ -34,10 +34,12 @@ class AuthController extends Controller
                 return redirect()->route('de.dashboard');
             } elseif (in_array($userRole, ['Chef de compagnie', 'Chef de batallaint', 'Chef de brigade', 'Chef division', 'Directeur général'])) {
                 // Check if user is an officer (has officer data)
+
                 $officer = auth()->user()->isOfficer();
                 if ($officer) {
+                    // dd(1);
                     // Redirect officers (Chef de compagnie, Chef de batallaint, etc.) to their main dashboard
-                    return redirect()->route('principale', ['id' => $officer->id]);
+                    return redirect()->route('brigade.statistics',['id'=>$officer->id] );
                 } else {
                     // If user has officer role but no officer data, logout and show error
                     Auth::logout();

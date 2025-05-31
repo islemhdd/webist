@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BrigadeStatisticsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ConvoncuController;
 use App\Http\Controllers\DashbaordController;
@@ -179,4 +180,15 @@ Route::middleware('auth')->prefix('de')->name('de.')->group(function () {    // 
     // Class Expulsions
     Route::resource('expulsions', ExpulsionController::class);
     Route::get('/expulsions/{expulsion}/edit', [ExpulsionController::class, 'edit'])->name('expulsions.edit');
+});
+Route::get('{id}/statistics', [BrigadeStatisticsController::class, 'index'])->name('brigade.statistics');
+Route::get('{id}/statistics/filter', [BrigadeStatisticsController::class, 'filter'])->name('brigade.statistics.filter');
+Route::middleware('auth')->group(function () {
+    Route::controller(SanctionController::class)->group(function () {
+        Route::get('{id}/sanctions', 'index')->name('sanctions.index');
+        Route::get('{id}/sanctions/create', 'create')->name('sanctions.create');
+        Route::post('{id}/sanctions', 'store')->name('sanctions.store');
+        Route::put('{id}/sanctions/{sanction}', 'update')->name('sanctions.update');
+        Route::delete('{id}/sanctions/{sanction}', 'destroy')->name('sanctions.destroy');
+    });
 });

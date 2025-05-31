@@ -17,10 +17,10 @@ return new class extends Migration
 
             $table->unsignedBigInteger('matricule');  // Add this line
 
-            $table->enum('name', ['consigne', 'arret', 'blame', 'avert']);
+            $table->enum('type', ['consigne', 'arret', 'blame', 'avert']);
             $table->foreign('matricule')->references('matricule')->on('students')->onDelete('cascade');
-            $table->date('from');
-            $table->date('to');
+            $table->date('date_debut');
+            $table->date('date_fin');
             $table->string('motif');
         });
     }

@@ -91,8 +91,10 @@ class ReportController extends Controller
         $officer = $id;
         // TODO : check if the officer is the owner of the report
         $avis = $request->input('avis');
+
         // if()
-        $avisRole = 'avis' . $officer->role->name;
+       $role=str_replace(" ","_",$officer->role->name);
+        $avisRole = 'avis' .$role;
 
         $report->update([
             $avisRole => $avis,

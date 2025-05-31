@@ -159,6 +159,7 @@ class Officer extends User
             case DIRECTEUR_GENERAL:
                 // Inform owner with DesitionMade
                 $report->status = "DONE";
+
                 $report->owner->notify(new DesitionMade($report));
                 $report->destination = $report->officer_id;
                 break;
