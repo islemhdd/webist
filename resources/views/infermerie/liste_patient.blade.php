@@ -3,7 +3,7 @@
     <div class="container mx-auto">
         <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
             <div class="p-6">
-                <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-6">Liste des patients</h1>
+                <h1 class="text-2xl font-semibold text-sky-400 dark:text-gray-200 mb-10 flex justify-center ">Liste des patients</h1>
 
                 <!-- Messages de succès et d'erreur -->
                 @if(session('success'))
@@ -29,10 +29,10 @@
                 @endif
 
                 <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 sm:space-x-4">
-                    <form method="GET" action="{{ route('patients.index') }}" class="flex items-center space-x-4">
+                    <form method="GET" action="{{ route('patients.index') }}" class="flex items-center space-x-10 w-[80%]">
                         <label for="filter-validation" class="text-gray-700 dark:text-gray-300">Trier par :</label>
                         <select name="validation" id="filter-validation"
-                            class="form-select rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                            class="form-select h-9 w-[35%] rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
                             onchange="this.form.submit()">
                             <option value="" {{ request('validation') === null ? 'selected' : '' }}>Tout</option>
                             <option value="1" {{ request('validation') === '1' ? 'selected' : '' }}>Validé</option>
@@ -42,7 +42,7 @@
 
                         <label for="per-page" class="text-gray-700 dark:text-gray-300">Par page :</label>
                         <select name="per_page" id="per-page"
-                            class="form-select rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                            class="form-select h-9 w-[35%] rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
                             onchange="this.form.submit()">
                             <option value="15" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
                             <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
@@ -62,7 +62,7 @@
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead class="bg-gray-50 dark:bg-gray-700">
-                            <tr>
+                            <tr class="bg-sky-100">
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                     Matricule</th>
@@ -112,11 +112,11 @@
                                         @if($patient->valider === 0)
                                             <!-- Actions seulement pour les patients non validés -->
                                             <button onclick="openValidationModal({{ $patient->id }})"
-                                                class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
+                                                class="bg-sky-500 hover:bg-sky-400 text-white px-3 py-1 rounded-full text-sm">
                                                 Valider
                                             </button>
                                             <button onclick="openDeleteModal({{ $patient->id }})"
-                                                class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">
+                                                class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-full text-sm">
                                                 Supprimer
                                             </button>
 
@@ -272,7 +272,7 @@
                                 Annuler
                             </button>
                             <button type="submit"
-                                class="px-4 py-2 bg-green-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-green-700">
+                                class="px-4 py-2 bg-sky-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-sky-400">
                                 Valider Patient
                             </button>
                         </div>
@@ -328,19 +328,19 @@
     <style>
         .badge-warning {
             background-color: #fbbf24;
-            color: #92400e;
+            color: white;
         }
         .badge-success {
             background-color: #34d399;
-            color: #065f46;
+            color: white;
         }
         .badge-danger {
             background-color: #f87171;
-            color: #991b1b;
+            color: white;
         }
         .badge-secondary {
             background-color: #9ca3af;
-            color: #374151;
+            color: white;
         }
     </style>
 </x-infermerie>

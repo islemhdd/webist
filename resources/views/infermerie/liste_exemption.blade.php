@@ -3,26 +3,32 @@
         <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
             <div class="p-6">
             <!-- Liste des exemptions -->
-            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
-                <div class="p-6">
-                    <form method="GET" action="{{ route('exemptions.index') }}" class="mb-6 flex items-center gap-4">
-                        <label class="text-sm text-gray-700 dark:text-gray-200">
-                            Date début:
-                            <input type="date" name="date_debut" value="{{ request('date_debut') }}" class="ml-2 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
-                        </label>
-                        <label class="text-sm text-gray-700 dark:text-gray-200">
-                            Date fin:
-                            <input type="date" name="date_fin" value="{{ request('date_fin') }}" class="ml-2 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
-                        </label>
-                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Filtrer</button>
-                        <a href="{{ route('exemptions.index') }}" class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500">Réinitialiser</a>
+            
+                
+                    <h1 class="text-2xl font-semibold text-sky-400 dark:text-gray-200 flex justify-center mb-6">Liste des exemptions</h1>
+                  
+                    <form method="GET" action="{{ route('exemptions.index') }}" class="mb-6 flex items-center gap-4 w-full ">
+                        <div class="space-y-10 w-[100%] mx-12">
+                       <div class=" "> <label class="text-sm text-gray-700 dark:text-gray-200">
+                        Date début: </label>
+                        <input type="date" name="date_debut" value="{{ request('date_debut') }}" class="mx-2 rounded-full h-8 border p-1 pl-2 w-[40%]  border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                   
+                    <label class="text-sm text-gray-700 dark:text-gray-200">
+                        Date fin:</label>
+                        <input type="date" name="date_fin" value="{{ request('date_fin') }}" class="mx-2 rounded-full border h-8 p-1 pl-2 w-[40%] border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div class=" flex justify-center space-x-10">
+                        <button type="submit" class="px-4 py-2 bg-sky-500 text-white mx-10 w-[12%] rounded hover:bg-sky-400">Filtrer</button>
+                        <a href="{{ route('exemptions.index') }}" class="px-6 py-2 bg-gray-400 text-white w-[12%]  rounded hover:bg-gray-500">Réinitialiser</a>
+                    </div>
+                    </div>
                     </form>
+                  
 
-                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">Liste des exemptions</h2>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-700">
-                                <tr>
+                                <tr class="bg-sky-100">
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Matricule</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Motif</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date début</th>
@@ -49,8 +55,8 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </div>
+                
+           
         </div>
     </div>
 </x-infermerie>

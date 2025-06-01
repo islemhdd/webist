@@ -18,8 +18,13 @@
 
 @if ($officer == null && $user->role->name == 'Medecin') {{-- ? un medcin :  --}}
     {{-- * Menu de rendez-vous avec sous-menu  --}}
-
-    <div x-data="{ rdvOpen: false }" class="relative">
+  {{-- Statistiques --}}
+   <a href="{{ route('statistics.index') }}"
+       class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+       <i class="fa-solid fa-chart-pie w-5 h-5"></i>
+       <span class="ml-3">Statistiques</span>
+   </a>
+    <div x-data="{ rdvOpen: false }" class="relative  overflow-scroll">
         <button @click="rdvOpen = !rdvOpen"
             class="flex items-center w-full p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
             <i class="fa-solid fa-calendar-check w-5 h-5"></i>
@@ -85,12 +90,7 @@
                 <span class="ml-3">Liste des exemptions</span>
             </a>
         </div>
-        {{-- Statistiques --}}
-    <a href="{{ route('statistics.index') }}"
-        class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-        <i class="fa-solid fa-chart-pie w-5 h-5"></i>
-        <span class="ml-3">Statistiques</span>
-    </a>
+  
 
     </div>
 

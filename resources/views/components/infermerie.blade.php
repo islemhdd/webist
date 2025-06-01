@@ -28,9 +28,9 @@
     <div class="min-h-screen flex">
         <!-- Sidebar -->
         <aside
-            class="w-64  bg-white dark:bg-gray-800 border-r dark:border-gray-700 fixed h-full shadow-lg transition-colors duration-200">
-            <div class="flex items-center justify-center p-4 border-b dark:border-gray-700">
-                <img src="/logo.png" alt="Logo" class="h-8">
+            class="w-64  bg-white dark:bg-gray-800 border-r dark:border-gray-700 fixed h-full shadow-lg transition-colors duration-200 overflow-scroll">
+            <div class="flex items-center justify-center p-4  dark:border-gray-700">
+                <img src="/logo.png" alt="Logo" class=" w-[50%] rounded-full">
             </div>
 
             <nav class="p-4 space-y-2">
@@ -41,13 +41,13 @@
         <!-- Main Content -->
         <div class="ml-64 flex-1">
             <!-- Top Navigation -->
-            <header
-                class="bg-white dark:bg-gray-800 border-b dark:border-gray-700 h-16 fixed w-full z-20 transition-colors duration-200">
+            <header dir="rtl"
+                class="bg-white dark:bg-gray-800 border-b dark:border-gray-700 h-16 fixed z-20 transition-colors duration-200 rounded-3xl shadow-xl  w-[77%] mx-12 ">
                 @include('components.header')
             </header>
 
             <!-- Main Content Area -->
-            <main class="pt-16 p-6">
+            <main class="pt-24 p-6 mx-6">
                 <!-- Flash Messages -->
                 <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)">
                     @if (session('success'))

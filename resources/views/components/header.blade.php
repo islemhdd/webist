@@ -3,9 +3,9 @@
 <div class="flex items-center justify-between h-full px-6">
 
     <!-- Profil utilisateur avec contrôles -->
-    <div class="flex items-center space-x-4">
+    <div  class="flex items-center space-x-4  ">
         <!-- Avatar et nom -->
-        <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-3 space-x-reverse">
             <img src="/profile.jpg" alt="Profile" class="h-8 w-8 rounded-full">
             <span class="text-gray-700 dark:text-gray-100">{{ auth()->user()->username ?? 'Utilisateur' }}</span>
         </div>

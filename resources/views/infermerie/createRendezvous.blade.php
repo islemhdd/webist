@@ -1,8 +1,8 @@
 <x-infermerie css='createRendezvous'>
-    <div class="container mx-auto px-4 py-6">
-        <div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+    <div class="container mx-auto  py-6">
+        <div class="max-w-7xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
             <div class="p-6">
-                <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-6">Créer un rendez-vous</h2>
+                <h2 class="text-2xl font-semibold text-sky-400 dark:text-gray-200 mb-6 flex justify-center">Créer un rendez-vous</h2>
 
                 <form method="POST" action="{{ route('liste_rdv.store') }}" class="space-y-6">
                     @csrf
@@ -16,7 +16,7 @@
                                id="matricule"
                                name="matricule"
                                value="{{ old('matricule') }}"
-                               class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300"
+                               class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 hover:bg-gray-100"
                                required>
                         @error('matricule')
                             <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -30,7 +30,7 @@
                         </label>
                         <select name="motif"
                                 id="motif"
-                                class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300"
+                                class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 bg-gray-100"
                                 required>
                             <option value="">Sélectionnez un motif</option>
                             <option value="consultation" {{ old('motif') == 'consultation' ? 'selected' : '' }}>
@@ -52,7 +52,7 @@
                         </label>
                         <select name="service"
                                 id="service"
-                                class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300"
+                                class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 bg-gray-100"
                                 required>
                             <option value="">Sélectionnez un service</option>
                             @foreach($services as $value => $label)
@@ -75,7 +75,7 @@
                                id="date"
                                name="date"
                                value="{{ old('date') }}"
-                               class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300"
+                               class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 bg-gray-100"
                                required>
                         @error('date')
                             <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -83,9 +83,9 @@
                     </div>
 
                     <!-- Submit Button -->
-                    <div class="flex justify-end">
+                    <div class="flex justify-center">
                         <button type="submit"
-                                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600">
+                                class="px-6 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600 shadow-md hover:shadow-lg transition-all duration-200 ">
                             Créer le rendez-vous
                         </button>
                     </div>
