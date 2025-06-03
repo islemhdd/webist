@@ -34,7 +34,9 @@ class Report extends Model
     }
     public function updateStatus(string $status)
     {
-        if (in_array($status, ['CC', 'CDt', 'CBt', 'DIV', 'MED', 'DG']))
+        if (in_array($status, ['Chef de compagnie', 'Chef de brigade', 'Chef de batallaint
+
+        ', 'Chef division', 'Medecin', 'Directeur général']))
             $this->status = $status;
         $this->save();
     }

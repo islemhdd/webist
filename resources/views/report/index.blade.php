@@ -24,6 +24,13 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y-0  divide-gray-200">
+                        <!-- New Report Button -->
+                        <div class="flex justify-end mt-5 mb-9 mr-3 ">
+                            <a href="{{ route('report.create', ['id' => $officer->id]) }}"
+                                class="px-6 py-2 rounded-md font-semibold   text-blue-500 bg-blue-100 dark:bg-blue-900 dark:text-blue-300 hover:bg-blue-200 transition shadow-lg">
+                                Nouveau Rapport +
+                            </a>
+                        </div>
                         @if ($reports->isEmpty())
                             <tr>
                                 <td colspan="5" class="text-center py-4 text-gray-500">
@@ -31,13 +38,6 @@
                                 </td>
                             </tr>
                         @else
-                            <!-- New Report Button -->
-                            <div class="flex justify-end mt-5 mb-9 mr-3 ">
-                                <a href="{{ route('report.create', ['id' => $officer->id]) }}"
-                                    class="px-6 py-2 rounded-md font-semibold   text-blue-500 bg-blue-100 dark:bg-blue-900 dark:text-blue-300 hover:bg-blue-200 transition shadow-lg">
-                                    Nouveau Rapport +
-                                </a>
-                            </div>
                             @foreach ($reports as $report)
                                 <tr onclick="window.location='{{ route('report.show', ['id' => $officer->id, 'report_id' => $report->id]) }}'"
                                     class="

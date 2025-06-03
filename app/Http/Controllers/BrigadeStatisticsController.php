@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Officer;
 use App\Models\Sanction;
 use App\Models\Student;
-use App\Models\Patient;
+use App\Models\Report;
 use App\Models\Sortie;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -19,21 +19,23 @@ class BrigadeStatisticsController extends Controller
         $query = Student::query();
 
         switch ($officer->role->name) {
-            case 'CC': // Chef de compagnie - show only their sections
+            case 'Chef de compagnie':
+                // Students in the officer's sections
                 return $query->whereIn('section_id', function ($q) use ($officer) {
                     $q->select('id')
                         ->from('sections')
                         ->where('officer_id', $officer->id);
                 });
-            case 'CBt': // Chef de bataillon - show students in their battalion
+
+            case 'Chef de brigade':
+                // Students in the same battalion (grade)
                 return $query->where('grade', $officer->bat);
-            case 'CBr': // Chef de brigade
-            case 'DIV': // Division
-                return $query; // Show all students
+
             default:
-                return $query->whereRaw('1 = 0'); // Return empty query for other roles
+                return $query;
         }
     }
+
 
     private function getWeekendStats($studentMatricules)
     {
@@ -53,9 +55,10 @@ class BrigadeStatisticsController extends Controller
 
     private function getSanctionsStats($studentMatricules)
     {
-        $now = now();
-        $weekendStart = $now->copy()->endOfWeek()->subDay(); // Saturday
-        $weekendEnd = $now->copy()->endOfWeek(); // Sunday
+        $today = today();
+
+        $weekendStart = $today->copy()->endOfWeek()->subDay(); // Saturday
+        $weekendEnd = $today->copy()->endOfWeek(); // Sunday
 
         // Get weekend restrictions (consignes for this weekend)
         $weekendRestrictions = Sanction::whereIn('matricule', $studentMatricules)
@@ -68,14 +71,16 @@ class BrigadeStatisticsController extends Controller
         // Get active arrests (not yet finished)
         $activeArrests = Sanction::whereIn('matricule', $studentMatricules)
             ->where('type', 'arret')
-            ->where('date_fin', '>=', $now)
+            ->whereDate('date_fin', '>=', $today)
+
             ->count();
 
         // Get past arrests (already finished)
         $pastArrests = Sanction::whereIn('matricule', $studentMatricules)
             ->where('type', 'arret')
-            ->where('date_fin', '<', $now)
+            ->where('date_fin', '<', $today)
             ->count();
+
 
         // Get warnings (avertissements)
         $warnings = Sanction::whereIn('matricule', $studentMatricules)
@@ -94,22 +99,24 @@ class BrigadeStatisticsController extends Controller
     private function getPatineStats($studentMatricules)
     {
         return [
-            'pending' => Patient::whereIn('matricule', $studentMatricules)
-                ->where('valider', 0)
+            'pending' => Report::whereIn('student_id', $studentMatricules)
+                ->where('status', '!=', 'DONE')
+                ->where('status', '!=', 'REFUSED')
                 ->count(),
-            'rejected' => Patient::whereIn('matricule', $studentMatricules)
-                ->where('valider', 2)
+            'rejected' => Report::whereIn('student_id', $studentMatricules)
+                ->where('status', 'REFUSED')
                 ->count(),
-            'validated' => Patient::whereIn('matricule', $studentMatricules)
-                ->where('valider', 1)
+            'validated' => Report::whereIn('student_id', $studentMatricules)
+                ->where('status', 'DONE')
                 ->count(),
-            'total' => Patient::whereIn('matricule', $studentMatricules)
+            'total' => Report::whereIn('student_id', $studentMatricules)
                 ->count()
         ];
     }
 
     private function getTotalStudents($studentMatricules)
     {
+
         return Student::whereIn('matricule', $studentMatricules)->count();
     }
 
@@ -125,6 +132,7 @@ class BrigadeStatisticsController extends Controller
         $weekendStats = $this->getWeekendStats($studentMatricules);
         $sanctionsStats = $this->getSanctionsStats($studentMatricules);
         $patineStats = $this->getPatineStats($studentMatricules);
+
         $totalStudents = $this->getTotalStudents($studentMatricules);
 
         return view('brigade.statistics', compact(

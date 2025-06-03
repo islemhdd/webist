@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BrigadeExemptionController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ConvoncuController;
 use App\Http\Controllers\DashbaordController;
@@ -14,6 +15,8 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SanctionController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\BrigadeStatisticsController;
+use App\Http\Controllers\StudentController;
+use App\Models\Student;
 use Illuminate\Support\Facades\Hash;
 
 // Routes publiques des pages home
@@ -145,12 +148,29 @@ Route::prefix('{id}')->controller(ReportController::class)->group(function () {
     Route::post('refuse/{report}', 'refuse')->name('report.refuse');
     Route::get('showNotification/{report_id}', 'unsetReportNotificationAndRedirect')->name('report.unsetNotificationAndShowReport');
 });
+Route::controller(StudentController::class)->group(function () {
+    Route::get("students", "index")->name("students.index");
+    Route::post("search", "search")->name("student.search");
+    Route::get("show/{matricule}", "show")->name("student.show");
+});
+
+
+
+
+
+Route::controller(BrigadeExemptionController::class)->group(
+    function () {
+        Route::get("exemptions", "index")->name("brigade.exemptions");
+    }
+);
 
 // Notifications Routes
 
 Route::get("test1", function () {
+    $students = Student::all();
 
-    return dd(Hash::make("123456789"));
+    return view("brigade.students", compact("students"));
 });
 
-Route::resource('patients', PatientController::class);
+// Route::
+// Route::resource('patients', PatientController::class);

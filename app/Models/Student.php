@@ -72,10 +72,10 @@ class Student extends Model
     }
     public function sortie(): Sortie
     {
-        //! retuning the most recent sortie
+        // Get the most recent sortie
+        $mostRecentSortie = $this->sorties->sortByDesc('created_at')->first();
 
-        $sortie = $this->sorties->sortByDesc('created_at')->first();
-        if (!$sortie) {
+        if (!$mostRecentSortie) {
             return new Sortie([
                 "student_id" => $this->matricule,
                 'from' => null,
@@ -84,14 +84,17 @@ class Student extends Model
             ]);
         }
 
-        $from = $sortie->from;
-        $to = $sortie->to;
+        // If you want to find any overlapping sorties within the same time period
+        // you might want something like this instead:
+        $overlappingSortie = $this->sorties()
+            ->where(function ($query) use ($mostRecentSortie) {
+                $query->whereBetween('from', [$mostRecentSortie->from, $mostRecentSortie->to])
+                    ->orWhereBetween('to', [$mostRecentSortie->from, $mostRecentSortie->to]);
+            })
+            ->orderBy('created_at', 'desc')
+            ->first();
 
-
-        $sortie = $this->sorties()->whereBetween('from', [$from, $to])->whereBetween('to', [$from, $to])->first();
-        //  because we can have an other sortie dakhl hadak intervale
-
-        return $sortie;
+        return $overlappingSortie ?? $mostRecentSortie;
     }
     /* this filters a student collection(used in the search)
     * @param Collection $collection

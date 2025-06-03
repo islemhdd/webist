@@ -1,98 +1,96 @@
 <x-brigade css="report">
     <div class="max-w-6xl mx-auto py-8 px-2">
-        <div class=" bg-white dark:bg-grey-500 backdrop-blur-sm rounded-3xl shadow-lg p-8 mb-8">
+        <!-- Search Section -->
+
+
+        <!-- Report Content Card -->
+        <div class="bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl shadow-lg p-8 mb-8">
             <!-- Header -->
-            <!-- Header -->
-            <div class="text-center mb-12 space-y-2">
-                <h1 class=" text-center text-xl  text-black">
+            <div class="text-center mb-8 space-y-2">
+                <h1 class="text-xl font-bold text-white">
                     الــجمــهــوريــــــــة الجــــزائــريـــــــة الــديــمــقـراطيـــــــة الــــشعبيــــــة
                 </h1>
-                <div class="flex justify-between items-start pt-8">
-                    <img src="/img/enpei.png" alt="ENPEI" class="w-32 h-32 object-contain ml-80 relative left-28  mt-2">
-                    <div class="  text-right space-y-1 flex-col justify-end ">
-                        <p class="text-black">وزارة الـدفـــــــاع الوطنــــــــي</p>
-                        <p class="text-black">اركـــــان الـجـيــش الوطـني الشعبـي</p>
-
-                        <p class="text-black">الـمدرســة الوطـنـيـة التحــضـيـريـة</p>
-                        <p class="text-black">لــدراســــــــــات مــهــنـــــــدس</p>
-                        <p class="text-black">بــــــــــــاجي مختــــــــــــــار</p>
-                        <p class="text-black">قـســـــــــم الـتعـــليـــــــــــم</p>
-                        <p class="text-black">لـــــــــواء الـطلـبــــــــــــــة</p>
-
+                <div class="flex justify-between items-start">
+                    <div class="space-y-1 text-right">
+                        <p class="text-gray-300">وزارة الـدفـــــــاع الوطنــــــــي</p>
+                        <p class="text-gray-300">أركـــــــــــــــــــــــــــــــــــــــان</p>
+                        <p class="text-gray-300">الجيـش الوطـــــني الشــــــعبـي</p>
+                        <p class="text-gray-300">المدرسـة الوطنية التحــضيريـة</p>
+                        <p class="text-gray-300">لــدراســــــــــات المهـنـــــــدس</p>
+                        <p class="text-gray-300">بــــــــــــــــاجي مختــــــــــــــار</p>
+                        <p class="text-gray-300">قـســـــــــــــــم الـتعـــليـــــــــــم</p>
+                        <p class="text-gray-300">لــــــــــــــواء الـطلـبــــــــــــــة</p>
+                        <p class="text-gray-300">الكتيبــــــــــــــــة <span></span></p>
                     </div>
-
+                    <img src="/img/enpei.png" alt="ENPEI" class="w-32 h-32 object-contain">
                 </div>
             </div>
 
             <!-- Report Number -->
-            <div class="text-right mb-6 ">
+            <div class="text-right mb-6 text-gray-200">
                 <p>رقم : <span
                         class="font-semibold">{{ $report->id }}</span>/{{ $report->created_at->format('Y') }}/ك{{ $report->student->grade }}/
                     ل ط / ق ت / م. و. ت. د .م</p>
             </div>
 
-
             <!-- Report Info -->
-            <div class="space-y-2 mb-36 flex-col justify-end text-black text-left">
-                <p class="ml-12 pl-5">الرويبة في:<span class="font-semibold text-black">{{ $report->created_at }}</span>
-                </p>
-                <p class="ml-56 pl-2"><span>:</span> الاســم<span class="font-semibold text-black">
-                        {{ $report->student->nom }}</span></p>
-                <p class="ml-56 pl-2 "><span></span> :الـلقـب<span
-                        class="font-semibold text-black">{{ $report->student->prenom }}</span></p>
-                <p class="ml-52 pl-2 "><span></span>السريــة <span
-                        class="font-semibold text-black">{{ $report->student->companie() }}</span></p>
+            <div class="space-y-4 mb-8 text-right">
+                <p class="text-gray-200">الرويبة في: <span
+                        class="font-semibold text-white">{{ $report->created_at }}</span></p>
+                <p class="text-gray-200">الإسم واللقـب: <span
+                        class="font-semibold text-white">{{ $report->student->nom }}</span></p>
+                <p class="text-gray-200">السريــة: <span
+                        class="font-semibold text-white">{{ $report->student->companie() }}</span></p>
             </div>
 
             <!-- Report Content -->
             <div class="mb-8">
-                <h2 class="text-right mb-6 text-2xl font-bold text-black border-b border-gray-700/50 pb-4">
+                <h2 class="text-right mb-6 text-2xl font-bold text-white border-b border-gray-700/50 pb-4">
                     {{ $report->title }}</h2>
-                <p class="text-black text-right leading-relaxed px-4">{{ $report->corps }}
-                </p>
+                <p class="text-gray-200 text-right leading-relaxed px-4">{{ $report->corps }}</p>
             </div>
 
             <!-- Avis Section -->
             <div class="space-y-6">
                 @php
                     $roles = [
-                        'CC' => 'قرار قائد السرية',
-
-                        'CBt' => 'قرار قائد الكتيبة',
-
-                        'CBr' => ' قرار قائد لواء الطلبة',
-                        'DIV' => 'قرار المدير العام لدراسات مهندس',
-                        'MED' => 'قرار الطبيب الرئيسي',
-                        'DG' => 'قرار مدير التعليم',
+                        'Chef de compagnie',
+                        'Chef de batallaint',
+                        'Chef de brigade',
+                        'Chef division',
+                        'Medecin',
+                        'Directeur général',
                     ];
                     $stopped = false;
                 @endphp
 
-                @foreach ($roles as $role => $roleName)
-                    @if (!(!$report->is_medical && $role == 'MED'))
+                @foreach ($roles as $roleName)
+
+                    @if (!(!$report->is_medical && $roleName == 'Medecin'))
                         @php
-                            $avis = 'Avis' . $role;
-                            if ($report->refused && $report->status === $role) {
+
+                            $avis = 'Avis' . str_replace(' ', '_', $roleName);
+                            if ($report->refused && $report->status === $roleName) {
                                 $stopped = true;
                             }
                         @endphp
 
                         @if (!$report->refused || !$stopped)
                             <div class="border-t dark:border-gray-700 pt-4">
-                                <h3 class="text-lg font-semibold mb-3 text-black dark:text-white">
+                                <h3 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100">
                                     {{ $roleName }}:
                                 </h3>
 
-                                @if ($officer->role->name == $role)
+
+                                @if ($officer->role->name == $roleName)
                                     @if (empty($report->$avis))
                                         <form id="avisForm">
                                             <div class="space-y-2">
                                                 <textarea id="avisText" name="avis{{ strtolower($roleName) }}"
-                                                    class="w-full p-4 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-black dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('avis') !border-red-500 dark:!border-red-500 @enderror"
-                                                    rows="4" placeholder="{{ $role == 'DG' ? 'donner votre decision' : 'votre avis' }}"></textarea>
+                                                    class="w-full p-4 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-pink-400 focus:border-transparent @error('avis') border-red-500 dark:border-red-500 @enderror"
+                                                    rows="4" placeholder="{{ $roleName == 'Directeur général' ? 'donner votre decision' : 'votre avis' }}"></textarea>
                                                 @error('avis')
-                                                    <p class="text-red-500 dark:text-red-400 text-sm mt-1">
-                                                        {{ $message }}</p>
+                                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                                 @enderror
                                             </div>
                                             <div class="flex justify-end gap-4 mt-4">
@@ -108,20 +106,20 @@
                                         </form>
                                     @else
                                         <div
-                                            class="p-4 rounded-xl {{ $role === 'DG' ? 'bg-green-50/50 dark:bg-green-900/20' : 'bg-gray-50/50 dark:bg-gray-800/50' }}">
-                                            <p class="text-black dark:text-white">{{ $report->$avis }}</p>
+                                            class="p-4 rounded-xl {{ $roleName === 'Directeur général' ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-gray-700' }}">
+                                            <p class="text-gray-700 dark:text-gray-300">{{ $report->$avis }}</p>
                                         </div>
                                     @endif
                                 @else
                                     @if (!empty($report->$avis))
                                         <div
-                                            class="p-4 {{ $role === 'DG' ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-gray-700' }} rounded-xl">
-                                            <p class="text-gray-700 dark:text-gray-300">
-                                                {{ $report->$avis }}</p>
+                                            class="p-4 {{ $roleName == 'Directeur général' ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-gray-700' }} rounded-xl">
+                                            <p class="text-gray-700 dark:text-gray-300">{{ $report->$avis }}</p>
                                         </div>
                                     @else
                                         <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
-                                            <p class="text-gray-500 dark:text-gray-400">l'avis n'existe pas
+                                            <p class="text-gray-500 dark:text-gray-400">
+                                                {{ $roleName == 'Directeur général' ? 'decision pas encore fait' : "avis n'exist pas" }}
                                             </p>
                                         </div>
                                     @endif
@@ -129,7 +127,7 @@
                             </div>
                         @endif
 
-                        @if ($report->refused && $report->status === $role)
+                        @if ($report->refused && $report->status === $roleName)
                             <div class="border-t dark:border-gray-700 pt-6">
                                 <div class="bg-red-50 dark:bg-red-900/20 rounded-xl p-6">
                                     <div class="flex items-center mb-4">
@@ -139,8 +137,7 @@
                                         </h3>
                                     </div>
                                     <div class="pl-8">
-                                        <h4 class="text-md font-medium text-gray-900 dark:text-gray-100 mb-2">
-                                            Motif du
+                                        <h4 class="text-md font-medium text-gray-900 dark:text-gray-100 mb-2">Motif du
                                             refus:
                                         </h4>
                                         <p
@@ -159,15 +156,14 @@
 
         <!-- set avis -->
         @php
-            $avis = 'Avis' . $officer->role->name;
+            $avis = 'Avis ' . $officer->role->name;
         @endphp
-        @if ($report->$avis == null && $officer->role->name != 'MED')
+        @if ($report->$avis == null && $officer->role->name != 'Medecin')
             <!-- Confirm Modal -->
             <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm hidden z-50">
                 <div class="fixed inset-0 flex items-center justify-center">
                     <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-6 w-full max-w-xl mx-4">
-                        <h2 class="text-xl font-bold mb-6 text-gray-900 dark:text-gray-100">Confirmer votre
-                            avis</h2>
+                        <h2 class="text-xl font-bold mb-6 text-gray-900 dark:text-gray-100">Confirmer votre avis</h2>
 
                         <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl mb-6">
                             <p class="text-gray-700 dark:text-gray-300" id="avisPreview"></p>
@@ -197,8 +193,7 @@
             <div id="refuseModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm hidden z-50">
                 <div class="fixed inset-0 flex items-center justify-center">
                     <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-6 w-full max-w-xl mx-4">
-                        <h2 class="text-xl font-bold mb-6 text-gray-900 dark:text-gray-100">Refuser le
-                            rapport</h2>
+                        <h2 class="text-xl font-bold mb-6 text-gray-900 dark:text-gray-100">Refuser le rapport</h2>
 
                         <form action="{{ route('report.refuse', ['report' => $report->id, 'id' => $officer->id]) }}"
                             method="post">

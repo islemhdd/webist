@@ -20,9 +20,9 @@ use stdClass;
 use Symfony\Component\Security\Core\Role\Role;
 
 define("DIV", "DIV");
-define("CBt", "CBt");
-define("CBr", "CBr");
-define("CC", "CC");
+define("CBt", "Chef de batallaint");
+define("CBr", "Chef de brigade");
+define("CC", "Chef de compagnie");
 define("MED", "MED");
 define("DG", "DG");
 
@@ -85,7 +85,7 @@ class Officer extends User
                 break;
 
             case CC:
-                // Find CBt with same battalion
+
                 $cbt = Officer::whereHas('role', function ($query) {
                     $query->where('name', CBt);
                 })->where('bat', $this->bat)->first();
@@ -110,7 +110,7 @@ class Officer extends User
                     $report->destination = $cbr->id;
                     $report->owner->notify(new ReportPassed($report));
                 } else {
-                    throw new \Exception("No CBr found");
+                    throw new \Exception("No Chef de brigade found");
                 }
                 break;
             case CBr:
@@ -193,10 +193,11 @@ class Officer extends User
             'DG' => 5,
             'DIV' => 4,
             'CBr' => 3,
-            'CBt' => 2,
-            'CC' => 1,
+            'Chef de batallaint' => 2,
+            'Chef de compagnie' => 1,
             'MED' => 0
         ];
+
         if ($this->role->name != "MED")
 
             return $ROLES[$this->role->name] > $ROLES[$officer->role->name];

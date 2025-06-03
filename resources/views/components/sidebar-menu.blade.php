@@ -58,7 +58,7 @@
         <span class="ml-3">Liste des patients</span>
     </a>
 
-    {{-- Compte rendu médical --}}
+    {{-- Compte rendu médical  --}}
     <a href="{{ route('compt') }}"
         class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
         <i class="fa-solid fa-notes-medical w-5 h-5"></i>
@@ -135,7 +135,7 @@
         <span class="ml-3">Sancions</span>
     </a>
 
-    @if ($officer->role->name == 'CC' || $officer->role->name == 'CBt')
+    @if ($officer->role->name == 'Chef de compagnie' || $officer->role->name == 'Chef de batallaint')
         {{-- Week-end --}}
         <a href="{{ route('weekends', ['id' => $officerid]) }}"
             class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
@@ -159,22 +159,37 @@
                     <i class="fa-solid fa-list w-5 h-5"></i>
                     <span class="ml-3">Liste des patients</span>
                 </a>
+                <a href="{{ route('brigade.list_patients', ['id' => $officerid]) }}"
+                    class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fa-solid fa-list w-5 h-5"></i>
+                    <span class="ml-3">Liste des rendez_vous</span>
+                </a>
+                <a href="{{ route('brigade.exemptions', ['id' => $officerid]) }}"
+                    class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fa-solid fa-list w-5 h-5"></i>
+                    <span class="ml-3">Liste des exemptions</span>
+                </a>
+                <a href="{{ route('brigade.list_patients', ['id' => $officerid]) }}"
+                    class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fa-solid fa-list w-5 h-5"></i>
+                    <span class="ml-3">Liste des convocation</span>
+                </a>
 
-                <a href="#"
+                {{-- <a href="#"
                     class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                     <i class="fa-solid fa-plus w-5 h-5"></i>
                     <span class="ml-3">Nouveau patient</span>
-                </a>
-                <a href="#"
+                </a> --}}
+                {{-- <a href="#"
                     class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                     <i class="fa-solid fa-file-medical w-5 h-5"></i>
                     <span class="ml-3">Rapports médicaux</span>
-                </a>
+                </a> --}}
             </div>
         </div>
 
         {{-- ? Étudiants :m3mbalich wach hada --}}
-        <a href="{{ route('cons', ['id' => $officerid]) }}"
+        <a href="{{ route('students.index') }}"
             class=" flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors orange-500">
             <i class="fa-solid fa-graduation-cap w-5 h-5"></i>
             <span class="ml-3">Étudiants</span>

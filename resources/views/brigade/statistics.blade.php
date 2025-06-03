@@ -12,44 +12,45 @@
                         {{ date('d/m/Y') }}
                     </div>
                 </div>
-
-                <!-- Grade Filter Section -->
-                <div class="mb-8">
-                    <div
-                        class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
-                        <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 text-center">Filter by Year
-                        </h3>
-                        <div class="flex justify-center">
-                            <div class="flex flex-wrap gap-3 justify-center">
-                                <label class="flex items-center cursor-pointer group">
-                                    <input type="radio" name="grade_filter" value="all" class="sr-only" checked>
-                                    <div
-                                        class="grade-radio-custom bg-gray-100 dark:bg-gray-700 group-hover:bg-gray-200 dark:group-hover:bg-gray-600 border-2 border-gray-300 dark:border-gray-600 group-hover:border-gray-400 dark:group-hover:border-gray-500 rounded-lg px-3 py-2 transition-all duration-200 text-sm">
-                                        <span class="text-gray-700 dark:text-gray-300 font-medium">All</span>
-                                    </div>
-                                </label>
-                                @for ($year = 1; $year <= 3; $year++)
+                @unless (in_array(auth()->user()->role->name, ['Chef de compagnie', 'chef de bataillant']))
+                    <!-- Grade Filter Section -->
+                    <div class="mb-8">
+                        <div
+                            class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+                            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 text-center">Filter by Year
+                            </h3>
+                            <div class="flex justify-center">
+                                <div class="flex flex-wrap gap-3 justify-center">
                                     <label class="flex items-center cursor-pointer group">
-                                        <input type="radio" name="grade_filter" value="{{ $year }}"
-                                            class="sr-only">
+                                        <input type="radio" name="grade_filter" value="all" class="sr-only" checked>
                                         <div
                                             class="grade-radio-custom bg-gray-100 dark:bg-gray-700 group-hover:bg-gray-200 dark:group-hover:bg-gray-600 border-2 border-gray-300 dark:border-gray-600 group-hover:border-gray-400 dark:group-hover:border-gray-500 rounded-lg px-3 py-2 transition-all duration-200 text-sm">
-                                            <span
-                                                class="text-gray-700 dark:text-gray-300 font-medium">{{ $year }}st
-                                                Year</span>
+                                            <span class="text-gray-700 dark:text-gray-300 font-medium">All</span>
                                         </div>
                                     </label>
-                                @endfor
+                                    @for ($year = 1; $year <= 3; $year++)
+                                        <label class="flex items-center cursor-pointer group">
+                                            <input type="radio" name="grade_filter" value="{{ $year }}"
+                                                class="sr-only">
+                                            <div
+                                                class="grade-radio-custom bg-gray-100 dark:bg-gray-700 group-hover:bg-gray-200 dark:group-hover:bg-gray-600 border-2 border-gray-300 dark:border-gray-600 group-hover:border-gray-400 dark:group-hover:border-gray-500 rounded-lg px-3 py-2 transition-all duration-200 text-sm">
+                                                <span
+                                                    class="text-gray-700 dark:text-gray-300 font-medium">{{ $year }}st
+                                                    Year</span>
+                                            </div>
+                                        </label>
+                                    @endfor
+                                </div>
                             </div>
-                        </div>
-                        <div class="text-center mt-3">
-                            <div id="loading-indicator" class="hidden">
-                                <i class="fas fa-spinner fa-spin text-blue-500 mr-2"></i>
-                                <span class="text-gray-600 dark:text-gray-400 text-sm">Updating...</span>
+                            <div class="text-center mt-3">
+                                <div id="loading-indicator" class="hidden">
+                                    <i class="fas fa-spinner fa-spin text-blue-500 mr-2"></i>
+                                    <span class="text-gray-600 dark:text-gray-400 text-sm">Updating...</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                @endunless
 
                 <!-- Statistics Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
@@ -175,8 +176,8 @@
                     <!-- Patine Chart -->
                     <div
                         class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl p-6 shadow-sm">
-                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center">Patine
-                            Reports</h3>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center">Patient
+                            history</h3>
                         <div class="flex justify-center">
                             <div class="relative w-48 h-48">
                                 <canvas id="patineChart" class="w-full h-full"></canvas>
