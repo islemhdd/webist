@@ -326,6 +326,7 @@
                                     <!-- Sanctions Tab -->
                                     <div x-show="activeStatsTab === 'sanctions'">
                                         <h3 class="text-lg font-medium mb-4">Sanction History</h3>
+                                        {{-- ! not gettong the histoey --}}
                                         <div class="overflow-x-auto">
                                             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                                 <thead class="bg-gray-50 dark:bg-gray-700">
