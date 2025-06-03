@@ -1,41 +1,49 @@
 <x-de title="Absences de l'infirmerie - Direction d'Études">
-    <div class="max-w-7xl mx-auto">
+    <div class="max-w-7xl mx-auto bg-white rounded-lg shadow-lg mt-6  p-6">
         <!-- Header -->
-        <div class="mb-8 text-center">
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Absences de l'infirmerie</h1>
-            <p class="mt-2 text-gray-600 dark:text-gray-400">Gestion et validation des absences médicales</p>
+        <div class="my-8 text-center ">
+            <h1 class="text-3xl font-bold text-sky-400 dark:text-white">
+                <i class="fas fa-user-injured text-sky-600 text-4xl mb-4 p-4"></i>Absences de l'infirmerie</h1>
+            
         </div>
+        
+        <div class=" rounded-lg  text-center w-full flex justify-end pr-8">
+            <p class="text-sm font-medium text-gray-600 ">
+                <i class="fas fa-calendar-alt mr-1"></i>
+                {{ date('d/m/Y') }}
+            </p>
+           
+        </div>
+    
+   
 
         <!-- Enhanced Filters Section -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg mb-6 border border-gray-200 dark:border-gray-700">
+        <div class="bg-white dark:bg-gray-800 r  mb-6 ">
             <div class="p-6">
-                <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                     <!-- Left side - Search and Grade filters (Real-time) -->
                     <div class="flex-1 space-y-4">
                         <!-- Search Filter -->
-                        <div>
-                            <label for="search-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                <i class="fas fa-search mr-1"></i>
-                                Rechercher un élève
-                            </label>
-                            <input
-                                type="text"
-                                id="search-input"
-                                name="matricule"
-                                value="{{ request('matricule') ?? '' }}"
-                                placeholder="Rechercher par matricule..."
-                                class="block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                onkeyup="applyRealTimeFilters()"
-                            >
+                        <div class="my-6 w-full">
+                            <form method="GET" action="{{ route('liste_convoncu') }}" class="relative flex ">
+                                <div class="flex items-center w-[95%]">
+                                    <input type="text" id="search" name="search" placeholder="Rechercher un étudiant..."
+                                        value="{{ request('search') }}"
+                                        class="w-full px-4 py-2 rounded-full border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 hover:bg-gray-100"
+                                        name="matricule">
+                                    </div>
+                                    <div class="flex items-center justify-end bg-sky-500 hover:bg-sky-400">
+                                    <button type="submit"
+                                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-white font-semibold  dark:hover:text-gray-200 bg-sky-500 hover:bg-sky-400 rounded-full">
+                                        <i class="fa-solid fa-magnifying-glass m-3"></i>
+                                    </button></div>
+                                
+                            </form>
                         </div>
-
                         <!-- Grade Filter -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                                <i class="fas fa-graduation-cap mr-1"></i>
-                                Année d'étude
-                            </label>
-                            <div class="flex flex-wrap gap-2">
+                        
+                            <div class="flex flex-wrap gap-2 justify-around">
                                 <label class="inline-flex items-center cursor-pointer group">
                                     <input type="radio" name="grade_filter" value="all" class="sr-only grade-radio"
                                            {{ (request('grade') ?? 'all') === 'all' ? 'checked' : '' }} onchange="applyRealTimeFilters()">
@@ -73,7 +81,7 @@
                                 <i class="fas fa-check-circle mr-1"></i>
                                 Statut
                             </label>
-                            <select name="status" id="status-filter" class="block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" onchange="applyRealTimeFilters()">
+                            <select name="status" id="status-filter" class="block w-full px-4 hover:bg-gray-100 cursor-pointer py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" onchange="applyRealTimeFilters()">
                                 <option value="">Tous</option>
                                 <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>En attente RHP</option>
                                 <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Validé RHP</option>
@@ -82,23 +90,6 @@
                         </div>
                     </div>
 
-                    <!-- Right side - Today's Data Display -->
-                    <div class="lg:max-w-md">
-                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
-                            <div class="flex items-center justify-center">
-                                <div class="flex-shrink-0">
-                                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-md">
-                                        <i class="fas fa-calendar-day text-white"></i>
-                                    </div>
-                                </div>
-                                <div class="ml-4">
-                                    <p class="text-sm font-medium text-blue-700 dark:text-blue-300">Données affichées</p>
-                                    <p class="text-lg font-bold text-blue-900 dark:text-blue-100">Aujourd'hui uniquement</p>
-                                    <p class="text-xs text-blue-600 dark:text-blue-400">{{ now()->format('d/m/Y') }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -124,11 +115,11 @@
         </div>
 
         <!-- Statistics Card -->
-        <div class="mb-6">
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div class="my-8">
+            <div class="bg-white dark:bg-gray-800 ">
                 <div class="grid grid-cols-3 gap-6">
                     <!-- Total Patients Stat -->
-                    <div class="flex items-center">
+                    <div class="flex items-center ronded-lg shadow-md hover:shadow-lg hover:relative bottom-2 rounded-xl transition-all duration-200 p-4">
                         <div class="flex-shrink-0">
                             <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
                                 <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
@@ -137,13 +128,13 @@
                             </div>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Patients</p>
+                            <p class="text-sm font-medium text-blue-600 dark:text-gray-400">Total Patients</p>
                             <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['total'] ?? 0 }}</p>
                         </div>
                     </div>
 
                     <!-- En attente RHP Stat -->
-                    <div class="flex items-center">
+                    <div class="flex items-center ronded-lg shadow-md hover:shadow-lg hover:relative bottom-2 rounded-xl transition-all duration-200 p-4">
                         <div class="flex-shrink-0">
                             <div class="w-8 h-8 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center">
                                 <svg class="w-4 h-4 text-yellow-600 dark:text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
@@ -152,13 +143,13 @@
                             </div>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">En attente RHP</p>
+                            <p class="text-sm font-medium text-yellow-600 dark:text-yellow-400">En attente RHP</p>
                             <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['pending'] ?? 0 }}</p>
                         </div>
                     </div>
 
                     <!-- Validé RHP Stat -->
-                    <div class="flex items-center">
+                    <div class="flex items-center ronded-lg shadow-md hover:shadow-lg hover:relative bottom-2 rounded-xl transition-all duration-200 p-4">
                         <div class="flex-shrink-0">
                             <div class="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
                                 <svg class="w-4 h-4 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
@@ -167,7 +158,7 @@
                             </div>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Validé RHP</p>
+                            <p class="text-sm font-medium text-green-600  dark:text-green-400">Validé RHP</p>
                             <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['validated'] ?? 0 }}</p>
                         </div>
                     </div>
@@ -178,13 +169,13 @@
         <!-- Patients Table -->
         <div class="bg-white dark:bg-gray-800 shadow-lg rounded-xl overflow-hidden" id="patients-table-container">
             <div class="p-6">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Liste des Patients</h2>
+                <h2 class="text-xl font-semibold text-sky-400 dark:text-white mb-4 text-center">Liste des Patients</h2>
 
                 @if(isset($patients) && $patients->count() > 0)
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-700">
-                                <tr>
+                                <tr class="bg-sky-100">
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                         Matricule
                                     </th>

@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::table('patients', function (Blueprint $table) {
             // Change valider from boolean to tinyInteger (0=non validé, 1=validé, 2=supprimé)
-            $table->tinyInteger('valider')->default(0)->change();
+            
 
             // Add new fields
             $table->text('motif_suppression')->nullable();
             $table->enum('type_medecin', ['médecin générale', 'dentiste', 'psycho'])->nullable();
             $table->text('avis_medecin')->nullable();
+           
         });
     }
 

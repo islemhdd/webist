@@ -1,14 +1,19 @@
 <x-de title="Exclusions de Classe - Direction d'Études">
-    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="min-h-screen bg-white dark:bg-gray-900 py-8 rounded-lg shadow-lg mt-8 px-8 ">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8  ">
             <!-- Header -->
             <div class="mb-8 text-center">
-                <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-                    <i class="fas fa-user-times text-red-500 mr-3"></i>
+                <h1 class="text-4xl font-bold text-sky-400 dark:text-white mb-2">
+                    <i class="fas fa-user-times text-sky-600 mr-3"></i>
                     Exclusions de Classe
                 </h1>
-                <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">Gestion et suivi des exclusions de classe des étudiants</p>
-                <div class="w-24 h-1 bg-gradient-to-r from-red-500 to-orange-500 mx-auto mt-4 rounded-full"></div>
+                <div class=" rounded-lg  text-center w-full flex justify-end pr-8">
+                    <p class="text-sm font-medium text-gray-600 ">
+                        <i class="fas fa-calendar-alt mr-1"></i>
+                        {{ date('d/m/Y') }}
+                    </p>
+                   
+                </div>
             </div>
 
         <!-- Enhanced Statistics Cards with Gradients and Hover Effects -->
@@ -77,38 +82,48 @@
                 </div>
             </div>
         </div>
-
+ <div class=" flex justify-end"> <!-- New Expulsion Button -->
+    <button type="button"
+    onclick="openAddModal()"
+    class="w-[20%] inline-flex items-center justify-center px-4 py-3  bg-sky-500  hover:bg-sky-400 text-white text-sm font-medium rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-600">
+  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+  </svg>
+  Nouvelle Exclusion
+  </button></div>
         <!-- Enhanced Filters Section -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg mb-6 border border-gray-200 dark:border-gray-700">
+        <div class="bg-white dark:bg-gray-800  my-6 ">
             <div class="p-6">
                 <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
                     <!-- Left side - Search and Grade filters (Real-time) -->
                     <div class="flex-1 space-y-4">
-                        <!-- Search Filter -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                <i class="fas fa-search mr-2 text-blue-500"></i>
-                                Recherche en temps réel
-                            </label>
-                            <input type="text"
-                                   id="searchInput"
-                                   placeholder="Rechercher par matricule ou nom..."
-                                   onkeyup="applyRealTimeFilters()"
-                                   class="block w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
-                        </div>
+                     <!-- Search Filter -->
+                     <div class="my-6 w-full">
+                        <form method="GET" action="{{ route('liste_convoncu') }}" class="relative flex ">
+                            <div class="flex items-center w-[95%]">
+                                <input type="text" id="search" name="search" placeholder="Rechercher un étudiant..."
+                                    value="{{ request('search') }}"
+                                    class="w-full px-4 py-2 rounded-full border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 hover:bg-gray-100"
+                                    name="matricule">
+                                </div>
+                                <div class="flex items-center justify-end bg-sky-500 hover:bg-sky-400">
+                                <button type="submit"
+                                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-white  dark:hover:text-gray-200 bg-sky-500 hover:bg-sky-400 rounded-full">
+                                    <i class="fa-solid fa-magnifying-glass m-3"></i>
+                                </button></div>
+                            
+                        </form>
+                    </div>
 
                         <!-- Grade Filter -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                                <i class="fas fa-graduation-cap mr-2 text-green-500"></i>
-                                Filtre par année (temps réel)
-                            </label>
-                            <div class="flex flex-wrap gap-2">
+                          
+                            <div class="flex flex-wrap gap-2 justify-around">
                                 <label class="inline-flex items-center cursor-pointer group">
                                     <input type="radio" name="grade_filter" value="all" class="sr-only grade-radio"
                                            {{ (request('grade') ?? 'all') === 'all' ? 'checked' : '' }} onchange="applyRealTimeFilters()">
-                                    <div class="grade-btn bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 hover:from-gray-200 hover:to-gray-300 dark:hover:from-gray-600 dark:hover:to-gray-500 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 transition-all duration-200 text-sm font-medium">
-                                        <span class="text-gray-800 dark:text-gray-200 font-semibold">Toutes</span>
+                                    <div class="grade-btn bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 hover:from-blue-200 hover:to-blue-300 dark:hover:from-blue-800/50 dark:hover:to-blue-700/50 border-2 border-blue-300 dark:border-blue-600 rounded-lg px-4 py-2 transition-all duration-200 text-sm font-medium">
+                                        <span class="text-blue-800 dark:text-blue-200 font-semibold">Toutes</span>
                                     </div>
                                 </label>
                                 <label class="inline-flex items-center cursor-pointer group">
@@ -136,33 +151,9 @@
                         </div>
                     </div>
 
-                    <!-- Right side - Today's Data Display and Actions -->
-                    <div class="lg:w-80 space-y-4">
-                        <!-- Today's Data Display -->
-                        <div class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
-                            <div class="flex items-center justify-center">
-                                <div class="flex-shrink-0">
-                                    <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center shadow-md">
-                                        <i class="fas fa-calendar-day text-white"></i>
-                                    </div>
-                                </div>
-                                <div class="ml-4">
-                                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Données affichées</p>
-                                    <p class="text-lg font-bold text-gray-900 dark:text-white">Aujourd'hui uniquement</p>
-                                    <p class="text-xs text-gray-600 dark:text-gray-400">{{ now()->format('d/m/Y') }}</p>
-                                </div>
-                            </div>
-                        </div>
+                   
 
-                        <!-- New Expulsion Button -->
-                        <button type="button"
-                                onclick="openAddModal()"
-                                class="w-full inline-flex items-center justify-center px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white text-sm font-medium rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                            </svg>
-                            Nouvelle Exclusion
-                        </button>
+                      
                     </div>
                 </div>
             </div>
@@ -189,18 +180,18 @@
         </div>
 
         <!-- Enhanced Expulsions Table -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                    <i class="fas fa-list mr-2 text-blue-500"></i>
+        <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden  border-gray-200 dark:border-gray-700">
+       
+                <h3 class="text-lg font-medium  dark:text-white my-8 text-center text-sky-400">
+                    <i class="fas fa-list mr-2 text-sky-00"></i>
                     Liste des Exclusions
                 </h3>
-            </div>
+          
 
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead class="bg-gray-50 dark:bg-gray-700">
-                        <tr>
+                        <tr class="bg-sky-100">
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Matricule
                             </th>
@@ -460,21 +451,21 @@
                 if (radio && radio.value === selectedGrade) {
                     // Active state - enhanced styling
                     btn.style.background = radio.value === 'all'
-                        ? 'linear-gradient(135deg, #4b5563 0%, #374151 100%)'
+                      
                         : radio.value === '1'
                         ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'
                         : radio.value === '2'
                         ? 'linear-gradient(135deg, #10b981 0%, #047857 100%)'
                         : 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)';
                     btn.style.borderColor = radio.value === 'all'
-                        ? '#374151'
+                       
                         : radio.value === '1'
                         ? '#1d4ed8'
                         : radio.value === '2'
                         ? '#047857'
                         : '#6d28d9';
                     btn.style.boxShadow = radio.value === 'all'
-                        ? '0 4px 12px rgba(75, 85, 99, 0.4)'
+                       
                         : radio.value === '1'
                         ? '0 4px 12px rgba(59, 130, 246, 0.4)'
                         : radio.value === '2'

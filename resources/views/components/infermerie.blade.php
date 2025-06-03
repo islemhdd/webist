@@ -29,7 +29,7 @@
         <!-- Sidebar -->
         <aside
             class="w-64  bg-white dark:bg-gray-800 border-r dark:border-gray-700 fixed h-full shadow-lg transition-colors duration-200 overflow-scroll">
-            <div class="flex items-center justify-center p-4  dark:border-gray-700">
+            <div class="flex items-center justify-center p-4  ">
                 <img src="/logo.png" alt="Logo" class=" w-[50%] rounded-full">
             </div>
 

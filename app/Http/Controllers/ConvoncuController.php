@@ -20,6 +20,7 @@ class ConvoncuController extends Controller
             ->orderBy('convoncus.created_at', 'desc')
             ->paginate(10)
             ->withQueryString();
+            // dd($convoncus);
 
         return view('infermerie.liste_convoncu', compact('convoncus'));
     }
