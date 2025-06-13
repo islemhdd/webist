@@ -16,36 +16,16 @@ class SanctionController extends Controller
     {
         $query = $id->officerSanctions();
 
-        if ($request->has('type') && $request->type !== '') {
+
+        if ($request->has('type') && $request->type != '') {
+
             // If type filter is specified, show all sanctions of that type
             $query->where('sanctions.type', $request->type);
-        } else {
-            // Default view: consignes for this weekend and active/upcoming arrets
-            $now = now();
-            $weekendStart = $now->copy()->endOfWeek()->subDay(); // Saturday
-            $weekendEnd = $now->copy()->endOfWeek(); // Sunday
-            $monthEnd = $now->copy()->endOfMonth();
-
-            $query->where(function ($q) use ($weekendStart, $weekendEnd, $now, $monthEnd) {
-                $q->where(function ($q1) use ($weekendStart, $weekendEnd) {
-                    // Consignes for this weekend
-                    $q1->where('sanctions.type', 'consigne')
-                        ->whereBetween('date_debut', [$weekendStart, $weekendEnd]);
-                })->orWhere(function ($q2) use ($now) {
-                    // Active arrets
-                    $q2->where('sanctions.type', 'arret')
-                        ->where('date_debut', '<=', $now)
-                        ->where('date_fin', '>=', $now);
-                })->orWhere(function ($q3) use ($now, $monthEnd) {
-                    // Upcoming arrets this month
-                    $q3->where('sanctions.type', 'arret')
-                        ->where('date_debut', '>', $now)
-                        ->where('date_debut', '<=', $monthEnd);
-                });
-            });
         }
+        // Default view: consignes for this weekend and active/upcoming arrets
 
         $sanctions = $query->orderBy('date_debut', 'asc')->paginate(15);
+
 
         return view('brigade.sanctions', [
             'sanctions' => $sanctions,
@@ -70,6 +50,7 @@ class SanctionController extends Controller
     public function store(Officer $id, Request $request)
     {
         // Règles de validation de base
+
         $rules = [
             'matricule' => 'required|exists:students,matricule',
             'type' => 'required|in:consigne,arret,blame,avert',
@@ -95,6 +76,15 @@ class SanctionController extends Controller
         if ($validated['type'] === 'arret') {
             $sanctionData['date_debut'] = $validated['from'];
             $sanctionData['date_fin'] = $validated['to'];
+        } elseif ($validated['type'] === 'consigne') {
+            // Pour consigne, date_debut = prochain vendredi, date_fin = samedi suivant
+            $now = now();
+            // Prochain vendredi
+            $friday = $now->copy()->next(Carbon::FRIDAY);
+            // Samedi qui suit
+            $saturday = $friday->copy()->addDay();
+            $sanctionData['date_debut'] = $friday;
+            $sanctionData['date_fin'] = $saturday;
         } else {
             // Pour les autres types, date_debut = aujourd'hui, date_fin = aujourd'hui
             $sanctionData['date_debut'] = now();

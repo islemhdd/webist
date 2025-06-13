@@ -245,7 +245,7 @@
                                         'matricule' => $sortie->student->matricule,
                                         'nom' => $sortie->student->nom,
                                         'prenom' => $sortie->student->prenom,
-                                        'section' => $sortie->student->section ? ['code' => $sortie->student->section->code] : null,
+                                        'section' => $sortie->student->section_id,
                                     ]
                                     : null,
                             ];
