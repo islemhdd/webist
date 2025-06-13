@@ -31,6 +31,7 @@ class Report extends Model
         $this->is_medical = $isMedical;
 
         $this->destination = $destination;
+        return 1;
     }
     public function updateStatus(string $status)
     {

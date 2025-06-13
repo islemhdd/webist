@@ -25,7 +25,7 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, true)) {  // Utilisation de Auth::attempt sans spécifier de guard
             $request->session()->regenerate();
 
-            if (Auth::user()->role->name != 'MED')
+            if (auth()->user()->role->name != 'MED')
                 return redirect()->route('brigade.statistics', ['id' => auth()->user()->isOfficer()->id]);
             return redirect()->route('statistics.index');
         }

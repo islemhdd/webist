@@ -6,20 +6,22 @@
                 <table class="w-full shadow-md rounded-sm">
                     <thead class="bg-grey-700 ">
                         <tr>
-                            <th class=" px-4 py-4 text-left text-xs font-bold text-white dark:text-gray-300 uppercase">
+                            <th
+                                class=" px-4 py-4 text-left text-xs font-bold text-gray-900 dark:text-gray-300 uppercase">
                                 Matricule
                             </th>
-                            <th class="px-4 py-4 text-left text-xs font-bold text-white dark:text-gray-300 uppercase">
+                            <th class="px-4 py-4 text-left text-xs font-bold text-gray-900 dark:text-gray-300 uppercase">
                                 Nom
                             </th>
-                            <th class="px-4 py-4 text-left text-xs font-bold text-white dark:text-gray-300 uppercase">
+                            <th class="px-4 py-4 text-left text-xs font-bold text-gray-900 dark:text-gray-300 uppercase">
                                 Prenom
                             </th>
-                            <th class="px-4 py-4 text-left text-xs font-bold text-white dark:text-gray-300 uppercase">
+                            <th class="px-4 py-4 text-left text-xs font-bold text-gray-900 dark:text-gray-300 uppercase">
                                 Section
                             </th>
-                            <th class="px-4 py-4 text-left text-xs font-bold text-white dark:text-gray-300 uppercase">
-                                Status
+                            <th
+                                class="px-4 py-4 text-left text-xs font-bold text-gray-900 dark:text-gray-300 uppercase">
+
                             </th>
                         </tr>
                     </thead>
@@ -60,7 +62,7 @@
                                         {{ $report->student->section->code() }}
                                     </td>
                                     <td
-                                        class="@if ($report->refused) text-red-500 @elseif($report->status == 'DONE') text-green-500 @else text-gray-100 @endif e px-4 py-4 text-sm last:rounded-r-lg">
+                                        class="@if ($report->refused) text-red-500 @elseif($report->status == 'DONE') text-green-500 @else text-yellow-400 @endif e px-4 py-4 text-sm last:rounded-r-lg">
                                         {{ $report->status }}
                                     </td>
                                 </tr>

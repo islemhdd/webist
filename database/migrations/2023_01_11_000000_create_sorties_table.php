@@ -11,17 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sanctions', function (Blueprint $table) {
+        Schema::create('sorties', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->unsignedBigInteger('matricule');
+            $table->foreign('matricule')->references('matricule')->on('students');
 
-            $table->unsignedBigInteger('matricule');  // Add this line
-
-            $table->enum('name', ['consigne', 'arret', 'blame', 'avert']);
-            $table->foreign('matricule')->references('matricule')->on('students')->onDelete('cascade');
             $table->date('from');
             $table->date('to');
-            $table->string('motif');
+            $table->string('choix');
+            $table->timestamps();
         });
     }
 
@@ -30,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('senctions');
+        Schema::dropIfExists('sorties');
     }
 };

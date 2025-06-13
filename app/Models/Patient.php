@@ -16,7 +16,7 @@ class Patient extends Model
         'valider' => 'integer',
         'validated_at' => 'datetime',
     ];
-    public function Student()
+    public function student()
     {
         return $this->belongsTo(Student::class, 'matricule', 'matricule');
     }

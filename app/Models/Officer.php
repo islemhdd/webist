@@ -19,12 +19,12 @@ use Illuminate\Support\Facades\DB;
 use stdClass;
 use Symfony\Component\Security\Core\Role\Role;
 
-define("DIV", "DIV");
+define("DIV", "Chef division");
 define("CBt", "Chef de batallaint");
 define("CBr", "Chef de brigade");
 define("CC", "Chef de compagnie");
-define("MED", "MED");
-define("DG", "DG");
+define("MED", "Medecin");
+define("DG", "Directeur général");
 
 class Officer extends User
 
@@ -150,6 +150,7 @@ class Officer extends User
                     })->first();
                     if ($dg) {
                         $dg->notify(new ReportArival($report));
+
                         $report->status = DG;
                         $report->destination = $dg->id;
                         $report->owner->notify(new ReportPassed($report));
@@ -162,6 +163,7 @@ class Officer extends User
 
             case DG:
                 // Inform owner with DesitionMade
+
                 $report->status = "DONE";
                 $report->owner->notify(new DesitionMade($report));
                 $report->destination = $report->officer_id;

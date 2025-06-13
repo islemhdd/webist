@@ -20,7 +20,7 @@ class DashbaordController extends Controller
     }
     public function principale($id)
     {
-        dd(1);
+
         return view('brigade.principale');
     }
 

@@ -12,17 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('liste_rdvs', function (Blueprint $table) {
-            $table->unsignedInteger('matricule');
-            // Utiliser 'string' si 'matricule' est une chaîne
-            $table->enum('motif', ['consultation', 'urgences']);
-            $table->string('service');
+            $table->id();
+            $table->string('matricule');
+            $table->text('motif')->nullable();
+            $table->string('service')->nullable();
             $table->dateTime('date');
             $table->timestamps();
 
-            $table->foreign('matricule')
-                ->references('matricule')
-                ->on('Students')
-                ->onDelete('cascade');
+            $table->foreign('matricule')->references('matricule')->on('students')
+                ->onDelete('cascade')->onUpdate('cascade');
         });
     }
 

@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrigadeExemptionController;
+use App\Http\Controllers\BrigadeRendezVousController;
+use App\Http\Controllers\BrigadeConvocationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ConvoncuController;
 use App\Http\Controllers\DashbaordController;
@@ -124,6 +126,12 @@ Route::controller(DashbaordController::class)
 // Brigade Statistics Routes
 Route::get('{id}/statistics', [BrigadeStatisticsController::class, 'index'])->name('brigade.statistics');
 Route::get('{id}/statistics/filter', [BrigadeStatisticsController::class, 'filter'])->name('brigade.statistics.filter');
+Route::get('{id}/statistics/weekend', [BrigadeStatisticsController::class, 'weekendDetails'])->name('brigade.statistics.weekend');
+Route::get('{id}/statistics/sanctions', [BrigadeStatisticsController::class, 'sanctionsDetails'])->name('brigade.statistics.sanctions');
+Route::get('{id}/statistics/reports', [BrigadeStatisticsController::class, 'reportsDetails'])->name('brigade.statistics.reports');
+Route::get('{id}/statistics/patients', [BrigadeStatisticsController::class, 'patientsDetails'])->name('brigade.statistics.patients');
+Route::get('{id}/statistics/students', [BrigadeStatisticsController::class, 'studentsDetails'])->name('brigade.statistics.students');
+Route::match(['GET', 'POST'], '{id}/statistics/graph-data', [BrigadeStatisticsController::class, 'getGraphData'])->name('brigade.statistics.graph-data');
 
 Route::middleware('auth')->group(function () {
     Route::controller(SanctionController::class)->group(function () {
@@ -139,6 +147,7 @@ Route::prefix('{id}')->controller(ReportController::class)->group(function () {
 
     Route::get('create', 'create')->name('report.create');
     Route::get('reports', 'index')->name('report.index');
+    Route::post('reports/search', 'search')->name('report.search');
     Route::get('show/{report_id}', 'show')->name('report.show');
     Route::post('avis/{report}', 'avis')->name('report.avis');
 
@@ -148,10 +157,13 @@ Route::prefix('{id}')->controller(ReportController::class)->group(function () {
     Route::post('refuse/{report}', 'refuse')->name('report.refuse');
     Route::get('showNotification/{report_id}', 'unsetReportNotificationAndRedirect')->name('report.unsetNotificationAndShowReport');
 });
-Route::controller(StudentController::class)->group(function () {
+Route::controller(StudentController::class)->middleware('auth')->group(function () {
     Route::get("students", "index")->name("students.index");
     Route::post("search", "search")->name("student.search");
     Route::get("show/{matricule}", "show")->name("student.show");
+    Route::match(['GET', 'POST'], 'student/{matricule}/graph-data', 'getStudentGraphData')->name('student.graph-data');
+    Route::match(['GET', 'POST'], 'student/{matricule}/all-graph-data', 'getStudentAllGraphData')->name('student.all-graph-data');
+    Route::match(['GET', 'POST'], 'student/{matricule}/all-graph-data', 'getStudentAllGraphData')->name('student.all-graph-data');
 });
 
 
@@ -165,6 +177,16 @@ Route::controller(BrigadeExemptionController::class)->group(
 );
 
 // Notifications Routes
+
+// Brigade list routes
+Route::get('/brigade/rdv-list/{id}', [BrigadeRendezVousController::class, 'index'])->name('brigade.rdv-list');
+Route::get('/brigade/rdv-list/{id}/search', [BrigadeRendezVousController::class, 'search'])->name('brigade.rdv-list.search');
+
+Route::get('/brigade/exemption-list/{id}', [BrigadeExemptionController::class, 'index'])->name('brigade.exemption-list');
+Route::get('/brigade/exemption-list/{id}/search', [BrigadeExemptionController::class, 'search'])->name('brigade.exemption-list.search');
+
+Route::get('/brigade/convocation-list/{id}', [BrigadeConvocationController::class, 'index'])->name('brigade.convocation-list');
+Route::get('/brigade/convocation-list/{id}/search', [BrigadeConvocationController::class, 'search'])->name('brigade.convocation-list.search');
 
 Route::get("test1", function () {
     $students = Student::all();

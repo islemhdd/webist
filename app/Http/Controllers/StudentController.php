@@ -13,8 +13,8 @@ use App\Models\Section;
 use App\Models\Sortie;
 use App\Models\Student;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class StudentController extends Controller
 {
@@ -23,31 +23,57 @@ class StudentController extends Controller
      */
     public function index()
     {
-        $user = auth()->user();
+        try {
+            $user = auth()->user();
+            $officer = $user->isOfficer();
 
-        $query = Student::with('section');
+            if (!$user) {
+                return redirect()->route('login');
+            }
 
-        switch ($user->status) {
-            case 'Chef de compagnie':
-                // L'utilisateur dirige certaines sections
-                $sectionIds = $user->sections()->pluck('id');
-                $query->whereIn('section_id', $sectionIds);
-                break;
+            $query = Student::with('section');
 
-            case 'Chef de batallaint':
-                // L'utilisateur est responsable d’un bataillon, comparé à grade
-                $query->where('grade', $user->bat);
-                break;
+            switch ($officer->role->name) {
+                case 'Chef de compagnie':
+                    // L'utilisateur dirige certaines sections
+                    if (method_exists($officer, 'sections')) {
+                        $sectionIds = $officer->sections()->pluck('id');
+                        $query->whereIn('section_id', $sectionIds);
+                    }
+                    break;
 
-            default:
-                // Autres statuts : accès complet (aucun filtre)
-                break;
+                case 'Chef de batallaint':
+                    // L'utilisateur est responsable d'un bataillon, comparé à grade
+                    if (isset($user->bat)) {
+                        $query->where('grade', $user->bat);
+                    }
+                    break;
+
+                default:
+                    // Autres statuts : accès complet (aucun filtre)
+                    break;
+            }
+
+            // ✅ Pas de pagination : collection complète
+            $students = $query->get();
+
+            // Check if this is an AJAX request
+            if (request()->expectsJson() || request()->header('X-Requested-With') === 'XMLHttpRequest') {
+                return response()->json([
+                    'students' => $students
+                ]);
+            }
+
+            return view('brigade.students', ['students' => []]);
+        } catch (\Exception $e) {
+            Log::error('Error in StudentController index: ' . $e->getMessage());
+
+            if (request()->expectsJson()) {
+                return response()->json(['error' => 'Unable to load students data'], 500);
+            }
+
+            return redirect()->back()->with('error', 'Unable to load students data.');
         }
-
-        // ✅ Pas de pagination : collection complète
-        $students = $query->get();
-
-        return view('brigade.students', compact('students'));
     }
 
 
@@ -58,41 +84,80 @@ class StudentController extends Controller
      */
     public function search(Request $request)
     {
-        $request->validate([
-            'search' => ['required', 'string', 'max:10']
-        ]);
+        try {
+            // Authentication check
+            $user = auth()->user();
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
 
-        $search = trim($request->input("search"));
+            $officer = $user->isOfficer();
+            if (!$officer) {
+                return response()->json(['error' => 'Access denied'], 403);
+            }
 
-        // Convert to integer if it's numeric
-        if (!is_numeric($search)) {
+            $request->validate([
+                'search' => ['required', 'string', 'max:10']
+            ]);
+
+            $search = trim($request->input("search"));
+
+            // Convert to integer if it's numeric
+            if (!is_numeric($search)) {
+                return response()->json([
+                    'students' => [],
+                    'message' => 'Search term must be numeric'
+                ], 400);
+            }
+
+            $searchInt = (int)$search;
+            $searchLength = strlen($search);
+
+            // Get base query with role-based filtering
+            $query = Student::with('section');
+
+            // Apply role-based filters
+            switch ($officer->role->name) {
+                case 'Chef de compagnie':
+                    if (method_exists($officer, 'sections')) {
+                        $sectionIds = $officer->sections()->pluck('id');
+                        $query->whereIn('section_id', $sectionIds);
+                    }
+                    break;
+
+                case 'Chef de batallaint':
+                    if (isset($officer->bat)) {
+                        $query->where('grade', $officer->bat);
+                    }
+                    break;
+
+                default:
+                    // Other roles: full access
+                    break;
+            }
+
+            if ($searchLength == 7) {
+                // Exact match for 7-digit matricule
+                $students = $query->where('matricule', $searchInt)->get();
+            } elseif ($searchLength < 7) {
+                // Prefix search for partial matricule
+                $lowerBound = $searchInt * pow(10, 7 - $searchLength);
+                $upperBound = (($searchInt + 1) * pow(10, 7 - $searchLength)) - 1;
+                $students = $query->whereBetween('matricule', [$lowerBound, $upperBound])->get();
+            } else {
+                $students = collect(); // Empty collection for invalid search
+            }
+
             return response()->json([
-                'students' => [],
-                'message' => 'Search term must be numeric'
-            ], 400);
+                'students' => $students
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in student search: ' . $e->getMessage(), [
+                'search' => $request->input("search"),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['error' => 'Search failed'], 500);
         }
-
-        $searchInt = (int)$search;
-        $searchLength = strlen($search);
-
-        if ($searchLength == 7) {
-            // Exact match for 7-digit matricule
-            $students = Student::with('section')
-                ->where('matricule', $searchInt)
-                ->get();
-        } elseif ($searchLength < 7) {
-            // Prefix search for partial matricule
-            $lowerBound = $searchInt * pow(10, 7 - $searchLength);
-            $upperBound = (($searchInt + 1) * pow(10, 7 - $searchLength)) - 1;
-
-            $students = Student::with('section')
-                ->whereBetween('matricule', [$lowerBound, $upperBound])
-                ->get();
-        }
-
-        return response()->json([
-            'students' => $students
-        ]);
     }
 
     /**
@@ -101,30 +166,30 @@ class StudentController extends Controller
     public function getStudentData($matricule)
     {
         try {
-
             $student = Student::with(['section.officer'])
                 ->where('matricule', $matricule)
                 ->first();
+
 
             if (!$student) {
                 return response()->json(['error' => 'Student not found'], 404);
             }
 
             // Get all related data
-            $studentData = ['student' => $this->getBasicStudentInfo($student), 'student' => $this->getBasicStudentInfo($student), 'medical' => $this->getStudentMedicalInfo($matricule), 'exemptions' => $this->getStudentExemptions($matricule), 'rdvs' => $this->getStudentRdvs($matricule), 'sorties' => $this->getStudentSorties($matricule), 'reports' => $this->getStudentReports($matricule)];
-            // $studentData = [
-            //
-            //
-            //];
-            //     ,
-            //
-            //
-            // ];
+            $studentData = [
+                'student' => $this->getBasicStudentInfo($student),
+                'medical' => $this->getStudentMedicalInfo($matricule),
+                'exemptions' => $this->getStudentExemptions($matricule),
+                'rdvs' => $this->getStudentRdvs($matricule),
+                'sorties' => $this->getStudentSorties($matricule),
+                'reports' => $this->getStudentReports($matricule),
+                'sanctions' => $this->getStudentSanctions($matricule)
+            ];
 
             return response()->json($studentData);
         } catch (\Exception $e) {
             Log::error('Error retrieving student data: ' . $e->getMessage());
-            return response()->json(['error' => 'Server error'], 500);
+            return response()->json(['error' => 'a error'], 450);
         }
     }
 
@@ -141,10 +206,10 @@ class StudentController extends Controller
             'consigned' => $student->consigned,
             'choix' => $student->choix,
             'section' => [
-                'id' => $student->section->id,
-                'num' => $student->section->num,
-                'companie' => $student->section->companie,
-                'bat' => $student->section->bat,
+                'id' => $student->section->id ?? null,
+                'num' => $student->section->num ?? null,
+                'companie' => $student->section->companie ?? null,
+                'bat' => $student->section->bat ?? null,
                 'officer' => optional($student->section->officer)->username ?? 'N/A'
             ],
             'created_at' => $student->created_at,
@@ -337,7 +402,7 @@ class StudentController extends Controller
                 return [
                     'id' => $sortie->id,
                     'choix' => $sortie->choix,
-                    'remarque' => $sortie->remarque,
+                    'remarque' => $sortie->remarque ?? null,
                     'from' => $sortie->from,
                     'to' => $sortie->to,
                     'created_at' => $sortie->created_at
@@ -503,22 +568,683 @@ class StudentController extends Controller
             // Get the authenticated user's officer record
             $user = auth()->user();
 
-            if (!$user || !$user->isOfficer()) {
+            if (!$user) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
 
-
+            // Get the officer record for authorization
             $officer = $user->isOfficer();
-
-
-            if (!$this->canAccessStudent($matricule, $officer)) {
+            if (!$officer) {
                 return response()->json(['error' => 'Access denied'], 403);
             }
 
-            return $this->getStudentData($matricule);           //!working , problem in displaying data
+            // Validate student access
+            if (!$this->canAccessStudent($matricule, $officer)) {
+                return response()->json(['error' => 'Access denied for this student'], 403);
+            }
+
+            return $this->getStudentData($matricule);
         } catch (\Exception $e) {
-            Log::error('Error in show method: ' . $e->getMessage());
+            Log::error('Error in show method: ' . $e->getMessage(), [
+                'matricule' => $matricule,
+                'trace' => $e->getTraceAsString()
+            ]);
             return response()->json(['error' => 'Server error'], 500);
         }
+    }
+
+    /**
+     * Get graph data for student sorties
+     */
+    public function getStudentGraphData(Request $request, $matricule)
+    {
+        try {
+            // Get the authenticated user's officer record
+            $user = auth()->user();
+
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
+            // Handle both POST JSON and GET query parameters
+            if ($request->isMethod('post')) {
+                $from = $request->input('from');
+                $to = $request->input('to');
+                $unit = $request->input('unit');
+            } else {
+                $from = $request->query('from');
+                $to = $request->query('to');
+                $unit = $request->query('unit');
+            }
+
+            // Validate required parameters
+            if (!$from || !$to || !$unit) {
+                Log::error('Student graph data request missing parameters', [
+                    'matricule' => $matricule,
+                    'from' => $from,
+                    'to' => $to,
+                    'unit' => $unit,
+                    'method' => $request->method()
+                ]);
+                return response()->json(['error' => 'Missing required parameters'], 400);
+            }
+
+            // Validate date format
+            try {
+                Carbon::parse($from);
+                Carbon::parse($to);
+            } catch (\Exception $e) {
+                Log::error('Invalid date format in student graph request', [
+                    'from' => $from,
+                    'to' => $to,
+                    'error' => $e->getMessage()
+                ]);
+                return response()->json(['error' => 'Invalid date format'], 400);
+            }
+
+            Log::info('Generating student sortie graph data', [
+                'matricule' => $matricule,
+                'from' => $from,
+                'to' => $to,
+                'unit' => $unit
+            ]);
+
+            $data = $this->generateStudentSortieGraphData($matricule, $from, $to, $unit);
+
+            return response()->json($data);
+        } catch (\Exception $e) {
+            Log::error('Error generating student graph data: ' . $e->getMessage(), [
+                'matricule' => $matricule,
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['error' => 'Failed to generate graph data'], 500);
+        }
+    }
+
+    /**
+     * Generate graph data for student sorties
+     */
+    private function generateStudentSortieGraphData($matricule, $from, $to, $unit)
+    {
+        $fromDate = Carbon::parse($from);
+        $toDate = Carbon::parse($to);
+        $labels = [];
+        $data = [];
+
+        switch ($unit) {
+            case 'days':
+                $current = $fromDate->copy();
+                while ($current->lte($toDate)) {
+                    $labels[] = $current->format('d/m');
+                    $count = $this->getStudentSortieCountForDate($matricule, $current);
+                    $data[] = $count;
+                    $current->addDay();
+                }
+                break;
+
+            case 'weeks':
+                $current = $fromDate->copy()->startOfWeek();
+                while ($current->lte($toDate)) {
+                    $weekEnd = $current->copy()->endOfWeek();
+                    $labels[] = $current->format('d/m') . ' - ' . $weekEnd->format('d/m');
+                    $count = $this->getStudentSortieCountForPeriod($matricule, $current, $weekEnd);
+                    $data[] = $count;
+                    $current->addWeek();
+                }
+                break;
+
+            case 'months':
+                $current = $fromDate->copy()->startOfMonth();
+                while ($current->lte($toDate)) {
+                    $labels[] = $current->format('M Y');
+                    $monthEnd = $current->copy()->endOfMonth();
+                    $count = $this->getStudentSortieCountForPeriod($matricule, $current, $monthEnd);
+                    $data[] = $count;
+                    $current->addMonth();
+                }
+                break;
+        }
+
+        return [
+            'labels' => $labels,
+            'data' => $data
+        ];
+    }
+
+    /**
+     * Get sortie count for specific date
+     */
+    private function getStudentSortieCountForDate($matricule, $date)
+    {
+        return Sortie::where('student_id', $matricule)
+            ->whereDate('created_at', $date)
+            ->count();
+    }
+
+    /**
+     * Get sortie count for period
+     */
+    private function getStudentSortieCountForPeriod($matricule, $start, $end)
+    {
+        return Sortie::where('student_id', $matricule)
+            ->whereBetween('created_at', [$start, $end])
+            ->count();
+    }
+
+    /**
+     * Get comprehensive graph data for all student data types
+     */
+    public function getStudentAllGraphData(Request $request, $matricule)
+    {
+        try {
+            $user = auth()->user();
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
+            // Get the officer record for authorization
+            $officer = $user->isOfficer();
+            if (!$officer) {
+                return response()->json(['error' => 'Access denied'], 403);
+            }
+
+            // Handle both dataType and data_type for compatibility
+            $dataType = $request->input('dataType') ?? $request->input('data_type'); // sorties, sanctions, medical, reports, rdvs, exemptions
+            $graphType = $request->input('graphType') ?? $request->input('graph_type', 'line'); // line, bar, pie, doughnut
+            $from = $request->input('from');
+            $to = $request->input('to');
+            $unit = $request->input('unit', 'days'); // days, weeks, months
+
+            if (!$dataType || !$from || !$to) {
+                return response()->json(['error' => 'Missing required parameters'], 400);
+            }
+
+            // Validate student access
+            if (!$this->canAccessStudent($matricule, $officer)) {
+                return response()->json(['error' => 'Access denied for this student'], 403);
+            }
+
+            $data = $this->generateGraphDataByType($matricule, $dataType, $graphType, $from, $to, $unit);
+
+            return response()->json([
+                'success' => true,
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error generating student graph data: ' . $e->getMessage(), [
+                'matricule' => $matricule,
+                'dataType' => $request->input('dataType') ?? $request->input('data_type'),
+                'graphType' => $request->input('graphType') ?? $request->input('graph_type'),
+                'from' => $request->input('from'),
+                'to' => $request->input('to'),
+                'unit' => $request->input('unit'),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to generate graph data',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Generate graph data based on data type
+     */
+    private function generateGraphDataByType($matricule, $dataType, $graphType, $from, $to, $unit)
+    {
+        switch ($dataType) {
+            case 'sorties':
+                return $this->generateSortiesGraphData($matricule, $graphType, $from, $to, $unit);
+            case 'sanctions':
+                return $this->generateSanctionsGraphData($matricule, $graphType, $from, $to, $unit);
+            case 'medical':
+                return $this->generateMedicalGraphData($matricule, $graphType, $from, $to, $unit);
+            case 'reports':
+                return $this->generateReportsGraphData($matricule, $graphType, $from, $to, $unit);
+            case 'rdvs':
+                return $this->generateRdvsGraphData($matricule, $graphType, $from, $to, $unit);
+            case 'exemptions':
+                return $this->generateExemptionsGraphData($matricule, $graphType, $from, $to, $unit);
+            default:
+                throw new \Exception('Invalid data type');
+        }
+    }
+
+    /**
+     * Generate sorties graph data
+     */
+    private function generateSortiesGraphData($matricule, $graphType, $from, $to, $unit)
+    {
+        $fromDate = Carbon::parse($from);
+        $toDate = Carbon::parse($to);
+
+        if ($graphType === 'pie' || $graphType === 'doughnut') {
+            // For pie/doughnut, show distribution by choix type
+            $sorties = Sortie::where('student_id', $matricule)
+                ->whereBetween('created_at', [$fromDate, $toDate])
+                ->get();
+
+            $distribution = $sorties->groupBy('choix')->map->count();
+
+            return [
+                'type' => $graphType,
+                'labels' => $distribution->keys()->toArray(),
+                'datasets' => [[
+                    'data' => $distribution->values()->toArray(),
+                    'backgroundColor' => ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+                    'label' => 'Distribution des sorties'
+                ]]
+            ];
+        }
+
+        // For line/bar charts, show timeline data
+        $labels = [];
+        $data = [];
+        $current = $fromDate->copy();
+
+        while ($current->lte($toDate)) {
+            switch ($unit) {
+                case 'days':
+                    $labels[] = $current->format('d/m');
+                    $count = Sortie::where('student_id', $matricule)
+                        ->whereDate('created_at', $current)
+                        ->count();
+                    $current->addDay();
+                    break;
+                case 'weeks':
+                    $weekEnd = $current->copy()->endOfWeek();
+                    $labels[] = $current->format('d/m') . ' - ' . $weekEnd->format('d/m');
+                    $count = Sortie::where('student_id', $matricule)
+                        ->whereBetween('created_at', [$current, $weekEnd])
+                        ->count();
+                    $current->addWeek();
+                    break;
+                case 'months':
+                    $labels[] = $current->format('M Y');
+                    $monthEnd = $current->copy()->endOfMonth();
+                    $count = Sortie::where('student_id', $matricule)
+                        ->whereBetween('created_at', [$current, $monthEnd])
+                        ->count();
+                    $current->addMonth();
+                    break;
+            }
+            $data[] = $count;
+        }
+
+        return [
+            'type' => $graphType,
+            'labels' => $labels,
+            'datasets' => [[
+                'label' => 'Nombre de sorties',
+                'data' => $data,
+                'borderColor' => '#36A2EB',
+                'backgroundColor' => $graphType === 'bar' ? '#36A2EB' : 'rgba(54, 162, 235, 0.2)',
+                'tension' => 0.4
+            ]]
+        ];
+    }
+
+    /**
+     * Generate sanctions graph data
+     */
+    private function generateSanctionsGraphData($matricule, $graphType, $from, $to, $unit)
+    {
+        $fromDate = Carbon::parse($from);
+        $toDate = Carbon::parse($to);
+
+        if ($graphType === 'pie' || $graphType === 'doughnut') {
+            $sanctions = Sanction::where('matricule', $matricule)
+                ->whereBetween('created_at', [$fromDate, $toDate])
+                ->get();
+
+            $distribution = $sanctions->groupBy('type')->map->count();
+
+            return [
+                'type' => $graphType,
+                'labels' => $distribution->keys()->toArray(),
+                'datasets' => [[
+                    'data' => $distribution->values()->toArray(),
+                    'backgroundColor' => ['#FF6384', '#FF9F40', '#FFCD56', '#4BC0C0'],
+                    'label' => 'Types de sanctions'
+                ]]
+            ];
+        }
+
+        $labels = [];
+        $data = [];
+        $current = $fromDate->copy();
+
+        while ($current->lte($toDate)) {
+            switch ($unit) {
+                case 'days':
+                    $labels[] = $current->format('d/m');
+                    $count = Sanction::where('matricule', $matricule)
+                        ->whereDate('created_at', $current)
+                        ->count();
+                    $current->addDay();
+                    break;
+                case 'weeks':
+                    $weekEnd = $current->copy()->endOfWeek();
+                    $labels[] = $current->format('d/m') . ' - ' . $weekEnd->format('d/m');
+                    $count = Sanction::where('matricule', $matricule)
+                        ->whereBetween('created_at', [$current, $weekEnd])
+                        ->count();
+                    $current->addWeek();
+                    break;
+                case 'months':
+                    $labels[] = $current->format('M Y');
+                    $monthEnd = $current->copy()->endOfMonth();
+                    $count = Sanction::where('matricule', $matricule)
+                        ->whereBetween('created_at', [$current, $monthEnd])
+                        ->count();
+                    $current->addMonth();
+                    break;
+            }
+            $data[] = $count;
+        }
+
+        return [
+            'type' => $graphType,
+            'labels' => $labels,
+            'datasets' => [[
+                'label' => 'Nombre de sanctions',
+                'data' => $data,
+                'borderColor' => '#FF6384',
+                'backgroundColor' => $graphType === 'bar' ? '#FF6384' : 'rgba(255, 99, 132, 0.2)',
+                'tension' => 0.4
+            ]]
+        ];
+    }
+
+    /**
+     * Generate medical graph data
+     */
+    private function generateMedicalGraphData($matricule, $graphType, $from, $to, $unit)
+    {
+        $fromDate = Carbon::parse($from);
+        $toDate = Carbon::parse($to);
+
+        if ($graphType === 'pie' || $graphType === 'doughnut') {
+            $patients = Patient::where('matricule', $matricule)
+                ->whereBetween('created_at', [$fromDate, $toDate])
+                ->get();
+
+            $validatedCount = $patients->where('valider', 1)->count();
+            $pendingCount = $patients->where('valider', 0)->count();
+
+            return [
+                'type' => $graphType,
+                'labels' => ['Validés', 'En attente'],
+                'datasets' => [[
+                    'data' => [$validatedCount, $pendingCount],
+                    'backgroundColor' => ['#4BC0C0', '#FFCE56'],
+                    'label' => 'État des consultations'
+                ]]
+            ];
+        }
+
+        $labels = [];
+        $data = [];
+        $current = $fromDate->copy();
+
+        while ($current->lte($toDate)) {
+            switch ($unit) {
+                case 'days':
+                    $labels[] = $current->format('d/m');
+                    $count = Patient::where('matricule', $matricule)
+                        ->whereDate('created_at', $current)
+                        ->count();
+                    $current->addDay();
+                    break;
+                case 'weeks':
+                    $weekEnd = $current->copy()->endOfWeek();
+                    $labels[] = $current->format('d/m') . ' - ' . $weekEnd->format('d/m');
+                    $count = Patient::where('matricule', $matricule)
+                        ->whereBetween('created_at', [$current, $weekEnd])
+                        ->count();
+                    $current->addWeek();
+                    break;
+                case 'months':
+                    $labels[] = $current->format('M Y');
+                    $monthEnd = $current->copy()->endOfMonth();
+                    $count = Patient::where('matricule', $matricule)
+                        ->whereBetween('created_at', [$current, $monthEnd])
+                        ->count();
+                    $current->addMonth();
+                    break;
+            }
+            $data[] = $count;
+        }
+
+        return [
+            'type' => $graphType,
+            'labels' => $labels,
+            'datasets' => [[
+                'label' => 'Consultations médicales',
+                'data' => $data,
+                'borderColor' => '#4BC0C0',
+                'backgroundColor' => $graphType === 'bar' ? '#4BC0C0' : 'rgba(75, 192, 192, 0.2)',
+                'tension' => 0.4
+            ]]
+        ];
+    }
+
+    /**
+     * Generate reports graph data
+     */
+    private function generateReportsGraphData($matricule, $graphType, $from, $to, $unit)
+    {
+        $fromDate = Carbon::parse($from);
+        $toDate = Carbon::parse($to);
+
+        if ($graphType === 'pie' || $graphType === 'doughnut') {
+            $reports = Report::where('student_id', $matricule)
+                ->whereBetween('created_at', [$fromDate, $toDate])
+                ->get();
+
+            $statusCounts = $reports->groupBy('status')->map->count();
+
+            return [
+                'type' => $graphType,
+                'labels' => $statusCounts->keys()->toArray(),
+                'datasets' => [[
+                    'data' => $statusCounts->values()->toArray(),
+                    'backgroundColor' => ['#9966FF', '#FF9F40', '#36A2EB', '#FF6384'],
+                    'label' => 'État des rapports'
+                ]]
+            ];
+        }
+
+        $labels = [];
+        $data = [];
+        $current = $fromDate->copy();
+
+        while ($current->lte($toDate)) {
+            switch ($unit) {
+                case 'days':
+                    $labels[] = $current->format('d/m');
+                    $count = Report::where('student_id', $matricule)
+                        ->whereDate('created_at', $current)
+                        ->count();
+                    $current->addDay();
+                    break;
+                case 'weeks':
+                    $weekEnd = $current->copy()->endOfWeek();
+                    $labels[] = $current->format('d/m') . ' - ' . $weekEnd->format('d/m');
+                    $count = Report::where('student_id', $matricule)
+                        ->whereBetween('created_at', [$current, $weekEnd])
+                        ->count();
+                    $current->addWeek();
+                    break;
+                case 'months':
+                    $labels[] = $current->format('M Y');
+                    $monthEnd = $current->copy()->endOfMonth();
+                    $count = Report::where('student_id', $matricule)
+                        ->whereBetween('created_at', [$current, $monthEnd])
+                        ->count();
+                    $current->addMonth();
+                    break;
+            }
+            $data[] = $count;
+        }
+
+        return [
+            'type' => $graphType,
+            'labels' => $labels,
+            'datasets' => [[
+                'label' => 'Nombre de rapports',
+                'data' => $data,
+                'borderColor' => '#9966FF',
+                'backgroundColor' => $graphType === 'bar' ? '#9966FF' : 'rgba(153, 102, 255, 0.2)',
+                'tension' => 0.4
+            ]]
+        ];
+    }
+
+    /**
+     * Generate RDVs graph data
+     */
+    private function generateRdvsGraphData($matricule, $graphType, $from, $to, $unit)
+    {
+        $fromDate = Carbon::parse($from);
+        $toDate = Carbon::parse($to);
+
+        if ($graphType === 'pie' || $graphType === 'doughnut') {
+            $rdvs = ListeRdv::where('matricule', $matricule)
+                ->whereBetween('created_at', [$fromDate, $toDate])
+                ->get();
+
+            $motifCounts = $rdvs->groupBy('motif')->map->count();
+
+            return [
+                'type' => $graphType,
+                'labels' => $motifCounts->keys()->toArray(),
+                'datasets' => [[
+                    'data' => $motifCounts->values()->toArray(),
+                    'backgroundColor' => ['#FF9F40', '#4BC0C0', '#36A2EB'],
+                    'label' => 'Types de RDV'
+                ]]
+            ];
+        }
+
+        $labels = [];
+        $data = [];
+        $current = $fromDate->copy();
+
+        while ($current->lte($toDate)) {
+            switch ($unit) {
+                case 'days':
+                    $labels[] = $current->format('d/m');
+                    $count = ListeRdv::where('matricule', $matricule)
+                        ->whereDate('created_at', $current)
+                        ->count();
+                    $current->addDay();
+                    break;
+                case 'weeks':
+                    $weekEnd = $current->copy()->endOfWeek();
+                    $labels[] = $current->format('d/m') . ' - ' . $weekEnd->format('d/m');
+                    $count = ListeRdv::where('matricule', $matricule)
+                        ->whereBetween('created_at', [$current, $weekEnd])
+                        ->count();
+                    $current->addWeek();
+                    break;
+                case 'months':
+                    $labels[] = $current->format('M Y');
+                    $monthEnd = $current->copy()->endOfMonth();
+                    $count = ListeRdv::where('matricule', $matricule)
+                        ->whereBetween('created_at', [$current, $monthEnd])
+                        ->count();
+                    $current->addMonth();
+                    break;
+            }
+            $data[] = $count;
+        }
+
+        return [
+            'type' => $graphType,
+            'labels' => $labels,
+            'datasets' => [[
+                'label' => 'Nombre de RDV',
+                'data' => $data,
+                'borderColor' => '#FF9F40',
+                'backgroundColor' => $graphType === 'bar' ? '#FF9F40' : 'rgba(255, 159, 64, 0.2)',
+                'tension' => 0.4
+            ]]
+        ];
+    }
+
+    /**
+     * Generate exemptions graph data
+     */
+    private function generateExemptionsGraphData($matricule, $graphType, $from, $to, $unit)
+    {
+        $fromDate = Carbon::parse($from);
+        $toDate = Carbon::parse($to);
+
+        if ($graphType === 'pie' || $graphType === 'doughnut') {
+            $exemptions = Exemption::where('matricule', $matricule)
+                ->whereBetween('created_at', [$fromDate, $toDate])
+                ->get();
+
+            $now = now();
+            $activeCount = $exemptions->where('date_fin', '>=', $now)->count();
+            $expiredCount = $exemptions->where('date_fin', '<', $now)->count();
+
+            return [
+                'type' => $graphType,
+                'labels' => ['Actives', 'Expirées'],
+                'datasets' => [[
+                    'data' => [$activeCount, $expiredCount],
+                    'backgroundColor' => ['#4BC0C0', '#FF6384'],
+                    'label' => 'État des exemptions'
+                ]]
+            ];
+        }
+
+        $labels = [];
+        $data = [];
+        $current = $fromDate->copy();
+
+        while ($current->lte($toDate)) {
+            switch ($unit) {
+                case 'days':
+                    $labels[] = $current->format('d/m');
+                    $count = Exemption::where('matricule', $matricule)
+                        ->whereDate('created_at', $current)
+                        ->count();
+                    $current->addDay();
+                    break;
+                case 'weeks':
+                    $weekEnd = $current->copy()->endOfWeek();
+                    $labels[] = $current->format('d/m') . ' - ' . $weekEnd->format('d/m');
+                    $count = Exemption::where('matricule', $matricule)
+                        ->whereBetween('created_at', [$current, $weekEnd])
+                        ->count();
+                    $current->addWeek();
+                    break;
+                case 'months':
+                    $labels[] = $current->format('M Y');
+                    $monthEnd = $current->copy()->endOfMonth();
+                    $count = Exemption::where('matricule', $matricule)
+                        ->whereBetween('created_at', [$current, $monthEnd])
+                        ->count();
+                    $current->addMonth();
+                    break;
+            }
+            $data[] = $count;
+        }
+
+        return [
+            'type' => $graphType,
+            'labels' => $labels,
+            'datasets' => [[
+                'label' => 'Nombre d\'exemptions',
+                'data' => $data,
+                'borderColor' => '#FFCE56',
+                'backgroundColor' => $graphType === 'bar' ? '#FFCE56' : 'rgba(255, 206, 86, 0.2)',
+                'tension' => 0.4
+            ]]
+        ];
     }
 }

@@ -60,12 +60,29 @@ class Weekendlist extends Component
 
     public function render()
     {
+        $officer = auth()->user()->isOfficer();
         $query = Student::where('grade', $this->bat)
             ->with('section');
+
+
+        if ($officer->role->name == 'Chef de compagnie') {
+
+            $userSections = $officer->sections()->pluck('id');
+            $query->whereHas('section', function ($q) use ($userSections) {
+                $q->whereIn('id', $userSections);
+            });
+        }
+        if ($officer->role->name == 'Chef de batallaint') {
+
+
+            $query->where("grade", $officer->bat);
+        }
+
 
         // Apply search filter if term exists
         if ($this->searchTerm) {
             $term = '%' . $this->searchTerm . '%';
+
 
             switch ($this->searchType) {
                 case 'matricule':

@@ -1,68 +1,63 @@
 <x-brigade css="report">
-    <div class="max-w-6xl mx-auto py-8 px-2">
-        <div class="bg-white dark:bg-gray-800 rounded-3xl shadow p-6">
+    <div class="max-w-6xl mx-auto py-8 px-4">
+        <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-6">
             <!-- Reports Table -->
-            <div class="overflow-x-auto rounded-2xll">
-                <table class="w-full shadow-md rounded-sm">
-                    <thead class="bg-sky-200">
-                        <tr>
-                            <th class=" px-4 py-4 text-left text-xs font-bold text-white dark:text-gray-300 uppercase">
-                                Matricule
-                            </th>
-                            <th class=" px-4 py-4 text-left text-xs font-bold text-white dark:text-gray-300 uppercase">
-                                Nom
-                            </th>
-                            <th class=" px-4 py-4 text-left text-xs font-bold text-white dark:text-gray-300 uppercase">
-                                Prenom
-                            </th>
-                            <th class=" px-4 py-4 text-left text-xs font-bold text-white dark:text-gray-300 uppercase">
-                                Section
-                            </th>
-                            <th class=" px-4 py-4 text-left text-xs font-bold text-white dark:text-gray-300 uppercase">
-                                status
-                            </th>
-                            <th class=" px-4 py-4 text-left text-xs font-bold text-white dark:text-gray-300 uppercase">
-                                temps
-                            </th>
+            <div class="overflow-hidden rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-100 dark:bg-gray-700">
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300">
+                                Matricule</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300">
+                                Nom</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300">
+                                Prenom</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300">
+                                Section</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300">
+                                Status</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300">
+                                Temps</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                         @if ($reports->isEmpty())
                             <tr>
-                                <td colspan="5" class="text-center py-4 text-gray-500 dark:text-gray-400">
+                                <td colspan="6" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
                                     Aucun rapport reçu.
                                 </td>
                             </tr>
                         @else
                             @foreach ($reports as $report)
                                 <tr onclick="window.location='{{ route('report.show', ['id' => $officer->id, 'report_id' => $report->id]) }}'"
-                                    class="
-                                        cursor-pointer transition-all duration-200 ease-in-out
-                                        transform hover:-translate-y-px
-                                        mb-3 rounded-lg shadow-sm
-                                        @if ($report->refused) bg-white dark:bg-amber-900/10 hover:bg-sky-50 dark:hover:bg-amber-900/20
-                                        @elseif ($report->status === 'DONE')
-                                            bg-white dark:bg-indigo-900/10 hover:bg-sky-50 dark:hover:bg-indigo-900/20
-                                        @else
-                                            bg-white dark:bg-gray-800 hover:bg-sky-50 dark:hover:bg-gray-700/70 @endif
-                                    ">
-                                    <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+                                    class="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-150">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                         {{ $report->student->matricule }}
                                     </td>
-                                    <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                         {{ $report->student->nom }}
                                     </td>
-                                    <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                         prenom
                                     </td>
-                                    <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                         {{ $report->student->section->code() }}
                                     </td>
-                                    <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
-                                        {{ $report->status }}
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span
+                                            class="status-badge status-{{ strtolower($report->status) }} {{ $report->refused ? 'status-refused' : '' }}">
+                                            {{ $report->status }}
+                                        </span>
                                     </td>
-                                    <td class=" px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                         {{ $report->updated_at }}
+                                    </td>
                                 </tr>
                             @endforeach
                         @endif
@@ -72,7 +67,21 @@
         </div>
     </div>
 
+    <style>
+        .status-badge {
+            @apply px-3 py-1 text-xs font-medium rounded-full;
+        }
 
+        .status-done {
+            @apply bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-100;
+        }
 
+        .status-refused {
+            @apply bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-100;
+        }
 
+        .status-pending {
+            @apply bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-100;
+        }
+    </style>
 </x-brigade>

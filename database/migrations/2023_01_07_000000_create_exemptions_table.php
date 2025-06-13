@@ -9,19 +9,18 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('exemptions', function (Blueprint $table) {
-            $table->unsignedInteger('matricule');
-            $table->string('motif');
+            $table->id();
+            $table->unsignedBigInteger('matricule');
+            $table->text('motif')->nullable();
             $table->date('date_debut');
             $table->date('date_fin');
-
-            $table->foreign('matricule')
-                ->references('matricule')
-                ->on('Students')
-                ->onDelete('cascade');
             $table->timestamps();
+
+            $table->foreign('matricule')->references('matricule')->on('students')
+                ->onDelete('cascade')->onUpdate('cascade');
         });
     }
 

@@ -159,20 +159,20 @@
                     <i class="fa-solid fa-list w-5 h-5"></i>
                     <span class="ml-3">Liste des patients</span>
                 </a>
-                <a href="{{ route('brigade.list_patients', ['id' => $officerid]) }}"
+                <a href="{{ route('brigade.rdv-list', ['id' => $officerid]) }}"
                     class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <i class="fa-solid fa-list w-5 h-5"></i>
-                    <span class="ml-3">Liste des rendez_vous</span>
+                    <i class="fa-solid fa-calendar-check w-5 h-5"></i>
+                    <span class="ml-3">Rendez-vous de demain</span>
                 </a>
-                <a href="{{ route('brigade.exemptions', ['id' => $officerid]) }}"
+                <a href="{{ route('brigade.exemption-list', ['id' => $officerid]) }}"
                     class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <i class="fa-solid fa-list w-5 h-5"></i>
-                    <span class="ml-3">Liste des exemptions</span>
+                    <i class="fa-solid fa-user-shield w-5 h-5"></i>
+                    <span class="ml-3">Exemptions actives</span>
                 </a>
-                <a href="{{ route('brigade.list_patients', ['id' => $officerid]) }}"
+                <a href="{{ route('brigade.convocation-list', ['id' => $officerid]) }}"
                     class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <i class="fa-solid fa-list w-5 h-5"></i>
-                    <span class="ml-3">Liste des convocation</span>
+                    <i class="fa-solid fa-user-clock w-5 h-5"></i>
+                    <span class="ml-3">Convocations médicales</span>
                 </a>
 
                 {{-- <a href="#"

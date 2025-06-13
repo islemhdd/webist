@@ -16,7 +16,7 @@ class ListeRdv extends Model
         'date'
     ];
 
-    public function Student()
+    public function student()
     {
         return $this->belongsTo(Student::class, 'matricule', 'matricule');
     }

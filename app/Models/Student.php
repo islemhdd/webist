@@ -68,8 +68,9 @@ class Student extends Model
     }
     public function sorties(): HasMany
     {
-        return $this->hasMany(Sortie::class, 'student_id', 'matricule');
+        return $this->hasMany(Sortie::class, 'matricule', 'student_id');
     }
+
     public function sortie(): Sortie
     {
         // Get the most recent sortie

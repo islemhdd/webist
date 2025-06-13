@@ -56,7 +56,14 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
                     <!-- Weekend Permissions Chart -->
                     <div
-                        class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-6 shadow-sm">
+                        class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-6 shadow-sm relative">
+                        <!-- Details Button -->
+                        <button
+                            onclick="window.location.href='{{ route('brigade.statistics.weekend', ['id' => $officer->id]) }}'"
+                            class="absolute top-4 right-4 w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center transition-colors duration-200 shadow-sm hover:shadow-md">
+                            <i class="fas fa-plus text-sm"></i>
+                        </button>
+
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center">Weekend
                             Permissions</h3>
                         <div class="flex justify-center">
@@ -115,7 +122,14 @@
 
                     <!-- Sanctions Chart -->
                     <div
-                        class="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-xl p-6 shadow-sm">
+                        class="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-xl p-6 shadow-sm relative">
+                        <!-- Details Button -->
+                        <button
+                            onclick="window.location.href='{{ route('brigade.statistics.sanctions', ['id' => $officer->id]) }}'"
+                            class="absolute top-4 right-4 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-colors duration-200 shadow-sm hover:shadow-md">
+                            <i class="fas fa-plus text-sm"></i>
+                        </button>
+
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center">Sanctions
                         </h3>
                         <div class="flex justify-center">
@@ -175,7 +189,14 @@
 
                     <!-- Patine Chart -->
                     <div
-                        class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl p-6 shadow-sm">
+                        class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl p-6 shadow-sm relative">
+                        <!-- Details Button -->
+                        <button
+                            onclick="window.location.href='{{ route('brigade.statistics.patients', ['id' => $officer->id]) }}'"
+                            class="absolute top-4 right-4 w-8 h-8 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center transition-colors duration-200 shadow-sm hover:shadow-md">
+                            <i class="fas fa-plus text-sm"></i>
+                        </button>
+
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center">Patient
                             history</h3>
                         <div class="flex justify-center">
@@ -227,7 +248,14 @@
 
                     <!-- Summary Stats -->
                     <div
-                        class="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-800/20 rounded-xl p-6 shadow-sm">
+                        class="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-800/20 rounded-xl p-6 shadow-sm relative">
+                        <!-- Details Button -->
+                        <button
+                            onclick="window.location.href='{{ route('brigade.statistics.students', ['id' => $officer->id]) }}'"
+                            class="absolute top-4 right-4 w-8 h-8 bg-indigo-500 hover:bg-indigo-600 text-white rounded-full flex items-center justify-center transition-colors duration-200 shadow-sm hover:shadow-md">
+                            <i class="fas fa-plus text-sm"></i>
+                        </button>
+
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center">Summary
                         </h3>
                         <div class="space-y-4">

@@ -1,5 +1,5 @@
 <x-brigade css="list students">
-    <div class="max-w-7xl mx-auto py-8 px-4" x-data="studentsList()">
+    <div class="max-w-7xl mx-auto py-8 px-4" x-data="studentsList()" x-init="init()">>
         <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-6">
             <!-- Header -->
             <div class="flex justify-between items-center mb-6">
@@ -297,7 +297,7 @@
                             <!-- Detailed Sections with Tabs -->
                             <div class="bg-white dark:bg-gray-700 rounded-lg shadow overflow-hidden">
                                 <div class="border-b border-gray-200 dark:border-gray-600">
-                                    <nav class="flex -mb-px">
+                                    <nav class="flex -mb-px overflow-x-auto">
                                         <button @click="activeStatsTab = 'sanctions'"
                                             :class="{ 'border-blue-500 text-blue-600 dark:text-blue-400': activeStatsTab === 'sanctions', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300': activeStatsTab !== 'sanctions' }"
                                             class="whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm">
@@ -313,6 +313,16 @@
                                             class="whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm">
                                             Medical
                                         </button>
+                                        <button @click="activeStatsTab = 'rdvs'"
+                                            :class="{ 'border-blue-500 text-blue-600 dark:text-blue-400': activeStatsTab === 'rdvs', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300': activeStatsTab !== 'rdvs' }"
+                                            class="whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm">
+                                            RDV
+                                        </button>
+                                        <button @click="activeStatsTab = 'exemptions'"
+                                            :class="{ 'border-blue-500 text-blue-600 dark:text-blue-400': activeStatsTab === 'exemptions', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300': activeStatsTab !== 'exemptions' }"
+                                            class="whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm">
+                                            Exemptions
+                                        </button>
                                         <button @click="activeStatsTab = 'sorties'"
                                             :class="{ 'border-blue-500 text-blue-600 dark:text-blue-400': activeStatsTab === 'sorties', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300': activeStatsTab !== 'sorties' }"
                                             class="whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm">
@@ -325,7 +335,14 @@
                                 <div class="p-6">
                                     <!-- Sanctions Tab -->
                                     <div x-show="activeStatsTab === 'sanctions'">
-                                        <h3 class="text-lg font-medium mb-4">Sanction History</h3>
+                                        <div class="flex justify-between items-center mb-4">
+                                            <h3 class="text-lg font-medium">Sanction History</h3>
+                                            <button @click="openGraphModal('sanctions')"
+                                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-md flex items-center gap-2">
+                                                <i class="fas fa-chart-bar"></i>
+                                                <span>Show Graph</span>
+                                            </button>
+                                        </div>
                                         {{-- ! not gettong the histoey --}}
                                         <div class="overflow-x-auto">
                                             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -386,7 +403,14 @@
 
                                     <!-- Reports Tab -->
                                     <div x-show="activeStatsTab === 'reports'" x-transition>
-                                        <h3 class="text-lg font-medium mb-4">Report History</h3>
+                                        <div class="flex justify-between items-center mb-4">
+                                            <h3 class="text-lg font-medium">Report History</h3>
+                                            <button @click="openGraphModal('reports')"
+                                                class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-md flex items-center gap-2">
+                                                <i class="fas fa-chart-pie"></i>
+                                                <span>Show Graph</span>
+                                            </button>
+                                        </div>
                                         <div class="overflow-x-auto">
                                             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                                 <thead class="bg-gray-50 dark:bg-gray-700">
@@ -441,7 +465,14 @@
 
                                     <!-- Medical Tab -->
                                     <div x-show="activeStatsTab === 'medical'" x-transition>
-                                        <h3 class="text-lg font-medium mb-4">Medical History</h3>
+                                        <div class="flex justify-between items-center mb-4">
+                                            <h3 class="text-lg font-medium">Medical History</h3>
+                                            <button @click="openGraphModal('medical')"
+                                                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-md flex items-center gap-2">
+                                                <i class="fas fa-chart-area"></i>
+                                                <span>Show Graph</span>
+                                            </button>
+                                        </div>
                                         <div class="space-y-6">
                                             <!-- Medical Visits -->
                                             <div>
@@ -550,9 +581,130 @@
                                         </div>
                                     </div>
 
+                                    <!-- RDVs Tab -->
+                                    <div x-show="activeStatsTab === 'rdvs'" x-transition>
+                                        <div class="flex justify-between items-center mb-4">
+                                            <h3 class="text-lg font-medium">Appointment History</h3>
+                                            <button @click="openGraphModal('rdvs')"
+                                                class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors shadow-md flex items-center gap-2">
+                                                <i class="fas fa-chart-doughnut"></i>
+                                                <span>Show Graph</span>
+                                            </button>
+                                        </div>
+                                        <div class="overflow-x-auto">
+                                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                                <thead class="bg-gray-50 dark:bg-gray-700">
+                                                    <tr>
+                                                        <th
+                                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                            Motif</th>
+                                                        <th
+                                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                            Service</th>
+                                                        <th
+                                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                            Date</th>
+                                                        <th
+                                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                            Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody
+                                                    class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                                    <template
+                                                        x-for="rdv in [...(statsData.rdvs?.upcoming || []), ...(statsData.rdvs?.past || [])]"
+                                                        :key="rdv.date">
+                                                        <tr>
+                                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100"
+                                                                x-text="rdv.motif"></td>
+                                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"
+                                                                x-text="rdv.service"></td>
+                                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"
+                                                                x-text="new Date(rdv.date).toLocaleDateString()"></td>
+                                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                                <span
+                                                                    :class="rdv.is_upcoming ?
+                                                                        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                                                                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'"
+                                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                                                                    x-text="rdv.is_upcoming ? 'Upcoming' : 'Past'">
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    </template>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <!-- Exemptions Tab -->
+                                    <div x-show="activeStatsTab === 'exemptions'" x-transition>
+                                        <div class="flex justify-between items-center mb-4">
+                                            <h3 class="text-lg font-medium">Exemption History</h3>
+                                            <button @click="openGraphModal('exemptions')"
+                                                class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-md flex items-center gap-2">
+                                                <i class="fas fa-chart-bar"></i>
+                                                <span>Show Graph</span>
+                                            </button>
+                                        </div>
+                                        <div class="overflow-x-auto">
+                                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                                <thead class="bg-gray-50 dark:bg-gray-700">
+                                                    <tr>
+                                                        <th
+                                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                            Motif</th>
+                                                        <th
+                                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                            Start Date</th>
+                                                        <th
+                                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                            End Date</th>
+                                                        <th
+                                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                            Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody
+                                                    class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                                    <template
+                                                        x-for="exemption in [...(statsData.exemptions?.active || []), ...(statsData.exemptions?.past || [])]"
+                                                        :key="exemption.date_debut">
+                                                        <tr>
+                                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100"
+                                                                x-text="exemption.motif"></td>
+                                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"
+                                                                x-text="new Date(exemption.date_debut).toLocaleDateString()">
+                                                            </td>
+                                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"
+                                                                x-text="new Date(exemption.date_fin).toLocaleDateString()">
+                                                            </td>
+                                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                                <span
+                                                                    :class="exemption.is_active ?
+                                                                        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                                                                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'"
+                                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                                                                    x-text="exemption.is_active ? 'Active' : 'Expired'">
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    </template>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
                                     <!-- Sorties Tab -->
                                     <div x-show="activeStatsTab === 'sorties'" x-transition>
-                                        <h3 class="text-lg font-medium mb-4">Weekend Permission History</h3>
+                                        <div class="flex justify-between items-center mb-4">
+                                            <h3 class="text-lg font-medium">Weekend Permission History</h3>
+                                            <button @click="openGraphModal('sorties')"
+                                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md flex items-center gap-2">
+                                                <i class="fas fa-chart-line"></i>
+                                                <span>Show Graph</span>
+                                            </button>
+                                        </div>
                                         <div class="overflow-x-auto">
                                             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                                 <thead class="bg-gray-50 dark:bg-gray-700">
@@ -601,6 +753,156 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Graph Modal -->
+        <div x-show="showGraphModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
+            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+            class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
+            @click.self="closeGraphModal()">
+            <div
+                class="relative top-10 mx-auto p-5 border w-11/12 md:w-4/5 lg:w-3/4 xl:w-2/3 shadow-lg rounded-md bg-white dark:bg-gray-800">
+                <!-- Modal Header -->
+                <div class="flex justify-between items-center pb-3 border-b dark:border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        <span
+                            x-text="'Graphiques - ' + (selectedStudent?.nom + ' ' + selectedStudent?.prenom || 'Étudiant')"></span>
+                    </h3>
+                    <button @click="closeGraphModal()"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="mt-4">
+                    <!-- Graph Controls -->
+                    <div class="mb-6 space-y-4">
+                        <!-- Data Type and Graph Type Selection -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Type de données
+                                </label>
+                                <select x-model="graphConfig.dataType"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
+                                    <option value="sorties">Sorties</option>
+                                    <option value="sanctions">Sanctions</option>
+                                    <option value="medical">Consultations médicales</option>
+                                    <option value="reports">Rapports</option>
+                                    <option value="rdvs">Rendez-vous</option>
+                                    <option value="exemptions">Exemptions</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Type de graphique
+                                </label>
+                                <select x-model="graphConfig.graphType"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
+                                    <option value="line">Ligne</option>
+                                    <option value="bar">Barres</option>
+                                    <option value="pie">Camembert</option>
+                                    <option value="doughnut">Anneau</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Date Range and Time Unit (only for timeline charts) -->
+                        <div x-show="['line', 'bar'].includes(graphConfig.graphType)"
+                            class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Date de début
+                                </label>
+                                <input type="date" x-model="graphConfig.from"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Date de fin
+                                </label>
+                                <input type="date" x-model="graphConfig.to"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Unité de temps
+                                </label>
+                                <select x-model="graphConfig.unit"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
+                                    <option value="days">Jours</option>
+                                    <option value="weeks">Semaines</option>
+                                    <option value="months">Mois</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Date Range for pie/doughnut charts -->
+                        <div x-show="['pie', 'doughnut'].includes(graphConfig.graphType)"
+                            class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Date de début
+                                </label>
+                                <input type="date" x-model="graphConfig.from"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Date de fin
+                                </label>
+                                <input type="date" x-model="graphConfig.to"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
+                            </div>
+                        </div>
+
+                        <!-- Generate Button -->
+                        <div class="flex justify-center">
+                            <button @click="loadGraphData()" :disabled="graphLoading"
+                                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md flex items-center gap-2">
+                                <i class="fas fa-chart-line" x-show="!graphLoading"></i>
+                                <i class="fas fa-spinner fa-spin" x-show="graphLoading"></i>
+                                <span x-text="graphLoading ? 'Génération...' : 'Générer le graphique'"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Graph Container -->
+                    <div class="mt-6" x-show="!graphLoading && chartInstance">
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                            <canvas id="studentChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div x-show="graphLoading" class="flex justify-center items-center py-8">
+                        <div class="text-center">
+                            <i class="fas fa-spinner fa-spin text-3xl text-blue-600 mb-4"></i>
+                            <p class="text-gray-600 dark:text-gray-400">Génération du graphique...</p>
+                        </div>
+                    </div>
+
+                    <!-- Error State -->
+                    <div x-show="graphError"
+                        class="mt-4 p-4 bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-800 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-triangle text-red-600 dark:text-red-400 mr-2"></i>
+                            <span class="text-red-700 dark:text-red-300" x-text="graphError"></span>
+                        </div>
+                    </div>
+
+                    <!-- No Data State -->
+                    <div x-show="!graphLoading && !chartInstance && !graphError"
+                        class="flex justify-center items-center py-8">
+                        <div class="text-center text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-chart-line text-4xl mb-4"></i>
+                            <p>Configurez les paramètres et cliquez sur "Générer le graphique"</p>
                         </div>
                     </div>
                 </div>
@@ -688,7 +990,7 @@
     <script>
         function studentsList() {
             return {
-                students: @json($students ?? []),
+                students: [],
                 searchQuery: '',
                 loading: false,
                 showModal: false,
@@ -703,14 +1005,61 @@
                 statsError: null,
                 statsData: null,
                 activeStatsTab: 'sanctions',
+                currentStudentMatricule: null,
+
+                // Graph modal properties
+                showGraphModal: false,
+                graphLoading: false,
+                graphError: null,
+                selectedStudent: null,
+                chartInstance: null,
+                graphConfig: {
+                    dataType: 'sorties',
+                    graphType: 'line',
+                    from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                    to: new Date().toISOString().split('T')[0],
+                    unit: 'days'
+                },
+
+                async init() {
+                    // Load students data when component initializes
+                    await this.loadStudents();
+                },
+
+                async loadStudents() {
+                    this.loading = true;
+                    try {
+                        const response = await fetch('{{ route('students.index') }}', {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            this.students = data.students || [];
+                        } else {
+                            console.error('Failed to load students:', response.status);
+                            this.students = [];
+                        }
+                    } catch (error) {
+                        console.error('Error loading students:', error);
+                        this.students = [];
+                    } finally {
+                        this.loading = false;
+                    }
+                },
 
                 async searchStudents() {
                     // Trim whitespace from search query
                     const query = this.searchQuery.trim();
 
                     if (query === '') {
-                        // If search is empty, show all students (or reload initial data)
-                        this.students = @json($students ?? []);
+                        // If search is empty, reload all students
+                        await this.loadStudents();
                         return;
                     }
 
@@ -762,11 +1111,13 @@
 
                 clearSearch() {
                     this.searchQuery = '';
-                    this.students = @json($students ?? []);
+                    // Reload all students when clearing search
+                    this.loadStudents();
                 },
 
                 async openStudentModal(studentId) {
                     this.currentStudentId = studentId;
+                    this.currentStudentMatricule = studentId; // Use matricule as ID
                     this.showModal = true;
                     this.modalLoading = true;
                     this.modalError = null;
@@ -905,6 +1256,272 @@
                     this.modalLoading = true;
                     this.modalError = null;
                     await this.loadStudentDetail();
+                },
+
+                // Graph functionality
+                openGraphModal(dataType = 'sorties') {
+                    this.graphConfig.dataType = dataType;
+                    this.showGraphModal = true;
+                    this.graphError = null;
+                    this.chartInstance = null;
+
+                    // Set selectedStudent from statsData if available
+                    if (this.statsData?.student) {
+                        this.selectedStudent = this.statsData.student;
+                    }
+
+                    // Ensure we have the current student matricule set
+                    if (!this.currentStudentMatricule && this.statsData?.student?.matricule) {
+                        this.currentStudentMatricule = this.statsData.student.matricule;
+                    }
+                },
+
+                closeGraphModal() {
+                    this.showGraphModal = false;
+                    this.graphError = null;
+                    if (this.chartInstance) {
+                        this.chartInstance.destroy();
+                        this.chartInstance = null;
+                    }
+                },
+
+                async loadGraphData() {
+                    if (!this.currentStudentMatricule) {
+                        this.graphError = 'Aucun étudiant sélectionné';
+                        return;
+                    }
+
+                    this.graphLoading = true;
+                    this.graphError = null;
+
+                    try {
+                        console.log('Loading graph data for:', this.currentStudentMatricule, this.graphConfig);
+
+                        const requestBody = {
+                            data_type: this.graphConfig.dataType,
+                            graph_type: this.graphConfig.graphType,
+                            from: this.graphConfig.from,
+                            to: this.graphConfig.to,
+                            unit: this.graphConfig.unit
+                        };
+
+                        const response = await fetch(
+                            `/student/${this.currentStudentMatricule}/all-graph-data`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                },
+                                body: JSON.stringify(requestBody)
+                            }
+                        );
+
+                        if (!response.ok) {
+                            const errorData = await response.json().catch(() => ({}));
+                            console.error('Graph response error:', response.status, errorData);
+                            throw new Error(errorData.message || `Erreur serveur: ${response.status}`);
+                        }
+
+                        const data = await response.json();
+                        console.log('Graph data received:', data);
+
+                        if (!data.success) {
+                            throw new Error(data.message || 'Erreur lors de la génération du graphique');
+                        }
+
+                        this.updateChart(data.data);
+                    } catch (error) {
+                        console.error('Graph error:', error);
+                        this.graphError = error.message || 'Échec de génération du graphique';
+                    } finally {
+                        this.graphLoading = false;
+                    }
+                },
+
+                updateChart(data) {
+                    const ctx = document.getElementById('studentChart').getContext('2d');
+
+                    console.log('Updating chart with data:', data);
+
+                    if (!window.Chart) {
+                        console.error('Chart.js not loaded');
+                        this.graphError = 'Bibliothèque Chart.js non chargée';
+                        return;
+                    }
+
+                    if (this.chartInstance) {
+                        this.chartInstance.destroy();
+                    }
+
+                    // Get chart configuration based on type and data
+                    const chartConfig = this.getChartConfig(data);
+
+                    try {
+                        this.chartInstance = new Chart(ctx, chartConfig);
+                        console.log('Chart created successfully');
+                    } catch (error) {
+                        console.error('Chart creation error:', error);
+                        this.graphError = 'Erreur lors de la création du graphique';
+                    }
+                },
+
+                getChartConfig(data) {
+                    const dataTypeLabels = {
+                        sorties: 'Sorties',
+                        sanctions: 'Sanctions',
+                        medical: 'Visites médicales',
+                        reports: 'Rapports',
+                        rdvs: 'Rendez-vous',
+                        exemptions: 'Exemptions'
+                    };
+
+                    const dataTypeColors = {
+                        sorties: {
+                            border: 'rgb(34, 197, 94)',
+                            background: 'rgba(34, 197, 94, 0.1)'
+                        },
+                        sanctions: {
+                            border: 'rgb(239, 68, 68)',
+                            background: 'rgba(239, 68, 68, 0.1)'
+                        },
+                        medical: {
+                            border: 'rgb(59, 130, 246)',
+                            background: 'rgba(59, 130, 246, 0.1)'
+                        },
+                        reports: {
+                            border: 'rgb(245, 158, 11)',
+                            background: 'rgba(245, 158, 11, 0.1)'
+                        },
+                        rdvs: {
+                            border: 'rgb(168, 85, 247)',
+                            background: 'rgba(168, 85, 247, 0.1)'
+                        },
+                        exemptions: {
+                            border: 'rgb(6, 182, 212)',
+                            background: 'rgba(6, 182, 212, 0.1)'
+                        }
+                    };
+
+                    const label = dataTypeLabels[this.graphConfig.dataType] || 'Données';
+                    const colors = dataTypeColors[this.graphConfig.dataType] || dataTypeColors.sorties;
+
+                    const baseConfig = {
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: label,
+                                data: data.data,
+                                borderColor: colors.border,
+                                backgroundColor: colors.background,
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top'
+                                },
+                                title: {
+                                    display: true,
+                                    text: `Graphique des ${label.toLowerCase()}`
+                                }
+                            }
+                        }
+                    };
+
+                    // Configure based on chart type
+                    switch (this.graphConfig.graphType) {
+                        case 'line':
+                            return {
+                                type: 'line',
+                                    ...baseConfig,
+                                    data: {
+                                        ...baseConfig.data,
+                                        datasets: [{
+                                            ...baseConfig.data.datasets[0],
+                                            fill: true,
+                                            tension: 0.4
+                                        }]
+                                    },
+                                    options: {
+                                        ...baseConfig.options,
+                                        scales: {
+                                            y: {
+                                                beginAtZero: true,
+                                                ticks: {
+                                                    stepSize: 1
+                                                }
+                                            }
+                                        }
+                                    }
+                            };
+
+                        case 'bar':
+                            return {
+                                type: 'bar',
+                                    ...baseConfig,
+                                    options: {
+                                        ...baseConfig.options,
+                                        scales: {
+                                            y: {
+                                                beginAtZero: true,
+                                                ticks: {
+                                                    stepSize: 1
+                                                }
+                                            }
+                                        }
+                                    }
+                            };
+
+                        case 'pie':
+                        case 'doughnut':
+                            // For pie/doughnut charts, use category data
+                            const pieColors = [
+                                'rgba(239, 68, 68, 0.8)', // Red
+                                'rgba(34, 197, 94, 0.8)', // Green
+                                'rgba(59, 130, 246, 0.8)', // Blue
+                                'rgba(245, 158, 11, 0.8)', // Yellow
+                                'rgba(168, 85, 247, 0.8)', // Purple
+                                'rgba(6, 182, 212, 0.8)', // Cyan
+                                'rgba(236, 72, 153, 0.8)', // Pink
+                                'rgba(75, 85, 99, 0.8)' // Gray
+                            ];
+
+                            return {
+                                type: this.graphConfig.graphType,
+                                    data: {
+                                        labels: data.labels,
+                                        datasets: [{
+                                            label: label,
+                                            data: data.data,
+                                            backgroundColor: pieColors.slice(0, data.labels.length),
+                                            borderWidth: 1,
+                                            borderColor: '#fff'
+                                        }]
+                                    },
+                                    options: {
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        plugins: {
+                                            legend: {
+                                                display: true,
+                                                position: 'right'
+                                            },
+                                            title: {
+                                                display: true,
+                                                text: `Répartition des ${label.toLowerCase()}`
+                                            }
+                                        }
+                                    }
+                            };
+
+                        default:
+                            return baseConfig;
+                    }
                 },
 
                 goToProfile(studentId) {

@@ -21,7 +21,7 @@ class Convoncu extends Model
         'updated_at'
     ];
 
-    public function Student()
+    public function student()
     {
         return $this->belongsTo(Student::class, 'matricule', 'matricule');
     }
