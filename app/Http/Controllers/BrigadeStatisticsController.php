@@ -28,7 +28,7 @@ class BrigadeStatisticsController extends Controller
             case 'Chef de batallaint': // Chef de bataillon - show students in their battalion
                 return $query->where('grade', $officer->bat);
             case 'Chef de brigade': // Chef de brigade
-            case 'Chef de brigade': // Division
+            case 'Chef Division': // Division
             case 'Directeur général': //DG
                 return $query; // Show all students
             default:
@@ -142,7 +142,11 @@ class BrigadeStatisticsController extends Controller
     {
         try {
             $grade = $request->query('grade');
-            $officer = auth()->user()->officer;
+            $officer = auth()->user()->isOfficer();
+            
+            if (!$officer) {
+                return response()->json(['error' => 'Access denied: User is not an officer'], 403);
+            }
 
             // Get base query for students based on officer role
             $baseStudentsQuery = $this->getStudentsQueryByRole($officer);

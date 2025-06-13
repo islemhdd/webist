@@ -1,0 +1,75 @@
+/* appointments_list.css - Styles pour la liste des rendez-vous médicaux */
+
+/* Styles pour les tableaux responsifs */
+.table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Styles pour les badges de spécialité */
+.specialty-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-weight: 500;
+}
+
+/* Animation pour les boutons */
+.btn-hover-effect {
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-hover-effect:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Styles pour le modal */
+.modal-overlay {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+}
+
+/* Styles pour les alertes */
+.alert-slide-in {
+    animation: slideInFromTop 0.3s ease-out;
+}
+
+@keyframes slideInFromTop {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Styles pour le mode sombre */
+@media (prefers-color-scheme: dark) {
+    .dark\:table-zebra tbody tr:nth-child(odd) {
+        background-color: rgba(55, 65, 81, 0.5);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .mobile-stack {
+        display: block !important;
+    }
+
+    .mobile-stack td {
+        display: block;
+        text-align: left !important;
+        border: none !important;
+        padding: 0.5rem 1rem !important;
+    }
+
+    .mobile-stack td:before {
+        content: attr(data-label) ": ";
+        font-weight: bold;
+        display: inline-block;
+        width: 100px;
+    }
+}

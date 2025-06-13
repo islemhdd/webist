@@ -11,11 +11,26 @@ class User extends Authenticatable
 {
     use Notifiable;
     protected $table = 'users';
-    // Champs remplissables
-    protected $gauarded = [];
+    
+    // Fix typo and add proper fillable fields
+    protected $guarded = [];
+    
+    protected $fillable = [
+        'username',
+        'password',
+        'phone',
+        'role_id',
+        'bat'
+    ];
 
     // Cacher le mot de passe lors de l'affichage de l'utilisateur
     protected $hidden = ['password'];
+
+    // Override the username field for authentication
+    public function getAuthIdentifierName()
+    {
+        return 'username';
+    }
 
     // Le mot de passe doit être haché avant d'être stocké dans la base de données
     public function setPasswordAttribute($value)
@@ -40,6 +55,10 @@ class User extends Authenticatable
         // Check if user has an officer role (not Medecin or other non-officer roles)
         if (in_array($this->role->name, ['Chef de compagnie', 'Chef de batallaint', 'Chef de brigade', 'Chef division', 'Directeur général'])) {
             $officer = new Officer($this->getAttributes());
+            // Make sure the officer has the same ID as the user
+            $officer->id = $this->id;
+            // Copy the role relationship
+            $officer->setRelation('role', $this->role);
             return $officer;
         }
 

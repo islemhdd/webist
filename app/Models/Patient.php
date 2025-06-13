@@ -16,6 +16,9 @@ class Patient extends Model
         'valider' => 'integer',
         'validated_at' => 'datetime',
     ];
+
+    // Pas d'assignation automatique - le type_medecin sera choisi manuellement par l'officier
+
     public function Student()
     {
         return $this->belongsTo(Student::class, 'matricule', 'matricule');

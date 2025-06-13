@@ -51,6 +51,9 @@
                                     Section</th>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    Type médecin</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                     Motif</th>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -70,13 +73,23 @@
                                         {{ $rdv->matricule }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                                        {{ $rdv->nom }}
+                                        {{ $rdv->student->nom ?? 'N/A' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                                        {{ $rdv->prenom }}
+                                        {{ $rdv->student->prenom ?? 'N/A' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                                        {{ $rdv->section_id }}
+                                        {{ $rdv->student->section_id ?? 'N/A' }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <span class="px-2 py-1 text-xs rounded-full
+                                            @if($rdv->type_medecin == 'psychologue') bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300
+                                            @elseif($rdv->type_medecin == 'dentiste') bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300
+                                            @elseif($rdv->type_medecin == 'médecin générale') bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300
+                                            @else bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300
+                                            @endif">
+                                            {{ $rdv->type_medecin ?? 'N/A' }}
+                                        </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                                         <span

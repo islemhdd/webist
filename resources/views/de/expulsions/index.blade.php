@@ -407,10 +407,10 @@
                     // Convert both to strings for comparison
                     const gradeStr = grade.toString().trim();
                     const selectedGradeStr = selectedGrade.toString().trim();
-                    
+
                     // Try exact match first
                     matchesGrade = gradeStr === selectedGradeStr;
-                    
+
                     // If no exact match, try to find the grade number within the string
                     if (!matchesGrade && selectedGradeStr !== 'all') {
                         // Check if the grade string contains the selected grade number

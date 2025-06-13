@@ -14,6 +14,24 @@ class PatientController extends Controller
     {
         $query = Patient::query();
 
+        // Vérifier si l'utilisateur connecté est un médecin spécialisé
+        $user = auth()->user();
+        $userRole = $user->role->name ?? '';
+
+        // Filtrage par spécialité selon le rôle du médecin
+        if ($userRole === 'Psychologue') {
+            $query->where('type_medecin', 'psycho');
+        } elseif ($userRole === 'Dentiste') {
+            $query->where('type_medecin', 'dentiste');
+        } elseif ($userRole === 'Médecin général') {
+            $query->where('type_medecin', 'médecin générale');
+        }
+
+        // Le médecin chef (rôle 'Medecin') voit tous les patients d'aujourd'hui uniquement
+        if ($userRole === 'Medecin') {
+            $query->whereDate('patients.created_at', Carbon::today());
+        }
+
         // Filter by validation status if specified
         if ($request->filled('validation')) {
             switch ($request->validation) {
@@ -31,6 +49,18 @@ class PatientController extends Controller
             }
         }
 
+        // Filtre de recherche
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('matricule', 'LIKE', '%' . $search . '%')
+                  ->orWhereHas('student', function($subQ) use ($search) {
+                      $subQ->where('nom', 'LIKE', '%' . $search . '%')
+                           ->orWhere('prenom', 'LIKE', '%' . $search . '%');
+                  });
+            });
+        }
+
         // Déterminer le nombre d'éléments par page
         $perPage = $request->get('per_page', 15);
         $perPage = in_array($perPage, [15, 25, 50, 100]) ? $perPage : 15;
@@ -42,7 +72,7 @@ class PatientController extends Controller
             ->paginate($perPage) // Utiliser le nombre d'éléments par page sélectionné
             ->appends(request()->query()); // Préserver les paramètres de requête
 
-        return view('infermerie.liste_patient', compact('patients'));
+        return view('infermerie.liste_patient', compact('patients', 'userRole'));
     }
 
     public function showValidationForm($id)
@@ -100,10 +130,26 @@ class PatientController extends Controller
 
             $patient->save();
 
+            // Check if the request is explicitly marked as AJAX or not
+            $isAjax = $request->filled('is_ajax') ? (int)$request->is_ajax : request()->expectsJson();
+
+            // Return appropriate response based on request type
+            if ($isAjax) {
+                return response()->json(['success' => true, 'message' => 'Patient validé avec diagnostic médical avec succès.']);
+            }
+
+            // Regular form submission - redirect with success message
             return redirect()->back()->with('success', 'Patient validé avec diagnostic médical avec succès.');
+
         } catch (\Illuminate\Validation\ValidationException $e) {
+            if (request()->expectsJson()) {
+                return response()->json(['success' => false, 'errors' => $e->errors()], 422);
+            }
             return redirect()->back()->withErrors($e->validator)->withInput();
         } catch (\Exception $e) {
+            if (request()->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Erreur lors de la validation: ' . $e->getMessage()], 500);
+            }
             return redirect()->back()->with('error', 'Erreur lors de la validation: ' . $e->getMessage());
         }
     }
@@ -179,9 +225,16 @@ class PatientController extends Controller
         $officer = $id;
         $request->validate([
             'matricule' => ['required', 'exists:students,matricule'],
+            'type_medecin' => ['required', 'in:médecin générale,dentiste,psycho'], // Ajout de la validation du type médecin
         ]);
 
-        $pateint = new Patient(["matricule" => $request->input("matricule")]);
+        $patientData = [
+            'matricule' => $request->input('matricule'),
+            'type_medecin' => $request->input('type_medecin'), // Récupérer le type médecin depuis le formulaire
+            'valider' => 0, // Non validé par défaut
+        ];
+
+        $pateint = new Patient($patientData);
         $pateint->save();
 
         // Retourner JSON pour les requêtes AJAX

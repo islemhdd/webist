@@ -122,4 +122,5 @@ class ReportController extends Controller
 
         return redirect()->back();
     }
+    
 }

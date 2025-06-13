@@ -28,8 +28,9 @@ class AuthController extends Controller
             // Redirect based on user role
             $userRole = Auth::user()->role->name;
 
-            if ($userRole == 'Medecin') {
-                return redirect()->route('statistics.index');
+            if (in_array($userRole, ['Medecin', 'Psychologue', 'Dentiste', 'Médecin général'])) {
+                // Redirect all medical staff (including chief) to their specialized dashboard
+                return redirect()->route('medical.dashboard');
             } elseif ($userRole == 'Directeur des etudes') {
                 return redirect()->route('de.dashboard');
             } elseif (in_array($userRole, ['Chef de compagnie', 'Chef de batallaint', 'Chef de brigade', 'Chef division', 'Directeur général'])) {
@@ -38,8 +39,8 @@ class AuthController extends Controller
                 $officer = auth()->user()->isOfficer();
                 if ($officer) {
                     // dd(1);
-                    // Redirect officers (Chef de compagnie, Chef de batallaint, etc.) to their main dashboard
-                    return redirect()->route('brigade.statistics',['id'=>$officer->id] );
+                    // Redirect officers using their user ID since officers table doesn't exist
+                    return redirect()->route('brigade.statistics',['id'=>auth()->user()->id] );
                 } else {
                     // If user has officer role but no officer data, logout and show error
                     Auth::logout();
@@ -49,7 +50,7 @@ class AuthController extends Controller
                 // For any other roles, try to redirect to principale if they have officer data
                 $officer = auth()->user()->isOfficer();
                 if ($officer) {
-                    return redirect()->route('principale', ['id' => $officer->id]);
+                    return redirect()->route('principale', ['id' => auth()->user()->id]);
                 } else {
                     // If no officer data, logout and show error
                     Auth::logout();

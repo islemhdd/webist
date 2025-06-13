@@ -79,16 +79,15 @@
                                         shadow-sm focus:ring-2 focus:ring-blue-500 dark:text-white">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nom</label>
-                            <input type="text" name="nom" required
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Type de médecin <span class="text-red-500">*</span></label>
+                            <select name="type_medecin" required
                                 class="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700
                                         shadow-sm focus:ring-2 focus:ring-blue-500 dark:text-white">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Prenom</label>
-                            <input type="text" name="prenom" required
-                                class="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700
-                                        shadow-sm focus:ring-2 focus:ring-blue-500 dark:text-white">
+                                <option value="">Sélectionnez le type de médecin</option>
+                                <option value="médecin générale">Médecin Générale</option>
+                                <option value="psycho">Psychologue</option>
+                                <option value="dentiste">Dentiste</option>
+                            </select>
                         </div>
                     </div>
 

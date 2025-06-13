@@ -10,13 +10,14 @@ class ListeRdv extends Model
     public $timestamps = true;
     public $incrementing = false;
     protected $fillable = [
+        'type_medecin',
         'matricule',
         'motif',
         'service',
         'date'
     ];
 
-    public function Student()
+    public function student()
     {
         return $this->belongsTo(Student::class, 'matricule', 'matricule');
     }

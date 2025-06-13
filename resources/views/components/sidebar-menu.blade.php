@@ -16,9 +16,18 @@
 @endphp
 
 
-@if ($officer == null && $user->role->name == 'Medecin') {{-- ? un medcin :  --}}
-    {{-- * Menu de rendez-vous avec sous-menu  --}}
+@if ($officer == null && in_array($user->role->name, ['Medecin', 'Psychologue', 'Dentiste', 'Médecin général'])) {{-- ? Médecins de toutes spécialités --}}
 
+    {{-- Dashboard spécialisé pour les médecins non-chef --}}
+    @if(in_array($user->role->name, ['Psychologue', 'Dentiste', 'Médecin général']))
+        <a href="{{ route('medical.dashboard') }}"
+            class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <i class="fa-solid fa-chart-bar w-5 h-5"></i>
+            <span class="ml-3">Tableau de bord</span>
+        </a>
+    @endif
+
+    {{-- * Menu de rendez-vous avec sous-menu (tous les médecins) --}}
     <div x-data="{ rdvOpen: false }" class="relative">
         <button @click="rdvOpen = !rdvOpen"
             class="flex items-center w-full p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
@@ -28,71 +37,134 @@
         </button>
 
         <div x-show="rdvOpen" class="pl-4 mt-1 space-y-1">
-            <a href="{{ route('liste_rdv.create') }}"
-                class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                <i class="fa-solid fa-plus w-5 h-5"></i>
-                <span class="ml-3">Nouveau rendez-vous</span>
-            </a>
-            <a href="{{ route('liste_rdv.index') }}"
-                class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                <i class="fa-solid fa-list w-5 h-5"></i>
-                <span class="ml-3">Liste des rendez-vous</span>
-            </a>
+            {{-- Médecin chef a accès à tous les rendez-vous --}}
+            @if($user->role->name === 'Medecin')
+                <a href="{{ route('liste_rdv.create') }}"
+                    class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fa-solid fa-plus w-5 h-5"></i>
+                    <span class="ml-3">Nouveau rendez-vous</span>
+                </a>
+                <a href="{{ route('liste_rdv.index') }}"
+                    class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fa-solid fa-list w-5 h-5"></i>
+                    <span class="ml-3">Liste des rendez-vous</span>
+                </a>
+            {{-- Médecins spécialisés ont accès aux rendez-vous filtrés --}}
+            @else
+                <a href="{{ route('medical.appointments.create') }}"
+                    class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fa-solid fa-plus w-5 h-5"></i>
+                    <span class="ml-3">Nouveau rendez-vous</span>
+                </a>
+                <a href="{{ route('medical.appointments') }}"
+                    class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fa-solid fa-list w-5 h-5"></i>
+                    <span class="ml-3">Mes rendez-vous</span>
+                </a>
+            @endif
         </div>
     </div>
 
-    {{-- Liste des patients --}}
-    <a href="{{ route('patients.index') }}"
-        class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-        <i class="fa-solid fa-hospital-user w-5 h-5"></i>
-        <span class="ml-3">Liste des patients</span>
-    </a>
+    {{-- Liste des patients (adaptée selon le rôle) --}}
+    @if($user->role->name === 'Medecin')
+        <a href="{{ route('patients.index') }}"
+            class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <i class="fa-solid fa-hospital-user w-5 h-5"></i>
+            <span class="ml-3">Tous les patients</span>
+        </a>
+    @else
+        <a href="{{ route('medical.patients') }}"
+            class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <i class="fa-solid fa-hospital-user w-5 h-5"></i>
+            <span class="ml-3">Mes patients</span>
+        </a>
+    @endif
 
-    {{-- Compte rendu médical --}}
-    <a href="{{ route('compt') }}"
-        class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-        <i class="fa-solid fa-notes-medical w-5 h-5"></i>
-        <span class="ml-3">Compte rendu médical</span>
-    </a>
-
-    {{-- Liste des convoqués --}}
+    {{-- Liste des convoqués (tous les médecins) --}}
     <a href="{{ route('liste_convoncu') }}"
         class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
         <i class="fa-solid fa-user-clock w-5 h-5"></i>
         <span class="ml-3">Liste des convoqués</span>
     </a>
 
+    {{-- Sections réservées au médecin chef uniquement --}}
+    @if($user->role->name === 'Medecin')
+        {{-- Tableau de bord médecin chef --}}
+        <a href="{{ route('medical.dashboard') }}"
+            class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <i class="fa-solid fa-chart-bar w-5 h-5"></i>
+            <span class="ml-3">Tableau de bord</span>
+        </a>
 
+        {{-- Compte rendu médical (médecin chef uniquement) --}}
+        <a href="{{ route('compt') }}"
+            class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <i class="fa-solid fa-notes-medical w-5 h-5"></i>
+            <span class="ml-3">Comptes Rendus Médicaux</span>
+        </a>
 
-    {{-- Menu de rendez-vous sous-menu des exemptions --}}
-    <div x-data="{ rdvOpen: false }" class="relative">
-        <button @click="rdvOpen = !rdvOpen"
-            class="flex items-center w-full p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-            <i class="fa-solid fa-user-shield w-5 h-5"></i>
-            <span class="ml-3">Exemptions</span>
-            <i class="fa-solid fa-chevron-down ml-auto" :class="{ 'rotate-180': rdvOpen }"></i>
-        </button>
+        {{-- Menu des exemptions (médecin chef uniquement) --}}
+        <div x-data="{ exemptionOpen: false }" class="relative">
+            <button @click="exemptionOpen = !exemptionOpen"
+                class="flex items-center w-full p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <i class="fa-solid fa-user-shield w-5 h-5"></i>
+                <span class="ml-3">Exemptions</span>
+                <i class="fa-solid fa-chevron-down ml-auto" :class="{ 'rotate-180': exemptionOpen }"></i>
+            </button>
 
-        <div x-show="rdvOpen" class="pl-4 mt-1 space-y-1">
-            <a href="{{ route('exemptions.create') }}"
-                class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                <i class="fa-solid fa-plus w-5 h-5"></i>
-                <span class="ml-3">Nouveau Exemption</span>
-            </a>
-            <a href="{{ route('exemptions.index') }}"
-                class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                <i class="fa-solid fa-list w-5 h-5"></i>
-                <span class="ml-3">Liste des exemptions</span>
-            </a>
+            <div x-show="exemptionOpen" class="pl-4 mt-1 space-y-1">
+                <a href="{{ route('exemptions.create') }}"
+                    class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fa-solid fa-plus w-5 h-5"></i>
+                    <span class="ml-3">Nouvelle exemption</span>
+                </a>
+                <a href="{{ route('exemptions.index') }}"
+                    class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fa-solid fa-list w-5 h-5"></i>
+                    <span class="ml-3">Liste des exemptions</span>
+                </a>
+            </div>
         </div>
-        {{-- Statistiques --}}
-    <a href="{{ route('statistics.index') }}"
-        class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-        <i class="fa-solid fa-chart-pie w-5 h-5"></i>
-        <span class="ml-3">Statistiques</span>
-    </a>
+    @endif
 
-    </div>
+    {{-- Statistiques (adaptées selon le rôle) --}}
+    @if($user->role->name === 'Medecin')
+        <a href="{{ route('statistics.index') }}"
+            class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <i class="fa-solid fa-chart-pie w-5 h-5"></i>
+            <span class="ml-3">Statistiques générales</span>
+        </a>
+    @else
+        <a href="{{ route('medical.statistics') }}"
+            class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <i class="fa-solid fa-chart-pie w-5 h-5"></i>
+            <span class="ml-3">Mes statistiques</span>
+        </a>
+    @endif
+
+    {{-- Affichage du type de médecin --}}
+    @if($user->role->name !== 'Medecin')
+        <div class="px-3 py-2 mt-4">
+            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                <div class="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                    Connecté comme :
+                </div>
+                <div class="text-sm text-blue-800 dark:text-blue-300 font-semibold">
+                    @switch($user->role->name)
+                        @case('Psychologue')
+                            Psychologue
+                            @break
+                        @case('Dentiste')
+                            Dentiste
+                            @break
+                        @case('Médecin général')
+                            Médecin Généraliste
+                            @break
+                    @endswitch
+                </div>
+            </div>
+        </div>
+    @endif
 
     {{-- Déconnexion --}}
     {{-- <form method="POST" action="{{ route('logout') }}" class="mt-auto">
@@ -162,7 +234,7 @@
         <span class="ml-3">Sancions</span>
     </a>
 
-    @if ($officer->role->name == 'Chef de compagnie' || $officer->role->name == 'Chef de batallaint')
+    @if ($officer && $officer->role && ($officer->role->name == 'Chef de compagnie' || $officer->role->name == 'Chef de batallaint'))
         {{-- Liste des étudiants --}}
         {{-- Week-end --}}
         <a href="{{ route('weekends', ['id' => $officerid]) }}"

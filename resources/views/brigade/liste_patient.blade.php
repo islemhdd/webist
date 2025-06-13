@@ -137,6 +137,27 @@
                         </div>
                     </div>
 
+                    <!-- Type de médecin -->
+                    <div>
+                        <label for="type_medecin" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Type de médecin <span class="text-red-500">*</span>
+                        </label>
+                        <div class="mt-2">
+                            <select name="type_medecin" id="type_medecin" required
+                                class="block w-full rounded-lg border-gray-300 shadow-sm
+                                   focus:border-blue-500 focus:ring-blue-500
+                                   dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                <option value="">Sélectionnez le type de médecin</option>
+                                <option value="médecin générale">Médecin Générale</option>
+                                <option value="psycho">Psychologue</option>
+                                <option value="dentiste">Dentiste</option>
+                            </select>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                Choisissez le type de médecin que l'étudiant doit consulter
+                            </p>
+                        </div>
+                    </div>
+
                     <!-- Form Actions -->
                     <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                         <button type="button" onclick="hideAddPatientModal()"

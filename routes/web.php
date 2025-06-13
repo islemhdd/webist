@@ -17,6 +17,7 @@ use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\DEController;
 use App\Http\Controllers\RHPController;
 use App\Http\Controllers\ExpulsionController;
+use App\Http\Controllers\MedicalSpecialtyController;
 use Illuminate\Support\Facades\Hash;
 
 // Routes publiques des pages home
@@ -74,6 +75,37 @@ Route::get('/infermerie/statistics', [StatisticsController::class, 'index'])
 
 Route::get('/infermerie/statistics/filter', [StatisticsController::class, 'filter'])
     ->name('statistics.filter')->middleware('auth');
+
+// Routes pour les spécialités médicales
+Route::middleware(['auth', 'medical.specialty'])->prefix('medical')->name('medical.')->group(function () {
+    // Dashboard spécialisé
+    Route::get('/dashboard', [MedicalSpecialtyController::class, 'dashboard'])->name('dashboard');
+
+    // API pour les statistiques du dashboard
+    Route::get('/dashboard/stats', [MedicalSpecialtyController::class, 'dashboardStats'])->name('dashboard.stats');
+
+    // Liste des patients filtrée par spécialité
+    Route::get('/patients', [MedicalSpecialtyController::class, 'patientsList'])->name('patients');
+
+    // API pour la liste des patients (pour le dashboard)
+    Route::get('/patients/api', [MedicalSpecialtyController::class, 'patientsApi'])->name('patients.api');
+
+    // Validation des patients par spécialité
+    Route::get('/patients/{id}/validate', [MedicalSpecialtyController::class, 'showValidationForm'])->name('patients.validate-form');
+    Route::post('/patients/{id}/validate', [MedicalSpecialtyController::class, 'validatePatient'])->name('patients.validate');
+    Route::post('/patients/{id}/assign-specialty', [MedicalSpecialtyController::class, 'assignSpecialty'])->name('patients.assign-specialty');
+
+    // Statistiques par spécialité
+    Route::get('/statistics', [MedicalSpecialtyController::class, 'statistics'])->name('statistics');
+    Route::get('/statistics/filter', [MedicalSpecialtyController::class, 'filterStatistics'])->name('statistics.filter');
+
+    // Rendez-vous par spécialité
+    Route::get('/appointments', [MedicalSpecialtyController::class, 'appointmentsList'])->name('appointments');
+    Route::get('/appointments/create', [MedicalSpecialtyController::class, 'showCreateAppointmentForm'])->name('appointments.create');
+    Route::post('/appointments/create', [MedicalSpecialtyController::class, 'createAppointment'])->name('appointments.store');
+    Route::delete('/appointments/{matricule}/{date}', [MedicalSpecialtyController::class, 'deleteAppointment'])->name('appointments.delete');
+    Route::get('/appointments/stats', [MedicalSpecialtyController::class, 'appointmentsStats'])->name('appointments.stats');
+});
 
 Route::post('/patients/{id}/valider', [PatientController::class, 'valider'])
     ->name('patients.valider')->middleware('auth');

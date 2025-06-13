@@ -265,6 +265,9 @@
                             <textarea name="avis_medecin" id="avis_medecin" rows="4" required
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300"
                                 placeholder="Diagnostic médical obligatoire pour validation..."></textarea>
+
+                            <!-- Add a hidden field to indicate this is NOT an AJAX request -->
+                            <input type="hidden" name="is_ajax" value="0">
                         </div>
                         <div class="flex justify-center space-x-4">
                             <button type="button" onclick="closeValidationModal()"
@@ -292,7 +295,13 @@
         // Validation Modal Functions
         function openValidationModal(patientId) {
             document.getElementById('validationModal').classList.remove('hidden');
-            document.getElementById('validationForm').action = `/patients/${patientId}/validate-with-diagnosis`;
+            const form = document.getElementById('validationForm');
+            form.action = `/patients/${patientId}/validate-with-diagnosis`;
+
+            // Ensure the form submits normally without AJAX
+            form.onsubmit = function() {
+                return true; // Allow normal form submission
+            };
         }
 
         function closeValidationModal() {

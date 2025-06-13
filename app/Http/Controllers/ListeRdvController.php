@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
 use App\Models\Student;
 use App\Models\ListeRdv;
@@ -12,23 +13,22 @@ class ListeRdvController extends Controller
 {
     public function index(Request $request)
     {
-        $query = ListeRdv::join('Students', 'liste_rdvs.matricule', '=', 'Students.matricule')
-            ->select('liste_rdvs.*', 'Students.nom', 'Students.prenom', 'Students.section_id');
+        $query = ListeRdv::with('student');
 
         // Filtre par motif si spécifié
         if ($request->has('motif') && $request->motif != '') {
-            $query->where('liste_rdvs.motif', $request->motif);
+            $query->where('motif', $request->motif);
         }
 
         // Filtre par date
         if ($request->has('date')) {
-            $query->whereDate('liste_rdvs.date', $request->date);
+            $query->whereDate('date', $request->date);
         } else {
             // Par défaut, affiche les rendez-vous d'aujourd'hui
-            $query->whereDate('liste_rdvs.date', Carbon::today());
+            $query->whereDate('date', Carbon::today());
         }
 
-        $rendezvous = $query->orderBy('liste_rdvs.date', 'asc')
+        $rendezvous = $query->orderBy('date', 'asc')
             ->paginate(10)
             ->withQueryString();
 
@@ -90,6 +90,20 @@ class ListeRdvController extends Controller
                 'duplicate' => 'Ce rendez-vous existe déjà pour cet élève.'
             ])->withInput();
         }
+
+        // Déterminer automatiquement le type_medecin selon le rôle de l'utilisateur connecté
+        $user = Auth::user();
+        $userRole = $user->role->name ?? '';
+
+        $typeMedecin = match($userRole) {
+            'Psychologue' => 'psycho',
+            'Dentiste' => 'dentiste',
+            'Médecin général' => 'médecin générale',
+            'Medecin' => 'chef_médecin', // Médecin chef
+            default => 'médecin générale' // Par défaut pour les comptes admin ou non définis
+        };
+
+        $validated['type_medecin'] = $typeMedecin;
 
         ListeRdv::create($validated);
 
