@@ -646,22 +646,43 @@ class MedicalSpecialtyController extends Controller
             $consultationRdvToday = (clone $appointmentsQuery)->where('motif', 'consultation')->count();
             $urgenceRdvToday = (clone $appointmentsQuery)->where('motif', 'urgences')->count();
 
-            // Convocations spécialisées par spécialité
+            // Convocations spécialisées par spécialité - NOUVELLE LOGIQUE
             $convocationsWithPsy = 0;
             $convocationsWithoutPsy = 0;
 
             if ($allowedSpecialty === 'psycho') {
-                // Pour le psychologue : convocations avec validation psy
-                $convocationsWithPsy = \DB::table('convoncus')->whereNotNull('psy')->count();
-                $convocationsWithoutPsy = \DB::table('convoncus')->whereNull('psy')->count();
+                // Psychologue : validé si champ psy rempli (non vide et non null)
+                $convocationsWithPsy = \DB::table('convoncus')
+                    ->whereNotNull('psy')
+                    ->where('psy', '!=', '')
+                    ->count();
+                $convocationsWithoutPsy = \DB::table('convoncus')
+                    ->where(function($q) {
+                        $q->whereNull('psy')->orWhere('psy', '=', '');
+                    })
+                    ->count();
             } elseif ($allowedSpecialty === 'médecin générale') {
-                // Pour le médecin général : convocations avec validation médecin généraliste
-                $convocationsWithPsy = \DB::table('convoncus')->whereNotNull('medGen')->count();
-                $convocationsWithoutPsy = \DB::table('convoncus')->whereNull('medGen')->count();
+                // Médecin général : validé si champ medGen rempli (non vide et non null)
+                $convocationsWithPsy = \DB::table('convoncus')
+                    ->whereNotNull('medGen')
+                    ->where('medGen', '!=', '')
+                    ->count();
+                $convocationsWithoutPsy = \DB::table('convoncus')
+                    ->where(function($q) {
+                        $q->whereNull('medGen')->orWhere('medGen', '=', '');
+                    })
+                    ->count();
             } elseif ($allowedSpecialty === 'dentiste') {
-                // Pour le dentiste : convocations avec validation chirurgien dentiste
-                $convocationsWithPsy = \DB::table('convoncus')->whereNotNull('chirDent')->count();
-                $convocationsWithoutPsy = \DB::table('convoncus')->whereNull('chirDent')->count();
+                // Dentiste : validé si champ chirDent rempli (non vide et non null)
+                $convocationsWithPsy = \DB::table('convoncus')
+                    ->whereNotNull('chirDent')
+                    ->where('chirDent', '!=', '')
+                    ->count();
+                $convocationsWithoutPsy = \DB::table('convoncus')
+                    ->where(function($q) {
+                        $q->whereNull('chirDent')->orWhere('chirDent', '=', '');
+                    })
+                    ->count();
             }
 
             // PAS d'exemptions pour les médecins spécialisés - collection vide
@@ -702,44 +723,71 @@ class MedicalSpecialtyController extends Controller
             ->where('motif', 'urgences')
             ->count();
 
-        // Statistiques détaillées par spécialité pour le médecin chef
+        // Statistiques détaillées par spécialité pour le médecin chef - LOGIQUE MISE À JOUR
         $specialtyStats = [
             'psycho' => [
                 'patients_today' => Patient::whereDate('created_at', $today)->where('type_medecin', 'psycho')->count(),
                 'patients_valid' => Patient::whereDate('created_at', $today)->where('type_medecin', 'psycho')->where('valider', 1)->count(),
                 'appointments_today' => \DB::table('liste_rdvs')->whereDate('date', $today)->where('type_medecin', 'psycho')->count(),
-                'convocations' => \DB::table('convoncus')->whereNotNull('psy')->count()
+                // Psychologue : validé si champ psy rempli uniquement (non vide et non null)
+                'convocations_valid' => \DB::table('convoncus')
+                    ->whereNotNull('psy')
+                    ->where('psy', '!=', '')
+                    ->count(),
+                'convocations_invalid' => \DB::table('convoncus')
+                    ->where(function($q) {
+                        $q->whereNull('psy')->orWhere('psy', '=', '');
+                    })
+                    ->count()
             ],
             'médecin générale' => [
                 'patients_today' => Patient::whereDate('created_at', $today)->where('type_medecin', 'médecin générale')->count(),
                 'patients_valid' => Patient::whereDate('created_at', $today)->where('type_medecin', 'médecin générale')->where('valider', 1)->count(),
                 'appointments_today' => \DB::table('liste_rdvs')->whereDate('date', $today)->where('type_medecin', 'médecin générale')->count(),
-                'convocations' => \DB::table('convoncus')->whereNotNull('medGen')->count()
+                // Médecin général : validé si champ medGen rempli uniquement (non vide et non null)
+                'convocations_valid' => \DB::table('convoncus')
+                    ->whereNotNull('medGen')
+                    ->where('medGen', '!=', '')
+                    ->count(),
+                'convocations_invalid' => \DB::table('convoncus')
+                    ->where(function($q) {
+                        $q->whereNull('medGen')->orWhere('medGen', '=', '');
+                    })
+                    ->count()
             ],
             'dentiste' => [
                 'patients_today' => Patient::whereDate('created_at', $today)->where('type_medecin', 'dentiste')->count(),
                 'patients_valid' => Patient::whereDate('created_at', $today)->where('type_medecin', 'dentiste')->where('valider', 1)->count(),
                 'appointments_today' => \DB::table('liste_rdvs')->whereDate('date', $today)->where('type_medecin', 'dentiste')->count(),
-                'convocations' => \DB::table('convoncus')->whereNotNull('chirDent')->count()
+                // Dentiste : validé si champ chirDent rempli uniquement (non vide et non null)
+                'convocations_valid' => \DB::table('convoncus')
+                    ->whereNotNull('chirDent')
+                    ->where('chirDent', '!=', '')
+                    ->count(),
+                'convocations_invalid' => \DB::table('convoncus')
+                    ->where(function($q) {
+                        $q->whereNull('chirDent')->orWhere('chirDent', '=', '');
+                    })
+                    ->count()
             ]
         ];
 
-        // Convocations globales pour le médecin chef - nouvelle logique
-        // Convocations valides : tous les champs (psy, medGen, chirDent, avisSpe) non-null
+        // Convocations globales pour le médecin chef - NOUVELLE LOGIQUE STRICTE
+        // Valides : TOUS les champs (psy, medGen, chirDent, avisSpe) remplis simultanément
         $convocationsWithPsy = \DB::table('convoncus')
-            ->whereNotNull('psy')
-            ->whereNotNull('medGen')
-            ->whereNotNull('chirDent')
-            ->whereNotNull('avisSpe')
+            ->whereNotNull('psy')->where('psy', '!=', '')
+            ->whereNotNull('medGen')->where('medGen', '!=', '')
+            ->whereNotNull('chirDent')->where('chirDent', '!=', '')
+            ->whereNotNull('avisSpe')->where('avisSpe', '!=', '')
             ->count();
 
-        // Convocations non-valides : au moins un champ null
+        // Non valides : au moins UN champ vide ou null
         $convocationsWithoutPsy = \DB::table('convoncus')
             ->where(function($q) {
-                $q->whereNull('psy')
-                  ->orWhereNull('medGen')
-                  ->orWhereNull('chirDent')
-                  ->orWhereNull('avisSpe');
+                $q->whereNull('psy')->orWhere('psy', '=', '')
+                  ->orWhereNull('medGen')->orWhere('medGen', '=', '')
+                  ->orWhereNull('chirDent')->orWhere('chirDent', '=', '')
+                  ->orWhereNull('avisSpe')->orWhere('avisSpe', '=', '');
             })->count();
 
         // Exemptions UNIQUEMENT pour le médecin chef
@@ -842,25 +890,46 @@ class MedicalSpecialtyController extends Controller
                 ->where('motif', 'urgences')
                 ->count();
 
-            // Convocations selon la spécialité - nouvelle logique
+            // Convocations selon la spécialité - NOUVELLE LOGIQUE MISE À JOUR
             $convocationsWithPsy = 0;
             $convocationsWithoutPsy = 0;
 
             if ($allowedSpecialty === 'psycho') {
-                // Convocations valides: psy NOT NULL, les autres champs ignorés
-                $convocationsWithPsy = \DB::table('convoncus')->whereNotNull('psy')->count();
-                // Convocations invalides: psy NULL
-                $convocationsWithoutPsy = \DB::table('convoncus')->whereNull('psy')->count();
+                // Convocations valides: psy NON-NULL ET non-vide, les autres champs ignorés
+                $convocationsWithPsy = \DB::table('convoncus')
+                    ->whereNotNull('psy')
+                    ->where('psy', '!=', '')
+                    ->count();
+                // Convocations invalides: psy NULL OU vide
+                $convocationsWithoutPsy = \DB::table('convoncus')
+                    ->where(function($q) {
+                        $q->whereNull('psy')->orWhere('psy', '=', '');
+                    })
+                    ->count();
             } elseif ($allowedSpecialty === 'médecin générale') {
-                // Convocations valides: medGen NOT NULL, les autres champs ignorés
-                $convocationsWithPsy = \DB::table('convoncus')->whereNotNull('medGen')->count();
-                // Convocations invalides: medGen NULL
-                $convocationsWithoutPsy = \DB::table('convoncus')->whereNull('medGen')->count();
+                // Convocations valides: medGen NON-NULL ET non-vide, les autres champs ignorés
+                $convocationsWithPsy = \DB::table('convoncus')
+                    ->whereNotNull('medGen')
+                    ->where('medGen', '!=', '')
+                    ->count();
+                // Convocations invalides: medGen NULL OU vide
+                $convocationsWithoutPsy = \DB::table('convoncus')
+                    ->where(function($q) {
+                        $q->whereNull('medGen')->orWhere('medGen', '=', '');
+                    })
+                    ->count();
             } elseif ($allowedSpecialty === 'dentiste') {
-                // Convocations valides: chirDent NOT NULL, les autres champs ignorés
-                $convocationsWithPsy = \DB::table('convoncus')->whereNotNull('chirDent')->count();
-                // Convocations invalides: chirDent NULL
-                $convocationsWithoutPsy = \DB::table('convoncus')->whereNull('chirDent')->count();
+                // Convocations valides: chirDent NON-NULL ET non-vide, les autres champs ignorés
+                $convocationsWithPsy = \DB::table('convoncus')
+                    ->whereNotNull('chirDent')
+                    ->where('chirDent', '!=', '')
+                    ->count();
+                // Convocations invalides: chirDent NULL OU vide
+                $convocationsWithoutPsy = \DB::table('convoncus')
+                    ->where(function($q) {
+                        $q->whereNull('chirDent')->orWhere('chirDent', '=', '');
+                    })
+                    ->count();
             }
 
             return response()->json([
@@ -917,42 +986,51 @@ class MedicalSpecialtyController extends Controller
             ->where('motif', 'urgences')
             ->count();
 
-        // Convocations de la spécialité filtrées par grade - nouvelle logique
+        // Convocations de la spécialité filtrées par grade - NOUVELLE LOGIQUE MISE À JOUR
         $convocationsWithPsy = 0;
         $convocationsWithoutPsy = 0;
 
         if ($allowedSpecialty === 'psycho') {
-            // Convocations valides: psy NOT NULL pour ces étudiants
+            // Convocations valides: psy NON-NULL ET non-vide pour ces étudiants
             $convocationsWithPsy = \DB::table('convoncus')
                 ->whereIn('matricule', $studentMatricules)
                 ->whereNotNull('psy')
+                ->where('psy', '!=', '')
                 ->count();
-            // Convocations invalides: psy NULL pour ces étudiants
+            // Convocations invalides: psy NULL OU vide pour ces étudiants
             $convocationsWithoutPsy = \DB::table('convoncus')
                 ->whereIn('matricule', $studentMatricules)
-                ->whereNull('psy')
+                ->where(function($q) {
+                    $q->whereNull('psy')->orWhere('psy', '=', '');
+                })
                 ->count();
         } elseif ($allowedSpecialty === 'médecin générale') {
-            // Convocations valides: medGen NOT NULL pour ces étudiants
+            // Convocations valides: medGen NON-NULL ET non-vide pour ces étudiants
             $convocationsWithPsy = \DB::table('convoncus')
                 ->whereIn('matricule', $studentMatricules)
                 ->whereNotNull('medGen')
+                ->where('medGen', '!=', '')
                 ->count();
-            // Convocations invalides: medGen NULL pour ces étudiants
+            // Convocations invalides: medGen NULL OU vide pour ces étudiants
             $convocationsWithoutPsy = \DB::table('convoncus')
                 ->whereIn('matricule', $studentMatricules)
-                ->whereNull('medGen')
+                ->where(function($q) {
+                    $q->whereNull('medGen')->orWhere('medGen', '=', '');
+                })
                 ->count();
         } elseif ($allowedSpecialty === 'dentiste') {
-            // Convocations valides: chirDent NOT NULL pour ces étudiants
+            // Convocations valides: chirDent NON-NULL ET non-vide pour ces étudiants
             $convocationsWithPsy = \DB::table('convoncus')
                 ->whereIn('matricule', $studentMatricules)
                 ->whereNotNull('chirDent')
+                ->where('chirDent', '!=', '')
                 ->count();
-            // Convocations invalides: chirDent NULL pour ces étudiants
+            // Convocations invalides: chirDent NULL OU vide pour ces étudiants
             $convocationsWithoutPsy = \DB::table('convoncus')
                 ->whereIn('matricule', $studentMatricules)
-                ->whereNull('chirDent')
+                ->where(function($q) {
+                    $q->whereNull('chirDent')->orWhere('chirDent', '=', '');
+                })
                 ->count();
         }
 
@@ -967,183 +1045,438 @@ class MedicalSpecialtyController extends Controller
         ]);
     }
 
+    // === MÉTHODES DUPLIQUÉES SUPPRIMÉES ===
+    // Les méthodes getAllStatisticsForChief() et getStatisticsByGradeForChief()
+    // dupliquées ont été supprimées pour éviter les erreurs de compilation.
+    // Les versions correctes sont maintenues plus bas dans le fichier.
+
     /**
-     * API pour les statistiques du dashboard
+     * Get all statistics for chief without grade filtering
+     * Pour le médecin chef uniquement
+     */
+    private function getAllStatisticsForChief($today)
+    {
+        // Statistiques globales de toutes les spécialités pour aujourd'hui
+        $validPatientsToday = Patient::whereDate('patients.created_at', $today)->where('valider', 1)->count();
+        $invalidPatientsToday = Patient::whereDate('patients.created_at', $today)->where('valider', 0)->count();
+
+        // Rendez-vous globaux pour aujourd'hui
+        $consultationRdvToday = \DB::table('liste_rdvs')
+            ->whereDate('date', $today)
+            ->where('motif', 'consultation')
+            ->count();
+        $urgenceRdvToday = \DB::table('liste_rdvs')
+            ->whereDate('date', $today)
+            ->where('motif', 'urgences')
+            ->count();
+
+        // Convocations globales pour le médecin chef - NOUVELLE LOGIQUE STRICTE
+        // Valides : TOUS les champs (psy, medGen, chirDent, avisSpe) remplis simultanément
+        $convocationsWithPsy = \DB::table('convoncus')
+            ->whereNotNull('psy')->where('psy', '!=', '')
+            ->whereNotNull('medGen')->where('medGen', '!=', '')
+            ->whereNotNull('chirDent')->where('chirDent', '!=', '')
+            ->whereNotNull('avisSpe')->where('avisSpe', '!=', '')
+            ->count();
+
+        // Non valides : au moins UN champ vide ou null
+        $convocationsWithoutPsy = \DB::table('convoncus')
+            ->where(function($q) {
+                $q->whereNull('psy')->orWhere('psy', '=', '')
+                  ->orWhereNull('medGen')->orWhere('medGen', '=', '')
+                  ->orWhereNull('chirDent')->orWhere('chirDent', '=', '')
+                  ->orWhereNull('avisSpe')->orWhere('avisSpe', '=', '');
+            })->count();
+
+        // Exemptions UNIQUEMENT pour le médecin chef
+        $exemptionsToday = \DB::table('exemptions')
+            ->whereDate('date_debut', '<=', $today)
+            ->whereDate('date_fin', '>=', $today)
+            ->selectRaw('motif, COUNT(*) as count')
+            ->groupBy('motif')
+            ->get();
+
+        // Statistiques détaillées par spécialité pour le médecin chef - NOUVELLE STRUCTURE AVEC VALIDES/INVALIDES
+        $specialtyStats = [
+            'psycho' => [
+                'patients_today' => Patient::whereDate('created_at', $today)->where('type_medecin', 'psycho')->count(),
+                'patients_valid' => Patient::whereDate('created_at', $today)->where('type_medecin', 'psycho')->where('valider', 1)->count(),
+                'appointments_today' => \DB::table('liste_rdvs')->whereDate('date', $today)->where('type_medecin', 'psycho')->count(),
+                'convocations_valid' => \DB::table('convoncus')
+                    ->whereNotNull('psy')
+                    ->where('psy', '!=', '')
+                    ->count(),
+                'convocations_invalid' => \DB::table('convoncus')
+                    ->where(function($q) {
+                        $q->whereNull('psy')->orWhere('psy', '=', '');
+                    })
+                    ->count()
+            ],
+            'médecin générale' => [
+                'patients_today' => Patient::whereDate('created_at', $today)->where('type_medecin', 'médecin générale')->count(),
+                'patients_valid' => Patient::whereDate('created_at', $today)->where('type_medecin', 'médecin générale')->where('valider', 1)->count(),
+                'appointments_today' => \DB::table('liste_rdvs')->whereDate('date', $today)->where('type_medecin', 'médecin générale')->count(),
+                'convocations_valid' => \DB::table('convoncus')
+                    ->whereNotNull('medGen')
+                    ->where('medGen', '!=', '')
+                    ->count(),
+                'convocations_invalid' => \DB::table('convoncus')
+                    ->where(function($q) {
+                        $q->whereNull('medGen')->orWhere('medGen', '=', '');
+                    })
+                    ->count()
+            ],
+            'dentiste' => [
+                'patients_today' => Patient::whereDate('created_at', $today)->where('type_medecin', 'dentiste')->count(),
+                'patients_valid' => Patient::whereDate('created_at', $today)->where('type_medecin', 'dentiste')->where('valider', 1)->count(),
+                'appointments_today' => \DB::table('liste_rdvs')->whereDate('date', $today)->where('type_medecin', 'dentiste')->count(),
+                'convocations_valid' => \DB::table('convoncus')
+                    ->whereNotNull('chirDent')
+                    ->where('chirDent', '!=', '')
+                    ->count(),
+                'convocations_invalid' => \DB::table('convoncus')
+                    ->where(function($q) {
+                        $q->whereNull('chirDent')->orWhere('chirDent', '=', '');
+                    })
+                    ->count()
+            ]
+        ];
+
+        return response()->json([
+            'validPatientsToday' => $validPatientsToday,
+            'invalidPatientsToday' => $invalidPatientsToday,
+            'consultationRdvToday' => $consultationRdvToday,
+            'urgenceRdvToday' => $urgenceRdvToday,
+            'convocationsWithPsy' => $convocationsWithPsy,
+            'convocationsWithoutPsy' => $convocationsWithoutPsy,
+            'exemptionsToday' => $exemptionsToday,
+            'specialtyStats' => $specialtyStats
+        ]);
+    }
+
+    /**
+     * Get statistics for chief filtered by specific grade
+     * Pour le médecin chef uniquement
+     */
+    private function getStatisticsByGradeForChief($today, $grade)
+    {
+        // Récupérer les matricules des étudiants du grade spécifié
+        $studentMatricules = \DB::table('students')->where('grade', $grade)->pluck('matricule');
+
+        if ($studentMatricules->isEmpty()) {
+            return response()->json([
+                'validPatientsToday' => 0,
+                'invalidPatientsToday' => 0,
+                'consultationRdvToday' => 0,
+                'urgenceRdvToday' => 0,
+                'convocationsWithPsy' => 0,
+                'convocationsWithoutPsy' => 0,
+                'exemptionsToday' => [],
+                'specialtyStats' => [
+                    'psycho' => [
+                        'patients_today' => 0,
+                        'patients_valid' => 0,
+                        'appointments_today' => 0,
+                        'convocations_valid' => 0,
+                        'convocations_invalid' => 0
+                    ],
+                    'médecin générale' => [
+                        'patients_today' => 0,
+                        'patients_valid' => 0,
+                        'appointments_today' => 0,
+                        'convocations_valid' => 0,
+                        'convocations_invalid' => 0
+                    ],
+                    'dentiste' => [
+                        'patients_today' => 0,
+                        'patients_valid' => 0,
+                        'appointments_today' => 0,
+                        'convocations_valid' => 0,
+                        'convocations_invalid' => 0
+                    ]
+                ]
+            ]);
+        }
+
+        // Patients filtrés par grade
+        $validPatientsToday = Patient::whereDate('created_at', $today)
+            ->where('valider', 1)
+            ->whereIn('matricule', $studentMatricules)
+            ->count();
+
+        $invalidPatientsToday = Patient::whereDate('created_at', $today)
+            ->where('valider', 0)
+            ->whereIn('matricule', $studentMatricules)
+            ->count();
+
+        // Rendez-vous filtrés par grade
+        $consultationRdvToday = \DB::table('liste_rdvs')
+            ->whereDate('date', $today)
+            ->where('motif', 'consultation')
+            ->whereIn('matricule', $studentMatricules)
+            ->count();
+
+        $urgenceRdvToday = \DB::table('liste_rdvs')
+            ->whereDate('date', $today)
+            ->where('motif', 'urgences')
+            ->whereIn('matricule', $studentMatricules)
+            ->count();
+
+        // Convocations globales pour le médecin chef filtrées par grade
+        $convocationsWithPsy = \DB::table('convoncus')
+            ->whereIn('matricule', $studentMatricules)
+            ->whereNotNull('psy')->where('psy', '!=', '')
+            ->whereNotNull('medGen')->where('medGen', '!=', '')
+            ->whereNotNull('chirDent')->where('chirDent', '!=', '')
+            ->whereNotNull('avisSpe')->where('avisSpe', '!=', '')
+            ->count();
+
+        $convocationsWithoutPsy = \DB::table('convoncus')
+            ->whereIn('matricule', $studentMatricules)
+            ->where(function($q) {
+                $q->whereNull('psy')->orWhere('psy', '=', '')
+                  ->orWhereNull('medGen')->orWhere('medGen', '=', '')
+                  ->orWhereNull('chirDent')->orWhere('chirDent', '=', '')
+                  ->orWhereNull('avisSpe')->orWhere('avisSpe', '=', '');
+            })->count();
+
+        // Exemptions filtrées par grade
+        $exemptionsToday = \DB::table('exemptions')
+            ->whereDate('date_debut', '<=', $today)
+            ->whereDate('date_fin', '>=', $today)
+            ->whereIn('matricule', $studentMatricules)
+            ->selectRaw('motif, COUNT(*) as count')
+            ->groupBy('motif')
+            ->get();
+
+        // Statistiques détaillées par spécialité filtrées par grade - NOUVELLE STRUCTURE
+        $specialtyStats = [
+            'psycho' => [
+                'patients_today' => Patient::whereDate('created_at', $today)
+                    ->where('type_medecin', 'psycho')
+                    ->whereIn('matricule', $studentMatricules)
+                    ->count(),
+                'patients_valid' => Patient::whereDate('created_at', $today)
+                    ->where('type_medecin', 'psycho')
+                    ->whereIn('matricule', $studentMatricules)
+                    ->where('valider', 1)
+                    ->count(),
+                'appointments_today' => \DB::table('liste_rdvs')
+                    ->whereDate('date', $today)
+                    ->where('type_medecin', 'psycho')
+                    ->whereIn('matricule', $studentMatricules)
+                    ->count(),
+                'convocations_valid' => \DB::table('convoncus')
+                    ->whereIn('matricule', $studentMatricules)
+                    ->whereNotNull('psy')
+                    ->where('psy', '!=', '')
+                    ->count(),
+                'convocations_invalid' => \DB::table('convoncus')
+                    ->whereIn('matricule', $studentMatricules)
+                    ->where(function($q) {
+                        $q->whereNull('psy')->orWhere('psy', '=', '');
+                    })
+                    ->count()
+            ],
+            'médecin générale' => [
+                'patients_today' => Patient::whereDate('created_at', $today)
+                    ->where('type_medecin', 'médecin générale')
+                    ->whereIn('matricule', $studentMatricules)
+                    ->count(),
+                'patients_valid' => Patient::whereDate('created_at', $today)
+                    ->where('type_medecin', 'médecin générale')
+                    ->whereIn('matricule', $studentMatricules)
+                    ->where('valider', 1)
+                    ->count(),
+                'appointments_today' => \DB::table('liste_rdvs')
+                    ->whereDate('date', $today)
+                    ->where('type_medecin', 'médecin générale')
+                    ->whereIn('matricule', $studentMatricules)
+                    ->count(),
+                'convocations_valid' => \DB::table('convoncus')
+                    ->whereIn('matricule', $studentMatricules)
+                    ->whereNotNull('medGen')
+                    ->where('medGen', '!=', '')
+                    ->count(),
+                'convocations_invalid' => \DB::table('convoncus')
+                    ->whereIn('matricule', $studentMatricules)
+                    ->where(function($q) {
+                        $q->whereNull('medGen')->orWhere('medGen', '=', '');
+                    })
+                    ->count()
+            ],
+            'dentiste' => [
+                'patients_today' => Patient::whereDate('created_at', $today)
+                    ->where('type_medecin', 'dentiste')
+                    ->whereIn('matricule', $studentMatricules)
+                    ->count(),
+                'patients_valid' => Patient::whereDate('created_at', $today)
+                    ->where('type_medecin', 'dentiste')
+                    ->whereIn('matricule', $studentMatricules)
+                    ->where('valider', 1)
+                    ->count(),
+                'appointments_today' => \DB::table('liste_rdvs')
+                    ->whereDate('date', $today)
+                    ->where('type_medecin', 'dentiste')
+                    ->whereIn('matricule', $studentMatricules)
+                    ->count(),
+                'convocations_valid' => \DB::table('convoncus')
+                    ->whereIn('matricule', $studentMatricules)
+                    ->whereNotNull('chirDent')
+                    ->where('chirDent', '!=', '')
+                    ->count(),
+                'convocations_invalid' => \DB::table('convoncus')
+                    ->whereIn('matricule', $studentMatricules)
+                    ->where(function($q) {
+                        $q->whereNull('chirDent')->orWhere('chirDent', '=', '');
+                    })
+                    ->count()
+            ]
+        ];
+
+        return response()->json([
+            'validPatientsToday' => $validPatientsToday,
+            'invalidPatientsToday' => $invalidPatientsToday,
+            'consultationRdvToday' => $consultationRdvToday,
+            'urgenceRdvToday' => $urgenceRdvToday,
+            'convocationsWithPsy' => $convocationsWithPsy,
+            'convocationsWithoutPsy' => $convocationsWithoutPsy,
+            'exemptionsToday' => $exemptionsToday,
+            'specialtyStats' => $specialtyStats
+        ]);
+    }
+
+    /**
+     * API pour les statistiques du dashboard médical
+     * Retourne les données pour les cartes du dashboard du médecin chef
      */
     public function dashboardStats(Request $request)
     {
         $user = Auth::user();
         $userRole = $user->role->name ?? '';
-        $type = $request->get('type', 'daily');
+        $specialtyMapping = $this->getSpecialtyMapping();
+        $allowedSpecialty = $specialtyMapping[$userRole] ?? null;
 
-        if ($type === 'daily') {
-            // Statistiques du jour pour le médecin chef
-            if ($userRole === 'Medecin') {
-                $today = Carbon::today();
-
-                $patientsToday = Patient::whereDate('patients.created_at', $today)->count();
-                $validatedToday = Patient::whereDate('patients.created_at', $today)
-                    ->where('valider', 1)->count();
-                $pendingToday = Patient::whereDate('patients.created_at', $today)
-                    ->where('valider', 0)->count();
-                $appointmentsToday = DB::table('liste_rdvs')
-                    ->whereDate('date', $today)->count();
-
-                return response()->json([
-                    'patients' => $patientsToday,
-                    'validated' => $validatedToday,
-                    'pending' => $pendingToday,
-                    'appointments' => $appointmentsToday
-                ]);
-            }
-        } elseif ($type === 'specialty') {
-            // Statistiques par spécialité pour le médecin chef
-            if ($userRole === 'Medecin') {
-                $today = Carbon::today();
-                $specialties = ['psycho', 'dentiste', 'médecin générale'];
-                $stats = [];
-
-                foreach ($specialties as $specialty) {
-                    $total = Patient::where('type_medecin', $specialty)
-                        ->whereDate('patients.created_at', $today)->count();
-                    $validated = Patient::where('type_medecin', $specialty)
-                        ->whereDate('patients.created_at', $today)
-                        ->where('valider', 1)->count();
-
-                    $displayName = match($specialty) {
-                        'psycho' => 'Psychologie',
-                        'dentiste' => 'Dentiste',
-                        'médecin générale' => 'Médecine Générale',
-                        default => $specialty
-                    };
-
-                    $icon = match($specialty) {
-                        'psycho' => 'fas fa-brain',
-                        'dentiste' => 'fas fa-tooth',
-                        'médecin générale' => 'fas fa-stethoscope',
-                        default => 'fas fa-user-md'
-                    };
-
-                    $stats[] = [
-                        'type' => $specialty,  // Ajout du champ type requis pour le front-end
-                        'name' => $displayName,
-                        'icon' => $icon,
-                        'total' => $total,
-                        'validated' => $validated,
-                        'pending' => $total - $validated
-                    ];
-                }
-
-                return response()->json($stats);
-            }
+        if (!$allowedSpecialty) {
+            return response()->json(['error' => 'Accès non autorisé'], 403);
         }
 
-        return response()->json(['error' => 'Unauthorized'], 403);
+        $type = $request->query('type', 'daily');
+        $today = Carbon::today();
+
+        if ($type === 'daily' && $allowedSpecialty === 'all') {
+            // Statistiques quotidiennes pour le médecin chef
+            $patientsToday = Patient::whereDate('created_at', $today)->count();
+            $validatedToday = Patient::whereDate('created_at', $today)->where('valider', 1)->count();
+            $pendingToday = Patient::whereDate('created_at', $today)->where('valider', 0)->count();
+            $appointmentsToday = \DB::table('liste_rdvs')->whereDate('date', $today)->count();
+
+            return response()->json([
+                'patients' => $patientsToday,
+                'validated' => $validatedToday,
+                'pending' => $pendingToday,
+                'appointments' => $appointmentsToday
+            ]);
+        }
+
+        if ($type === 'specialty' && $allowedSpecialty === 'all') {
+            // Statistiques par spécialité pour le médecin chef avec la nouvelle structure
+            $specialties = [
+                [
+                    'type' => 'psycho',
+                    'name' => 'Psychologie',
+                    'validated' => Patient::where('type_medecin', 'psycho')->where('valider', 1)->count(),
+                    'pending' => Patient::where('type_medecin', 'psycho')->where('valider', 0)->count(),
+                    'total' => Patient::where('type_medecin', 'psycho')->count(),
+                    'convocations_valid' => \DB::table('convoncus')
+                        ->whereNotNull('psy')
+                        ->where('psy', '!=', '')
+                        ->count(),
+                    'convocations_invalid' => \DB::table('convoncus')
+                        ->where(function($q) {
+                            $q->whereNull('psy')->orWhere('psy', '=', '');
+                        })
+                        ->count()
+                ],
+                [
+                    'type' => 'médecin générale',
+                    'name' => 'Médecine Générale',
+                    'validated' => Patient::where('type_medecin', 'médecin générale')->where('valider', 1)->count(),
+                    'pending' => Patient::where('type_medecin', 'médecin générale')->where('valider', 0)->count(),
+                    'total' => Patient::where('type_medecin', 'médecin générale')->count(),
+                    'convocations_valid' => \DB::table('convoncus')
+                        ->whereNotNull('medGen')
+                        ->where('medGen', '!=', '')
+                        ->count(),
+                    'convocations_invalid' => \DB::table('convoncus')
+                        ->where(function($q) {
+                            $q->whereNull('medGen')->orWhere('medGen', '=', '');
+                        })
+                        ->count()
+                ],
+                [
+                    'type' => 'dentiste',
+                    'name' => 'Dentaire',
+                    'validated' => Patient::where('type_medecin', 'dentiste')->where('valider', 1)->count(),
+                    'pending' => Patient::where('type_medecin', 'dentiste')->where('valider', 0)->count(),
+                    'total' => Patient::where('type_medecin', 'dentiste')->count(),
+                    'convocations_valid' => \DB::table('convoncus')
+                        ->whereNotNull('chirDent')
+                        ->where('chirDent', '!=', '')
+                        ->count(),
+                    'convocations_invalid' => \DB::table('convoncus')
+                        ->where(function($q) {
+                            $q->whereNull('chirDent')->orWhere('chirDent', '=', '');
+                        })
+                        ->count()
+                ]
+            ];
+
+            return response()->json($specialties);
+        }
+
+        // Pour les médecins spécialisés, retourner seulement leurs statistiques
+        if ($allowedSpecialty !== 'all') {
+            $stats = $this->getSpecialtyStats($allowedSpecialty);
+            return response()->json($stats);
+        }
+
+        return response()->json(['error' => 'Type de statistique non supporté'], 400);
     }
 
     /**
-     * Get specialty display information based on user role
+     * Get specialty display information
+     * Retourne les informations d'affichage pour chaque spécialité médicale
      */
     private function getSpecialtyDisplayInfo($userRole)
     {
-        $displayInfo = [
-            'specialtyName' => 'Médecine Générale',
-            'specialtyIcon' => 'fa-solid fa-user-doctor',
-            'specialtyColor' => 'blue'
+        $specialtyInfo = [
+            'Medecin' => [
+                'specialtyName' => 'Médecin Chef',
+                'specialtyIcon' => 'fas fa-user-md',
+                'specialtyColor' => 'blue'
+            ],
+            'Psychologue' => [
+                'specialtyName' => 'Psychologie',
+                'specialtyIcon' => 'fas fa-brain',
+                'specialtyColor' => 'purple'
+            ],
+            'Dentiste' => [
+                'specialtyName' => 'Dentaire',
+                'specialtyIcon' => 'fas fa-tooth',
+                'specialtyColor' => 'green'
+            ],
+            'Médecin général' => [
+                'specialtyName' => 'Médecine Générale',
+                'specialtyIcon' => 'fas fa-stethoscope',
+                'specialtyColor' => 'indigo'
+            ]
         ];
 
-        switch ($userRole) {
-            case 'Psychologue':
-                $displayInfo = [
-                    'specialtyName' => 'Psychologie',
-                    'specialtyIcon' => 'fa-solid fa-brain',
-                    'specialtyColor' => 'purple'
-                ];
-                break;
-
-            case 'Dentiste':
-                $displayInfo = [
-                    'specialtyName' => 'Dentisterie',
-                    'specialtyIcon' => 'fa-solid fa-tooth',
-                    'specialtyColor' => 'green'
-                ];
-                break;
-
-            case 'Medecin general':
-            case 'Médecin général':
-                $displayInfo = [
-                    'specialtyName' => 'Médecine Générale',
-                    'specialtyIcon' => 'fa-solid fa-stethoscope',
-                    'specialtyColor' => 'blue'
-                ];
-                break;
-
-            case 'Medecin':
-            case 'Medecin chef':
-            case 'Chef Medecin':
-                $displayInfo = [
-                    'specialtyName' => 'Médecin Chef',
-                    'specialtyIcon' => 'fa-solid fa-user-tie',
-                    'specialtyColor' => 'red'
-                ];
-                break;
-
-            default:
-                // Default values already set above
-                break;
-        }
-
-        return $displayInfo;
-    }
-
-    /**
-     * API pour la liste des patients (pour le dashboard)
-     */
-    public function patientsApi(Request $request)
-    {
-        $user = Auth::user();
-        $userRole = $user->role->name ?? '';
-
-        // Seul le médecin chef peut accéder à cette API
-        if ($userRole !== 'Medecin') {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
-        $query = Patient::with('Student')->query();
-
-        // Filtrer par date d'aujourd'hui pour le médecin chef
-        $query->whereDate('patients.created_at', Carbon::today());
-
-        // Filtres
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('matricule', 'LIKE', '%' . $search . '%')
-                  ->orWhereHas('Student', function($subQ) use ($search) {
-                      $subQ->where('nom', 'LIKE', '%' . $search . '%')
-                           ->orWhere('prenom', 'LIKE', '%' . $search . '%');
-                  });
-            });
-        }
-
-        if ($request->filled('specialty')) {
-            $query->where('type_medecin', $request->specialty);
-        }
-
-        if ($request->filled('status')) {
-            if ($request->status === 'validated') {
-                $query->where('valider', 1);
-            } elseif ($request->status === 'pending') {
-                $query->where('valider', 0);
-            }
-        }
-
-        $perPage = $request->get('per_page', 15);
-        $perPage = in_array($perPage, [15, 25, 50, 100]) ? $perPage : 15;
-
-        $patients = $query->orderBy('patients.created_at', 'desc')
-                         ->paginate($perPage);
-
-        return response()->json($patients);
+        return $specialtyInfo[$userRole] ?? [
+            'specialtyName' => 'Spécialité Médicale',
+            'specialtyIcon' => 'fas fa-user-md',
+            'specialtyColor' => 'gray'
+        ];
     }
 }

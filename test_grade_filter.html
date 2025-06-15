@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test du Filtre d'Année</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-6">Test du Filtre d'Année - Patients</h1>
+
+        <!-- Grade Filter -->
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-3">
+                <i class="fas fa-graduation-cap mr-1"></i>
+                Année d'étude
+            </label>
+            <div class="flex flex-wrap gap-2">
+                <label class="inline-flex items-center cursor-pointer group">
+                    <input type="radio" name="grade_filter" value="all" class="sr-only grade-radio" checked onchange="applyRealTimeFilters()">
+                    <div class="grade-btn bg-gradient-to-r from-gray-100 to-gray-200 border-2 border-gray-300 rounded-lg px-4 py-2 transition-all duration-200 text-sm font-medium">
+                        <span class="text-gray-800 font-semibold">Toutes</span>
+                    </div>
+                </label>
+                <label class="inline-flex items-center cursor-pointer group">
+                    <input type="radio" name="grade_filter" value="1" class="sr-only grade-radio" onchange="applyRealTimeFilters()">
+                    <div class="grade-btn bg-gradient-to-r from-blue-100 to-blue-200 border-2 border-blue-300 rounded-lg px-4 py-2 transition-all duration-200 text-sm font-medium">
+                        <span class="text-blue-800 font-semibold">1ère année</span>
+                    </div>
+                </label>
+                <label class="inline-flex items-center cursor-pointer group">
+                    <input type="radio" name="grade_filter" value="2" class="sr-only grade-radio" onchange="applyRealTimeFilters()">
+                    <div class="grade-btn bg-gradient-to-r from-green-100 to-green-200 border-2 border-green-300 rounded-lg px-4 py-2 transition-all duration-200 text-sm font-medium">
+                        <span class="text-green-800 font-semibold">2ème année</span>
+                    </div>
+                </label>
+                <label class="inline-flex items-center cursor-pointer group">
+                    <input type="radio" name="grade_filter" value="3" class="sr-only grade-radio" onchange="applyRealTimeFilters()">
+                    <div class="grade-btn bg-gradient-to-r from-purple-100 to-purple-200 border-2 border-purple-300 rounded-lg px-4 py-2 transition-all duration-200 text-sm font-medium">
+                        <span class="text-purple-800 font-semibold">3ème année</span>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <!-- Search Filter -->
+        <div class="mb-6">
+            <label for="search-input" class="block text-sm font-medium text-gray-700 mb-2">
+                <i class="fas fa-search mr-1"></i>
+                Rechercher un élève
+            </label>
+            <input
+                type="text"
+                id="search-input"
+                placeholder="Rechercher par matricule, nom ou prénom..."
+                class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                onkeyup="applyRealTimeFilters()"
+            >
+        </div>
+
+        <!-- Patients Table -->
+        <div class="bg-white shadow-lg rounded-xl overflow-hidden">
+            <div class="p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Liste des Patients</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Matricule</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom & Prénom</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grade</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Section</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="patients-tbody">
+                            <!-- Grade 1 patients -->
+                            <tr class="patient-row" data-matricule="2022375" data-grade="1">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">2022375</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Omar Yazbek</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">1</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">341</td>
+                            </tr>
+                            <tr class="patient-row" data-matricule="2022055" data-grade="1">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">2022055</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Walid Zahran</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">1</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">342</td>
+                            </tr>
+                            <tr class="patient-row" data-matricule="2022104" data-grade="1">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">2022104</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Youssef Yazbek</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">1</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">342</td>
+                            </tr>
+
+                            <!-- Grade 2 patients -->
+                            <tr class="patient-row" data-matricule="2022549" data-grade="2">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">2022549</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Khaled Nasser</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">341</td>
+                            </tr>
+                            <tr class="patient-row" data-matricule="2022169" data-grade="2">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">2022169</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Khaled Zahran</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">341</td>
+                            </tr>
+
+                            <!-- Grade 3 patients -->
+                            <tr class="patient-row" data-matricule="2022545" data-grade="3">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">2022545</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Ahmed Qasem</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">3</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">341</td>
+                            </tr>
+                            <tr class="patient-row" data-matricule="2022580" data-grade="3">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">2022580</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Walid Al-Farouq</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">3</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">341</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Results counter -->
+                <div class="mt-4">
+                    <span id="results-counter" class="text-sm text-gray-600"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Real-time filtering function (same as corrected version)
+        function applyRealTimeFilters() {
+            const searchValue = document.getElementById('search-input').value.toLowerCase();
+            const selectedGrade = document.querySelector('input[name="grade_filter"]:checked').value;
+
+            console.log('Filtering with:', { searchValue, selectedGrade });
+
+            // Filter table rows
+            const rows = document.querySelectorAll('.patient-row');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const matricule = row.dataset.matricule.toLowerCase();
+                const grade = row.dataset.grade;
+
+                console.log('Row data:', { matricule, grade });
+
+                let matchesSearch = true;
+                let matchesGrade = true;
+
+                // Search filter - search in matricule, nom, and prenom
+                if (searchValue) {
+                    const fullText = row.textContent.toLowerCase();
+                    if (!matricule.includes(searchValue) && !fullText.includes(searchValue)) {
+                        matchesSearch = false;
+                    }
+                }
+
+                // Grade filter - exact match
+                if (selectedGrade !== 'all') {
+                    if (grade !== selectedGrade) {
+                        matchesGrade = false;
+                    }
+                }
+
+                console.log('Matches:', { matchesSearch, matchesGrade });
+
+                // Show/hide row based on all filters
+                if (matchesSearch && matchesGrade) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Update visible count
+            document.getElementById('results-counter').textContent = `Patients visibles: ${visibleCount}/${rows.length}`;
+        }
+
+        // Style updates for grade filter buttons
+        function updateGradeButtonStyles() {
+            const gradeRadios = document.querySelectorAll('input[name="grade_filter"]');
+
+            gradeRadios.forEach(radio => {
+                const btn = radio.parentNode.querySelector('.grade-btn');
+                const span = btn.querySelector('span');
+                if (radio.checked) {
+                    // Active state
+                    btn.classList.add('ring-2', 'ring-blue-500', 'transform', 'scale-105', 'shadow-lg');
+                    btn.style.borderColor = '#3b82f6';
+                } else {
+                    // Inactive state
+                    btn.classList.remove('ring-2', 'ring-blue-500', 'transform', 'scale-105', 'shadow-lg');
+                    btn.style.borderColor = '';
+                }
+            });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateGradeButtonStyles();
+
+            // Add event listeners to grade filter buttons
+            const gradeRadios = document.querySelectorAll('input[name="grade_filter"]');
+            gradeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    updateGradeButtonStyles();
+                    applyRealTimeFilters();
+                });
+            });
+
+            // Apply initial filters
+            applyRealTimeFilters();
+        });
+    </script>
+</body>
+</html>

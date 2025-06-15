@@ -23,7 +23,7 @@
                                 id="search-input"
                                 name="matricule"
                                 value="{{ request('matricule') ?? '' }}"
-                                placeholder="Rechercher par matricule..."
+                                placeholder="Rechercher par matricule, nom ou prénom..."
                                 class="block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                                 onkeyup="applyRealTimeFilters()"
                             >
@@ -138,7 +138,7 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Patients</p>
-                            <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['total'] ?? 0 }}</p>
+                            <p class="text-2xl font-bold text-gray-900 dark:text-white" id="stat-total">{{ $stats['total'] ?? 0 }}</p>
                         </div>
                     </div>
 
@@ -153,7 +153,7 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">En attente RHP</p>
-                            <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['pending'] ?? 0 }}</p>
+                            <p class="text-2xl font-bold text-gray-900 dark:text-white" id="stat-pending">{{ $stats['pending'] ?? 0 }}</p>
                         </div>
                     </div>
 
@@ -168,7 +168,7 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Validé RHP</p>
-                            <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['validated'] ?? 0 }}</p>
+                            <p class="text-2xl font-bold text-gray-900 dark:text-white" id="stat-validated">{{ $stats['validated'] ?? 0 }}</p>
                         </div>
                     </div>
                 </div>
@@ -212,8 +212,9 @@
                                 @foreach($patients as $patient)
                                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 patient-row"
                                         data-matricule="{{ $patient->matricule ?? '' }}"
-                                        data-grade="{{ $patient->student->section_id ?? $patient->student->grade ?? '' }}"
-                                        data-status="{{ $patient->valider_rhp ?? 0 }}">
+                                        data-grade="{{ $patient->student->grade ?? '' }}"
+                                        data-status="{{ $patient->valider_rhp ?? 0 }}"
+                                        data-valider="{{ $patient->valider ?? 0 }}">
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-300">
                                             {{ $patient->matricule }}
                                         </td>
@@ -351,41 +352,38 @@
             const selectedGrade = document.querySelector('input[name="grade_filter"]:checked').value;
             const selectedStatus = document.getElementById('status-filter').value;
 
-            // Update hidden inputs for period form
-            document.getElementById('hidden-matricule').value = document.getElementById('search-input').value;
-            document.getElementById('hidden-grade').value = selectedGrade === 'all' ? '' : selectedGrade;
-            document.getElementById('hidden-status').value = selectedStatus;
-
             // Filter table rows
             const rows = document.querySelectorAll('.patient-row');
+            let visibleCount = 0;
+            let pendingCount = 0;
+            let validatedCount = 0;
 
             rows.forEach(row => {
                 const matricule = row.dataset.matricule.toLowerCase();
                 const grade = row.dataset.grade;
-                const status = row.dataset.status;
+                const status = row.dataset.status; // valider_rhp
+                const valider = row.dataset.valider; // valider
 
                 let matchesSearch = true;
                 let matchesGrade = true;
                 let matchesStatus = true;
 
-                // Search filter
-                if (searchValue && !matricule.includes(searchValue)) {
-                    matchesSearch = false;
+                // Search filter - search in matricule, nom, and prenom
+                if (searchValue) {
+                    const fullText = row.textContent.toLowerCase();
+                    if (!matricule.includes(searchValue) && !fullText.includes(searchValue)) {
+                        matchesSearch = false;
+                    }
                 }
 
-                // Grade filter - improved logic
+                // Grade filter - exact match
                 if (selectedGrade !== 'all') {
-                    // Check if grade contains the selected grade number or matches exactly
-                    if (grade && grade.toString().includes(selectedGrade)) {
-                        matchesGrade = true;
-                    } else if (grade === selectedGrade) {
-                        matchesGrade = true;
-                    } else {
+                    if (grade !== selectedGrade) {
                         matchesGrade = false;
                     }
                 }
 
-                // Status filter
+                // Status filter (based on valider_rhp)
                 if (selectedStatus !== '' && status !== selectedStatus) {
                     matchesStatus = false;
                 }
@@ -393,10 +391,27 @@
                 // Show/hide row based on all filters
                 if (matchesSearch && matchesGrade && matchesStatus) {
                     row.style.display = '';
+                    visibleCount++;
+
+                    // Count by RHP status for visible rows
+                    // En attente RHP = valider IN (1,2) AND valider_rhp = 0
+                    // Validé RHP = valider IN (1,2) AND valider_rhp = 1
+                    if ((valider === '1' || valider === '2') && status === '0') {
+                        pendingCount++;
+                    } else if ((valider === '1' || valider === '2') && status === '1') {
+                        validatedCount++;
+                    }
                 } else {
                     row.style.display = 'none';
                 }
             });
+
+            // Update statistics display
+            document.getElementById('stat-total').textContent = visibleCount;
+            document.getElementById('stat-pending').textContent = pendingCount;
+            document.getElementById('stat-validated').textContent = validatedCount;
+
+            console.log(`Patients visibles: ${visibleCount}/${rows.length} (Pending: ${pendingCount}, Validated: ${validatedCount})`);
         }
 
         // Style updates for grade filter buttons
@@ -440,8 +455,14 @@
             // Add event listeners to grade filter buttons
             const gradeRadios = document.querySelectorAll('input[name="grade_filter"]');
             gradeRadios.forEach(radio => {
-                radio.addEventListener('change', updateGradeButtonStyles);
+                radio.addEventListener('change', function() {
+                    updateGradeButtonStyles();
+                    applyRealTimeFilters(); // Apply filters when grade changes
+                });
             });
+
+            // Apply initial filters if any are set
+            applyRealTimeFilters();
         });
     </script>
 

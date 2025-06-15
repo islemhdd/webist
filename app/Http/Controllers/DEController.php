@@ -236,29 +236,39 @@ class DEController extends Controller
             'matricule' => $matricule
         ]);
 
-        // Ne compter que les patients validés par l'infirmerie (valider = 1 ou 2)
-        // Requêtes distinctes pour éviter les problèmes de cache
+        // Compter TOUS les patients de tous les médecins (valider = 0, 1, 2)
+        // Query pour le total de tous les patients
+        $totalQuery = Patient::whereIn('valider', [0, 1, 2]);
+
+        // Requêtes distinctes pour les statistiques RHP (seulement pour patients valider = 1 ou 2)
         $validatedQuery = Patient::whereIn('valider', [1, 2])->where('valider_rhp', 1);
         $nonValidatedQuery = Patient::whereIn('valider', [1, 2])->where('valider_rhp', 0);
 
         // Appliquer le filtre de date pour aujourd'hui seulement
         if ($today) {
+            $totalQuery->whereDate('created_at', '=', $today);
             $validatedQuery->whereDate('created_at', '=', $today);
             $nonValidatedQuery->whereDate('created_at', '=', $today);
         } else {
             // Par défaut, utiliser la date d'aujourd'hui
             $today = now()->toDateString();
+            $totalQuery->whereDate('created_at', '=', $today);
             $validatedQuery->whereDate('created_at', '=', $today);
             $nonValidatedQuery->whereDate('created_at', '=', $today);
         }
 
         // Filtre par matricule
         if ($matricule) {
+            $totalQuery->where('matricule', 'LIKE', '%' . $matricule . '%');
             $validatedQuery->where('matricule', 'LIKE', '%' . $matricule . '%');
             $nonValidatedQuery->where('matricule', 'LIKE', '%' . $matricule . '%');
         }
 
         if ($grade !== 'all') {
+            $totalQuery->whereHas('student', function($q) use ($grade) {
+                $q->where('grade', $grade);
+            });
+
             $validatedQuery->whereHas('student', function($q) use ($grade) {
                 $q->where('grade', $grade);
             });
@@ -268,15 +278,15 @@ class DEController extends Controller
             });
         }
 
+        $total = $totalQuery->count(); // Total de TOUS les patients
         $validated = $validatedQuery->count();
         $nonValidated = $nonValidatedQuery->count();
-        $total = $validated + $nonValidated;
 
         // Logging pour le débogage
         \Log::info("Infirmary stats result:", [
+            'total_all_patients' => $total,
             'validated' => $validated,
             'non_validated' => $nonValidated,
-            'total' => $total,
             'grade' => $grade,
             'today' => $today,
             'matricule' => $matricule
@@ -285,7 +295,7 @@ class DEController extends Controller
         return [
             'validated' => $validated,
             'non_validated' => $nonValidated,
-            'total' => $total
+            'total' => $total // Maintenant inclut TOUS les patients
         ];
     }
 
@@ -359,7 +369,7 @@ class DEController extends Controller
         // Préparer les données d'expulsions pour le graphique
         $expulsionsByReason = [];
         $totalExpulsions = 0;
-        
+
         foreach ($expulsionStats as $expulsion) {
             $expulsionsByReason[$expulsion->motif_expulsion] = $expulsion->count;
             $totalExpulsions += $expulsion->count;

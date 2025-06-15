@@ -122,7 +122,7 @@ Route::put('/patients/{id}/medical-info', [PatientController::class, 'updateMedi
 Route::get('/fiche/{matricule}', [FicheController::class, 'show'])
     ->name('fiche.show')->middleware('auth');
 
-Route::put('/fiche/{matricule}', [ConvoncuController::class, 'update'])
+Route::put('/fiche/{matricule}', [FicheController::class, 'update'])
     ->name('fiche.update')->middleware('auth');
 
 Route::get('/brigade/principale', fn() => view('brigade.principale'));

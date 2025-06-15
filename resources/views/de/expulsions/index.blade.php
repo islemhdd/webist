@@ -157,11 +157,11 @@
                         <!-- New Expulsion Button -->
                         <button type="button"
                                 onclick="openAddModal()"
-                                class="w-full inline-flex items-center justify-center px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white text-sm font-medium rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                class="w-full inline-flex items-center justify-center px-4 py-3 bg-gradient-to-r from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 text-red text-sm font-medium rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                             </svg>
-                            Nouvelle Exclusion
+                            Ajouter une Exclusion
                         </button>
                     </div>
                 </div>
@@ -289,32 +289,100 @@
     </div>
 
     <!-- Add/Edit Expulsion Modal -->
-    <div id="expulsionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50" x-show="false" x-transition>
+    <div id="expulsionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
         <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
                 <form id="expulsionForm" method="POST">
                     @csrf
                     <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <div class="sm:flex sm:items-start">
                             <div class="w-full">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4" id="modal-title">
-                                    Nouvelle Exclusion
-                                </h3>
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white" id="modal-title">
+                                        Nouvelle Exclusion
+                                    </h3>
+                                    <button type="button" onclick="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full p-2 transition-all duration-200">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
 
                                 <div class="space-y-4">
-                                    <div>
-                                        <label for="student_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Étudiant</label>
-                                        <select name="student_id" id="student_id" required class="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                            <option value="">Sélectionner un étudiant</option>
-                                            @foreach($students as $student)
-                                            <option value="{{ $student->id }}">{{ $student->matricule }} - {{ $student->nom }} {{ $student->prenom }}</option>
-                                            @endforeach
-                                        </select>
+                                    <!-- Recherche d'étudiant avec suggestions -->
+                                    <div class="relative">
+                                        <label for="student_search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            <i class="fas fa-search mr-1 text-blue-500"></i>
+                                            Rechercher un étudiant
+                                        </label>
+                                        <div class="relative">
+                                            <input type="text"
+                                                   id="student_search"                                   placeholder="Tapez le matricule, nom ou prénom..."
+                                   oninput="searchStudentSuggestions(this.value)"
+                                                   autocomplete="off"
+                                                   class="block w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+
+                                            <!-- Hidden input to store selected student ID -->
+                                            <input type="hidden" name="student_id" id="selected_student_id">
+
+                                            <!-- Suggestions dropdown -->
+                                            <div id="student_suggestions" class="absolute z-[2000] w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-xl hidden max-h-60 overflow-y-auto mt-1">
+                                                <!-- Suggestions will be populated here -->
+                                            </div>
+                                        </div>
                                     </div>
 
+                                    <!-- Informations de l'étudiant -->
+                                    <div id="student_info" class="hidden bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border">
+                                        <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            <i class="fas fa-user mr-1 text-green-500"></i>
+                                            Informations de l'étudiant
+                                        </h4>
+                                        <div class="grid grid-cols-2 gap-3 text-sm">
+                                            <div>
+                                                <span class="font-medium text-gray-600 dark:text-gray-400">Matricule:</span>
+                                                <span id="info_matricule" class="text-gray-900 dark:text-white ml-1">-</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-medium text-gray-600 dark:text-gray-400">Section:</span>
+                                                <span id="info_section" class="text-gray-900 dark:text-white ml-1">-</span>
+                                            </div>
+                                            <div class="col-span-2">
+                                                <span class="font-medium text-gray-600 dark:text-gray-400">Nom complet:</span>
+                                                <span id="info_nom_complet" class="text-gray-900 dark:text-white ml-1">-</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Raison de l'exclusion -->
                                     <div>
-                                        <label for="raison" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Raison de l'exclusion</label>
-                                        <textarea name="raison" id="raison" rows="3" required class="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Décrivez la raison de l'exclusion..."></textarea>
+                                        <label for="raison" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            <i class="fas fa-exclamation-triangle mr-1 text-red-500"></i>
+                                            Raison de l'exclusion
+                                        </label>
+                                        <select name="raison" id="raison" required
+                                                class="block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                            <option value="">Sélectionner une raison</option>
+                                            <option value="Absence injustifiée">Absence injustifiée</option>
+                                            <option value="Retard répété">Retard répété</option>
+                                            <option value="Comportement perturbateur">Comportement perturbateur</option>
+                                            <option value="Non-respect du règlement">Non-respect du règlement</option>
+                                            <option value="Manque de respect envers l'enseignant">Manque de respect envers l'enseignant</option>
+                                            <option value="Utilisation du téléphone en classe">Utilisation du téléphone en classe</option>
+                                            <option value="Tenue vestimentaire inappropriée">Tenue vestimentaire inappropriée</option>
+                                            <option value="Bavardage excessif">Bavardage excessif</option>
+                                            <option value="Refus de travailler">Refus de travailler</option>
+                                            <option value="Violence verbale">Violence verbale</option>
+                                            <option value="Dégradation du matériel">Dégradation du matériel</option>
+                                            <option value="Autre">Autre (préciser ci-dessous)</option>
+                                        </select>
+
+                                        <!-- Zone de texte pour "Autre" -->
+                                        <textarea name="raison_autre" id="raison_autre"
+                                                  class="mt-2 hidden block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                                  rows="2"
+                                                  placeholder="Précisez la raison..."></textarea>
+
                                         <!-- Hidden date field that will be auto-filled -->
                                         <input type="hidden" name="date_expulsion" id="date_expulsion" value="{{ date('Y-m-d') }}">
                                     </div>
@@ -322,20 +390,98 @@
                             </div>
                         </div>
                     </div>
-                    <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
-                            Enregistrer
-                        </button>
-                        <button type="button" onclick="closeModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                            Annuler
+                    <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 flex justify-center">
+                        <button type="submit" class="inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-red-600 via-red-700 to-red-800 hover:from-red-700 hover:via-red-800 hover:to-red-900 text-red text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-red-300 focus:ring-opacity-50 border border-red-500">
+                            <i class="fas fa-user-times mr-3 text-lg"></i>
+                            <span class="tracking-wide">Exclure l'étudiant</span>
                         </button>
                     </div>
                 </form>
             </div>
         </div>
-    </div>
+    </div>    <style>
+        /* Custom styles for modal and suggestions */
+        #expulsionModal {
+            z-index: 1050;
+            backdrop-filter: blur(4px);
+            animation: modalFadeIn 0.3s ease-out;
+        }
 
-    <style>
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                backdrop-filter: blur(0px);
+            }
+            to {
+                opacity: 1;
+                backdrop-filter: blur(4px);
+            }
+        }
+
+        #expulsionModal .sm\:max-w-2xl {
+            max-width: 48rem;
+            margin: 2rem auto;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        #student_suggestions {
+            z-index: 2000;
+            max-height: 280px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            margin-top: 4px;
+        }
+
+        #student_suggestions .hover\:bg-gray-100:hover {
+            background-color: #f3f4f6;
+            transition: background-color 0.15s ease-in-out;
+        }
+
+        .dark #student_suggestions .hover\:bg-gray-100:hover {
+            background-color: #4b5563;
+        }
+
+        #student_suggestions::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #student_suggestions::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        #student_suggestions::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        #student_suggestions::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .dark #student_suggestions::-webkit-scrollbar-track {
+            background: #374151;
+        }
+
+        .dark #student_suggestions::-webkit-scrollbar-thumb {
+            background: #6b7280;
+        }
+
+        .dark #student_suggestions::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+
         /* Enhanced grade filter button styles */
         .grade-filter-btn {
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
@@ -378,6 +524,73 @@
     </style>
 
     <script>
+        // Students data for search functionality
+        const studentsData = @json($students ?? []);
+        console.log('✅ Students loaded:', studentsData?.length || 0, 'students');
+
+        // Debug function - you can call this in browser console
+        window.debugStudents = function() {
+            console.log('=== 🔧 DEBUGGING STUDENTS DATA ===');
+            console.log('studentsData exists:', typeof studentsData !== 'undefined');
+            console.log('studentsData is array:', Array.isArray(studentsData));
+            console.log('studentsData length:', studentsData ? studentsData.length : 'N/A');
+            console.log('First 3 students:', studentsData ? studentsData.slice(0, 3) : 'No data');
+            console.log('Sample student fields:', studentsData && studentsData[0] ? Object.keys(studentsData[0]) : 'No data');
+
+            // Test search functionality
+            console.log('\n=== 🧪 TESTING SEARCH FUNCTIONALITY ===');
+
+            // Test 1: Search input element
+            const searchInput = document.getElementById('student_search');
+            console.log('Search input element:', searchInput);
+
+            // Test 2: Suggestions div element
+            const suggestionsDiv = document.getElementById('student_suggestions');
+            console.log('Suggestions div element:', suggestionsDiv);
+
+            // Test 3: Try manual search
+            if (studentsData && studentsData.length > 0) {
+                const testStudent = studentsData[0];
+                console.log('Testing search with first student:', testStudent);
+                if (testStudent.nom) {
+                    const testTerm = testStudent.nom.substring(0, 3);
+                    console.log('Calling searchStudentSuggestions with:', testTerm);
+                    searchStudentSuggestions(testTerm);
+                }
+
+                // Test with matricule if available
+                if (testStudent.matricule) {
+                    const testMatricule = String(testStudent.matricule).substring(0, 4);
+                    console.log('Testing with matricule:', testMatricule);
+                    setTimeout(() => {
+                        searchStudentSuggestions(testMatricule);
+                    }, 1000);
+                }
+            }
+
+            // Test 4: Check if modal is open
+            const modal = document.getElementById('expulsionModal');
+            console.log('Modal element:', modal);
+            console.log('Modal is visible:', modal && !modal.classList.contains('hidden'));
+
+            // Test 5: Try opening modal if not open
+            if (modal && modal.classList.contains('hidden')) {
+                console.log('🔥 OPENING MODAL FOR TESTING...');
+                openAddModal();
+                setTimeout(() => {
+                    console.log('🔥 Modal should be open now. Testing input...');
+                    const searchInput = document.getElementById('student_search');
+                    if (searchInput) {
+                        searchInput.value = '2022';
+                        searchInput.dispatchEvent(new Event('input'));
+                        console.log('🔥 Triggered input event programmatically');
+                    }
+                }, 500);
+            }
+
+            return studentsData;
+        };
+
         // Real-time filtering function
         function applyRealTimeFilters() {
             const searchInput = document.getElementById('searchInput');
@@ -491,13 +704,224 @@
             });
         }
 
+        // Students data for suggestions
+        // const studentsData = @json($students ?? []); // Déjà défini plus haut
+
+        // Search student suggestions function
+        function searchStudentSuggestions(searchTerm) {
+            const suggestionsDiv = document.getElementById('student_suggestions');
+
+            if (!suggestionsDiv) {
+                console.error('❌ Suggestions div not found!');
+                return;
+            }
+
+            if (!searchTerm || searchTerm.length < 2) {
+                suggestionsDiv.classList.add('hidden');
+                return;
+            }
+
+            if (!studentsData || !Array.isArray(studentsData)) {
+                console.error('❌ Students data not available');
+                suggestionsDiv.innerHTML = '<div class="p-3 text-sm text-red-600 dark:text-red-400">Erreur: Données des étudiants non disponibles</div>';
+                suggestionsDiv.classList.remove('hidden');
+                return;
+            }
+
+            const filteredStudents = studentsData.filter(student => {
+                if (!student) return false;
+
+                // Convert to string and handle null/undefined values safely
+                const matricule = String(student.matricule || '').toLowerCase();
+                const nom = String(student.nom || '').toLowerCase();
+                const prenom = String(student.prenom || '').toLowerCase();
+                const search = searchTerm.toLowerCase();
+
+                return matricule.includes(search) ||
+                       nom.includes(search) ||
+                       prenom.includes(search);
+            }).slice(0, 8); // Limite à 8 résultats
+
+            if (filteredStudents.length === 0) {
+                suggestionsDiv.innerHTML = '<div class="p-3 text-sm text-gray-500 dark:text-gray-400">Aucun étudiant trouvé pour "' + searchTerm + '"</div>';
+                suggestionsDiv.classList.remove('hidden');
+                return;
+            }
+
+            let html = '';
+            filteredStudents.forEach(student => {
+                // Convert to string safely for template
+                const matricule = String(student.matricule || '');
+                const nom = String(student.nom || '');
+                const prenom = String(student.prenom || '');
+                const section = String(student.section_id || 'Non définie');
+
+                html += `
+                    <div class="cursor-pointer p-3 hover:bg-gray-100 dark:hover:bg-gray-600 border-b border-gray-200 dark:border-gray-600 last:border-b-0"
+                         onclick="selectStudent(this)"
+                         data-student-id="${matricule}"
+                         data-matricule="${matricule}"
+                         data-nom="${nom}"
+                         data-prenom="${prenom}"
+                         data-section="${section}">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-blue-600 dark:text-blue-400 text-xs"></i>
+                                </div>
+                            </div>
+                            <div class="ml-3">
+                                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                    ${nom} ${prenom}
+                                </div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">
+                                    ${matricule} • ${section}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            suggestionsDiv.innerHTML = html;
+            suggestionsDiv.classList.remove('hidden');
+        }
+
+        // Select student from suggestions
+        function selectStudent(element) {
+            try {
+                const studentId = element.getAttribute('data-student-id');
+                const matricule = element.getAttribute('data-matricule');
+                const nom = element.getAttribute('data-nom');
+                const prenom = element.getAttribute('data-prenom');
+                const section = element.getAttribute('data-section');
+
+                console.log('Selecting student:', { studentId, matricule, nom, prenom, section });
+
+                if (!studentId) {
+                    console.error('Student ID not found');
+                    return;
+                }
+
+                // Update search input with selected student
+                const searchInput = document.getElementById('student_search');
+                if (searchInput) {
+                    searchInput.value = `${matricule} - ${nom} ${prenom}`;
+                }
+
+                // Store selected student ID
+                const selectedStudentIdInput = document.getElementById('selected_student_id');
+                if (selectedStudentIdInput) {
+                    selectedStudentIdInput.value = studentId;
+                }
+
+                // Update student info display
+                const infoMatricule = document.getElementById('info_matricule');
+                const infoSection = document.getElementById('info_section');
+                const infoNomComplet = document.getElementById('info_nom_complet');
+                const studentInfo = document.getElementById('student_info');
+
+                if (infoMatricule) infoMatricule.textContent = matricule || '-';
+                if (infoSection) infoSection.textContent = section || 'Non définie';
+                if (infoNomComplet) infoNomComplet.textContent = `${nom} ${prenom}`;
+                if (studentInfo) studentInfo.classList.remove('hidden');
+
+                // Hide suggestions
+                const suggestionsDiv = document.getElementById('student_suggestions');
+                if (suggestionsDiv) {
+                    suggestionsDiv.classList.add('hidden');
+                }
+
+                console.log('Student selected successfully');
+            } catch (error) {
+                console.error('Error selecting student:', error);
+            }
+        }
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#student_search') && !e.target.closest('#student_suggestions')) {
+                document.getElementById('student_suggestions').classList.add('hidden');
+            }
+        });
+
+        // Student search function (legacy - kept for compatibility)
+        function searchStudent(searchTerm) {
+            // This function is now handled by searchStudentSuggestions
+            searchStudentSuggestions(searchTerm);
+        }
+
+        // Load student information (updated for new system)
+        function loadStudentInfo(studentId) {
+            if (!studentId) {
+                document.getElementById('student_info').classList.add('hidden');
+                return;
+            }
+
+            const student = studentsData.find(s => s.id == studentId);
+            if (student) {
+                document.getElementById('info_matricule').textContent = student.matricule || '-';
+                document.getElementById('info_section').textContent = student.section_id || 'Non définie';
+                document.getElementById('info_nom_complet').textContent = `${student.nom} ${student.prenom}` || '-';
+                document.getElementById('student_info').classList.remove('hidden');
+            } else {
+                document.getElementById('student_info').classList.add('hidden');
+            }
+        }
+
+        // Handle "Autre" option in reasons
+        document.addEventListener('DOMContentLoaded', function() {
+            const raisonSelect = document.getElementById('raison');
+            const raisonAutre = document.getElementById('raison_autre');
+
+            if (raisonSelect && raisonAutre) {
+                raisonSelect.addEventListener('change', function() {
+                    if (this.value === 'Autre') {
+                        raisonAutre.classList.remove('hidden');
+                        raisonAutre.required = true;
+                    } else {
+                        raisonAutre.classList.add('hidden');
+                        raisonAutre.required = false;
+                        raisonAutre.value = '';
+                    }
+                });
+            }
+        });
+
         // Modal functions
         function openAddModal() {
-            document.getElementById('modal-title').textContent = 'Nouvelle Exclusion';
-            document.getElementById('expulsionForm').action = '{{ route("de.expulsions.store") }}';
-            document.getElementById('expulsionForm').method = 'POST';
-            document.getElementById('expulsionModal').classList.remove('hidden');
-            resetForm();
+            try {
+                console.log('Attempting to open modal...');
+
+                const modal = document.getElementById('expulsionModal');
+                const title = document.getElementById('modal-title');
+                const form = document.getElementById('expulsionForm');
+
+                console.log('Modal element:', modal);
+                console.log('Title element:', title);
+                console.log('Form element:', form);
+
+                if (!modal) {
+                    console.error('Modal not found!');
+                    return;
+                }
+
+                if (title) {
+                    title.textContent = 'Nouvelle Exclusion';
+                }
+
+                if (form) {
+                    form.action = '/de/expulsions';
+                    form.method = 'POST';
+                }
+
+                modal.classList.remove('hidden');
+                resetForm();
+                console.log('Modal opened successfully');
+            } catch (error) {
+                console.error('Error opening modal:', error);
+                alert('Erreur lors de l\'ouverture du modal: ' + error.message);
+            }
         }
 
         function editExpulsion(id) {
@@ -518,13 +942,45 @@
                     }
                     methodInput.value = 'PUT';
 
-                    // Set student ID (using the student relationship from data)
-                    if (data.student && data.student.id) {
-                        document.getElementById('student_id').value = data.student.id;
+                    // Set student information
+                    if (data.student && data.student.matricule) {
+                        const student = data.student;
+
+                        // Update search input with selected student
+                        document.getElementById('student_search').value = `${student.matricule} - ${student.nom} ${student.prenom}`;
+
+                        // Store selected student matricule (not id)
+                        document.getElementById('selected_student_id').value = student.matricule;
+
+                        // Update student info display
+                        document.getElementById('info_matricule').textContent = student.matricule || '-';
+                        document.getElementById('info_section').textContent = student.section_id || 'Non définie';
+                        document.getElementById('info_nom_complet').textContent = `${student.nom} ${student.prenom}` || '-';
+                        document.getElementById('student_info').classList.remove('hidden');
                     }
 
                     // Set the reason (from either raison or motif_expulsion)
-                    document.getElementById('raison').value = data.raison || data.motif_expulsion || '';
+                    const reason = data.raison || data.motif_expulsion || '';
+                    const raisonSelect = document.getElementById('raison');
+                    const raisonAutre = document.getElementById('raison_autre');
+
+                    // Check if reason exists in dropdown
+                    let reasonFound = false;
+                    for (let option of raisonSelect.options) {
+                        if (option.value === reason) {
+                            raisonSelect.value = reason;
+                            reasonFound = true;
+                            break;
+                        }
+                    }
+
+                    // If reason not found in dropdown, set as "Autre"
+                    if (!reasonFound && reason) {
+                        raisonSelect.value = 'Autre';
+                        raisonAutre.classList.remove('hidden');
+                        raisonAutre.required = true;
+                        raisonAutre.value = reason;
+                    }
 
                     document.getElementById('expulsionModal').classList.remove('hidden');
                 })
@@ -563,17 +1019,101 @@
         }
 
         function resetForm() {
-            document.getElementById('expulsionForm').reset();
-            const methodInput = document.querySelector('input[name="_method"]');
-            if (methodInput) {
-                methodInput.remove();
+            try {
+                console.log('Resetting form...');
+
+                // Reset the form
+                const form = document.getElementById('expulsionForm');
+                if (form) {
+                    form.reset();
+                    form.action = '/de/expulsions';
+                    form.method = 'POST';
+                }
+
+                // Clear student search and selection
+                const searchInput = document.getElementById('student_search');
+                const selectedStudentId = document.getElementById('selected_student_id');
+                const studentInfo = document.getElementById('student_info');
+                const suggestions = document.getElementById('student_suggestions');
+
+                if (searchInput) searchInput.value = '';
+                if (selectedStudentId) selectedStudentId.value = '';
+                if (studentInfo) studentInfo.classList.add('hidden');
+                if (suggestions) suggestions.classList.add('hidden');
+
+                // Hide "Autre" reason text area
+                const raisonAutre = document.getElementById('raison_autre');
+                if (raisonAutre) {
+                    raisonAutre.classList.add('hidden');
+                    raisonAutre.required = false;
+                    raisonAutre.value = '';
+                }
+
+                // Remove method input if exists
+                const methodInput = document.querySelector('input[name="_method"]');
+                if (methodInput) {
+                    methodInput.remove();
+                }
+
+                // Reset modal title
+                const modalTitle = document.getElementById('modal-title');
+                if (modalTitle) {
+                    modalTitle.textContent = 'Nouvelle Exclusion';
+                }
+
+                console.log('Form reset successfully');
+            } catch (error) {
+                console.error('Error resetting form:', error);
             }
         }
+
+        // Form validation
+        document.getElementById('expulsionForm').addEventListener('submit', function(e) {
+            const selectedStudentId = document.getElementById('selected_student_id').value;
+            const raisonSelect = document.getElementById('raison');
+            const raisonAutre = document.getElementById('raison_autre');
+
+            // Validate student selection
+            if (!selectedStudentId) {
+                e.preventDefault();
+                alert('Veuillez sélectionner un étudiant avant de soumettre le formulaire.');
+                document.getElementById('student_search').focus();
+                return false;
+            }
+
+            // Validate reason
+            if (!raisonSelect.value) {
+                e.preventDefault();
+                alert('Veuillez sélectionner une raison pour l\'exclusion.');
+                raisonSelect.focus();
+                return false;
+            }
+
+            // Validate "Autre" reason if selected
+            if (raisonSelect.value === 'Autre' && !raisonAutre.value.trim()) {
+                e.preventDefault();
+                alert('Veuillez préciser la raison de l\'exclusion.');
+                raisonAutre.focus();
+                return false;
+            }
+
+            return true;
+        });
 
         // Close modal when clicking outside
         document.getElementById('expulsionModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('expulsionModal');
+                if (modal && !modal.classList.contains('hidden')) {
+                    closeModal();
+                }
             }
         });
 

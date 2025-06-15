@@ -113,12 +113,12 @@ class ExpulsionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'student_id' => 'required|exists:students,id',
+            'student_id' => 'required|exists:students,matricule',
             'raison' => 'required|string|max:255'
         ]);
 
-        // Get student's matricule
-        $student = Student::findOrFail($request->student_id);
+        // Get student by matricule (which is stored in student_id field)
+        $student = Student::where('matricule', $request->student_id)->firstOrFail();
 
         // Create expulsion with properly mapped fields
         Expulsion::create([
@@ -157,12 +157,12 @@ class ExpulsionController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'student_id' => 'required|exists:students,id',
+            'student_id' => 'required|exists:students,matricule',
             'raison' => 'required|string|max:255'
         ]);
 
-        // Get student's matricule
-        $student = Student::findOrFail($request->student_id);
+        // Get student by matricule (which is stored in student_id field)
+        $student = Student::where('matricule', $request->student_id)->firstOrFail();
 
         $expulsion = Expulsion::findOrFail($id);
         $expulsion->update([
