@@ -206,7 +206,8 @@
                                     <div class="text-center">
                                         <div class="text-2xl font-bold text-gray-800 dark:text-gray-200"
                                             id="total-patine">
-                                            {{ $patineStats['total'] }}
+
+                                            {{ $patientsStats['total'] }}
                                         </div>
                                         <div class="text-sm text-gray-600 dark:text-gray-400">Total</div>
                                     </div>
@@ -217,11 +218,11 @@
                             <div class="text-center">
                                 <div class="flex items-center justify-center">
                                     <div class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
-                                    <span class="text-gray-700 dark:text-gray-300">Pending</span>
+                                    <span class="text-gray-700 dark:text-gray-300">notValidated</span>
                                 </div>
                                 <div class="font-semibold text-yellow-600 dark:text-yellow-400"
                                     id="pending-patine-detail">
-                                    {{ $patineStats['pending'] }}
+                                    {{ $patientsStats['notValidated'] }}
                                 </div>
                             </div>
                             <div class="text-center">
@@ -230,7 +231,7 @@
                                     <span class="text-gray-700 dark:text-gray-300">Rejected</span>
                                 </div>
                                 <div class="font-semibold text-red-600 dark:text-red-400" id="rejected-patine-detail">
-                                    {{ $patineStats['rejected'] }}
+                                    {{ $patientsStats['deleted'] }}
                                 </div>
                             </div>
                             <div class="text-center">
@@ -240,7 +241,7 @@
                                 </div>
                                 <div class="font-semibold text-green-600 dark:text-green-400"
                                     id="validated-patine-detail">
-                                    {{ $patineStats['validated'] }}
+                                    {{ $patientsStats['validated'] }}
                                 </div>
                             </div>
                         </div>
@@ -275,7 +276,7 @@
                             <div class="bg-white dark:bg-gray-700 rounded-lg p-4 border-l-4 border-purple-500">
                                 <div class="text-2xl font-bold text-purple-600 dark:text-purple-400"
                                     id="patine-approval-rate">
-                                    {{ number_format($patineStats['total'] > 0 ? ($patineStats['validated'] / $patineStats['total']) * 100 : 0, 1) }}%
+                                    {{ number_format($patientsStats['total'] > 0 ? ($patientsStats['validated'] / $patientsStats['total']) * 100 : 0, 1) }}%
                                 </div>
                                 <div class="text-sm text-gray-600 dark:text-gray-400">Patine Approval Rate</div>
                             </div>
@@ -359,16 +360,16 @@
                 },
                 options: commonOptions
             });
-
+            //! important
             let patineChart = new Chart(patineCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Pending', 'Rejected', 'Validated'],
+                    labels: ['notValidated', 'Rejected', 'Validated'],
                     datasets: [{
                         data: [
-                            {{ $patineStats['pending'] }},
-                            {{ $patineStats['rejected'] }},
-                            {{ $patineStats['validated'] }}
+                            {{ $patientsStats['notValidated'] }},
+                            {{ $patientsStats['deleted'] }},
+                            {{ $patientsStats['validated'] }}
                         ],
                         backgroundColor: ['#eab308', '#ef4444', '#22c55e'],
                         borderWidth: 0

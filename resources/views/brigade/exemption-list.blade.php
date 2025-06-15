@@ -1,12 +1,12 @@
-<x-brigade>
-    <div class="max-w-7xl mx-auto py-8 px-4" x-data="exemptionList()">
+<x-brigade css="rdv-list">
+    <div class="max-w-7xl mx-auto py-8 px-4" x-data="exemptionList()" x-init="init()">
         <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-6">
             <!-- Header -->
             <div class="flex justify-between items-center mb-6">
                 <div>
                     <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">Exemptions Actives</h2>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        {{ now()->format('d/m/Y') }} - {{ $exemptions->count() }} exemptions en cours
+                        {{ now()->format('d/m/Y') }} - <span x-text="exemptions.length"></span> exemptions en cours
                     </p>
                 </div>
                 <div class="flex items-center space-x-3">
@@ -193,24 +193,7 @@
     <script>
         function exemptionList() {
             return {
-                exemptions: @json(
-                    $exemptions->map(function ($exemption) {
-                        return [
-                            'id' => $exemption->id,
-                            'matricule' => $exemption->matricule,
-                            'student_name' => $exemption->student->nom . ' ' . $exemption->student->prenom,
-                            'section' => $exemption->student->section->name ?? 'N/A',
-                            'motif' => $exemption->motif,
-                            'date_debut' => $exemption->date_debut,
-                            'date_fin' => $exemption->date_fin,
-                            'formatted_debut' => date('d/m/Y', strtotime($exemption->date_debut)),
-                            'formatted_fin' => date('d/m/Y', strtotime($exemption->date_fin)),
-                            'duration_days' =>
-                                now()->parse($exemption->date_debut)->diffInDays(now()->parse($exemption->date_fin)) + 1,
-                            'days_remaining' => now()->diffInDays(now()->parse($exemption->date_fin)),
-                            'created_at' => $exemption->created_at->format('d/m/Y'),
-                        ];
-                    })),
+                exemptions: [],
                 filteredExemptions: [],
                 paginatedExemptions: [],
                 searchQuery: '',
@@ -220,9 +203,39 @@
                 currentPage: 1,
                 perPage: 10,
 
-                init() {
-                    this.filteredExemptions = this.exemptions;
-                    this.updatePagination();
+                async init() {
+                    await this.loadExemptions();
+                },
+
+                async loadExemptions() {
+                    this.loading = true;
+                    try {
+                        const response = await fetch('{{ route('brigade.exemption-list', $officer->id) }}', {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            this.exemptions = data.exemptions || [];
+                            this.filteredExemptions = this.exemptions;
+                            this.updatePagination();
+                        } else {
+                            console.error('Failed to load exemptions:', response.status);
+                            this.exemptions = [];
+                            this.filteredExemptions = [];
+                        }
+                    } catch (error) {
+                        console.error('Error loading exemptions:', error);
+                        this.exemptions = [];
+                        this.filteredExemptions = [];
+                    } finally {
+                        this.loading = false;
+                    }
                 },
 
                 get totalPages() {

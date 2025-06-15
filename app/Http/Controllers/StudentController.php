@@ -87,6 +87,7 @@ class StudentController extends Controller
         try {
             // Authentication check
             $user = auth()->user();
+
             if (!$user) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }

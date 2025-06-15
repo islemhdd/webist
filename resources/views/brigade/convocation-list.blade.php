@@ -1,12 +1,12 @@
 <x-brigade>
-    <div class="max-w-7xl mx-auto py-8 px-4" x-data="convocationList()">
+    <div class="max-w-7xl mx-auto py-8 px-4" x-data="convocationList()" x-init="init()">>
         <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-6">
             <!-- Header -->
             <div class="flex justify-between items-center mb-6">
                 <div>
                     <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">Convocations Médicales</h2>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        {{ now()->format('d/m/Y') }} - {{ $convocations->total() }} convocations actives
+                        {{ now()->format('d/m/Y') }} - <span x-text="convocations.length"></span> convocations actives
                     </p>
                 </div>
                 <div class="flex items-center space-x-3">
@@ -166,39 +166,44 @@
     <script>
         function convocationList() {
             return {
-                convocations: @json(
-                    $convocations->items()->map(function ($convocation) {
-                        $services = [];
-                        if ($convocation->psy) {
-                            $services[] = 'Psychiatre';
-                        }
-                        if ($convocation->medGen) {
-                            $services[] = 'Médecin Général';
-                        }
-                        if ($convocation->chirDent) {
-                            $services[] = 'Chirurgien Dentiste';
-                        }
-                        if ($convocation->avisSpe) {
-                            $services[] = 'Avis Spécialisé';
-                        }
-                
-                        return [
-                            'id' => $convocation->id,
-                            'matricule' => $convocation->matricule,
-                            'student_name' => $convocation->student->nom . ' ' . $convocation->student->prenom,
-                            'section' => $convocation->student->section->name ?? 'N/A',
-                            'services' => $services,
-                            'services_text' => implode(', ', $services),
-                            'psy' => $convocation->psy,
-                            'medGen' => $convocation->medGen,
-                            'chirDent' => $convocation->chirDent,
-                            'avisSpe' => $convocation->avisSpe,
-                            'created_at' => $convocation->created_at->format('d/m/Y'),
-                            'formatted_date' => $convocation->created_at->format('d/m/Y H:i'),
-                        ];
-                    })),
+                convocations: [],
                 filteredConvocations: [],
                 searchQuery: '',
+                loading: false,
+
+                async init() {
+                    await this.loadConvocations();
+                },
+
+                async loadConvocations() {
+                    this.loading = true;
+                    try {
+                        const response = await fetch('{{ route('brigade.convocation-list', $officer->id) }}', {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            this.convocations = data.convocations || [];
+                            this.filteredConvocations = this.convocations;
+                        } else {
+                            console.error('Failed to load convocations:', response.status);
+                            this.convocations = [];
+                            this.filteredConvocations = [];
+                        }
+                    } catch (error) {
+                        console.error('Error loading convocations:', error);
+                        this.convocations = [];
+                        this.filteredConvocations = [];
+                    } finally {
+                        this.loading = false;
+                    }
+                },
                 loading: false,
 
                 init() {

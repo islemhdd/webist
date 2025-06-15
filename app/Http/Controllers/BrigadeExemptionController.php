@@ -30,7 +30,29 @@ class BrigadeExemptionController extends Controller
             ->orderBy('date_debut', 'desc')
             ->get();
 
-        return view('brigade.exemption-list', compact('officer', 'exemptions'));
+        // Check if this is an AJAX request
+        if (request()->expectsJson() || request()->header('X-Requested-With') === 'XMLHttpRequest') {
+            return response()->json([
+                'exemptions' => $exemptions->map(function ($exemption) {
+                    return [
+                        'id' => $exemption->id,
+                        'matricule' => $exemption->matricule,
+                        'student_name' => $exemption->student->nom . ' ' . $exemption->student->prenom,
+                        'section' => $exemption->student->section->name ?? 'N/A',
+                        'motif' => $exemption->motif,
+                        'date_debut' => $exemption->date_debut,
+                        'date_fin' => $exemption->date_fin,
+                        'formatted_debut' => date('d/m/Y', strtotime($exemption->date_debut)),
+                        'formatted_fin' => date('d/m/Y', strtotime($exemption->date_fin)),
+                        'duration_days' => now()->parse($exemption->date_debut)->diffInDays(now()->parse($exemption->date_fin)) + 1,
+                        'days_remaining' => now()->diffInDays(now()->parse($exemption->date_fin)),
+                        'created_at' => $exemption->created_at->format('d/m/Y')
+                    ];
+                })
+            ]);
+        }
+
+        return view('brigade.exemption-list', ['officer' => $officer, 'exemptions' => collect()]);
     }
 
     /**

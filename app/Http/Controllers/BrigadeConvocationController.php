@@ -18,7 +18,9 @@ class BrigadeConvocationController extends Controller
 
         // Get students based on officer role
         $studentsQuery = $this->getStudentsQueryByRole($officer);
-        $studentMatricules = $studentsQuery->pluck('matricule');        // Get today's convocations (created today or have any medical requirement)
+        $studentMatricules = $studentsQuery->pluck('matricule');
+
+        // Get today's convocations (created today or have any medical requirement)
         $convocations = Convoncu::whereIn('matricule', $studentMatricules)
             ->with(['student.section'])
             ->where(function ($query) {
@@ -28,9 +30,37 @@ class BrigadeConvocationController extends Controller
                     ->orWhere('avisSpe', true);
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->get();
 
-        return view('brigade.convocation-list', compact('officer', 'convocations'));
+        // Check if this is an AJAX request
+        if (request()->expectsJson() || request()->header('X-Requested-With') === 'XMLHttpRequest') {
+            return response()->json([
+                'convocations' => $convocations->map(function ($convocation) {
+                    $services = [];
+                    if ($convocation->psy) $services[] = 'Psychiatre';
+                    if ($convocation->medGen) $services[] = 'Médecin Général';
+                    if ($convocation->chirDent) $services[] = 'Chirurgien Dentiste';
+                    if ($convocation->avisSpe) $services[] = 'Avis Spécialisé';
+
+                    return [
+                        'id' => $convocation->id,
+                        'matricule' => $convocation->matricule,
+                        'student_name' => $convocation->student->nom . ' ' . $convocation->student->prenom,
+                        'section' => $convocation->student->section->name ?? 'N/A',
+                        'services' => $services,
+                        'services_text' => implode(', ', $services),
+                        'psy' => $convocation->psy,
+                        'medGen' => $convocation->medGen,
+                        'chirDent' => $convocation->chirDent,
+                        'avisSpe' => $convocation->avisSpe,
+                        'created_at' => $convocation->created_at->format('d/m/Y'),
+                        'formatted_date' => $convocation->created_at->format('d/m/Y H:i')
+                    ];
+                })
+            ]);
+        }
+
+        return view('brigade.convocation-list', ['officer' => $officer, 'convocations' => collect()]);
     }
 
     /**

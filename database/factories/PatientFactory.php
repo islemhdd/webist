@@ -2,49 +2,51 @@
 
 namespace Database\Factories;
 
-use App\Models\Patient;
-use App\Models\Student;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Patient>
- */
 class PatientFactory extends Factory
 {
     /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = Patient::class;
-
-    /**
      * Define the model's default state.
      *
-     * @return array<string, mixed>
+     * @return array
      */
-    public function definition(): array
+    public function definition()
     {
-        $valider = fake()->randomElement([0, 1, 2]); // 0: Not validated, 1: Validated, 2: Deleted
-        $medecin_types = ['General', 'Specialist', 'Dentist', 'Psychiatrist', 'Orthopedist'];
+        $matricules = [
+            '2022055',
+            '2022104',
+            '2022011',
+            '2022056',
+            '2022064',
+            '2022120',
+            '2022131',
+            '2022250',
+            '2022002',
+            '2022003',
+            '2022004',
+            '2022005',
+            '2022006',
+            '2022007',
+            '2022096'
+        ];
 
-        $validated_at = null;
-        if ($valider === 1) {
-            $validated_at = fake()->dateTimeBetween('-30 days', 'now');
-        }
-
-        $motif_suppression = null;
-        if ($valider === 2) {
-            $motif_suppression = fake()->sentence();
-        }
+        $types = ['médecin générale', 'dentiste', 'psycho'];
 
         return [
-            'matricule' => Student::inRandomOrder()->first()?->matricule,
-            'valider' => $valider,
-            'validated_at' => $validated_at,
-            'motif_suppression' => $motif_suppression,
-            'type_medecin' => $valider === 2 ? null : fake()->randomElement($medecin_types),
-            'avis_medecin' => $valider === 2 ? null : fake()->paragraph(),
+            'matricule' => $this->faker->randomElement($matricules),
+            'valider' => $this->faker->boolean(80), // 80% chance of being validated
+            'valider_rhp' => function (array $attributes) {
+                return $attributes['valider'] ? $this->faker->boolean(70) : 0;
+            },
+            'validated_at' => function (array $attributes) {
+                return $attributes['valider'] ? $this->faker->dateTimeThisYear() : null;
+            },
+            'created_at' => $this->faker->dateTimeThisYear(),
+            'updated_at' => $this->faker->dateTimeThisYear(),
+            'motif_suppression' => $this->faker->optional(0.2)->text(200), // 20% chance of having a suppression reason
+            'type_medecin' => $this->faker->randomElement($types),
+            'avis_medecin' => $this->faker->optional(0.9)->text(500), // 90% chance of having a doctor's opinion
         ];
     }
 }

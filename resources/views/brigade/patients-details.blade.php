@@ -59,7 +59,7 @@
 
                         <!-- Graph Container -->
                         <div class="relative">
-                            <canvas id="patientsChart" width="400" height="150"></canvas>
+                            <canvas id="patientsChart" width="400" height="500"></canvas>
                             <div x-show="graphLoading"
                                 class="absolute inset-0 bg-white dark:bg-gray-700 bg-opacity-75 flex items-center justify-center">
                                 <div class="text-center">

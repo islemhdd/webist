@@ -117,6 +117,8 @@ class BrigadeStatisticsController extends Controller
 
     private function getPatientsStats($studentMatricules)
     {
+
+
         return [
             'notValidated' => Patient::whereIn('matricule', $studentMatricules)
                 ->where('valider', 0)
@@ -152,12 +154,13 @@ class BrigadeStatisticsController extends Controller
         $patineStats = $this->getPatineStats($studentMatricules);
         $patientsStats = $this->getPatientsStats($studentMatricules);
 
+
         $totalStudents = $this->getTotalStudents($studentMatricules);
 
         return view('brigade.statistics', compact(
             'weekendStats',
             'sanctionsStats',
-            'patineStats',
+
             'patientsStats',
             'totalStudents',
             'officer'

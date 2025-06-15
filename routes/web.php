@@ -179,14 +179,14 @@ Route::controller(BrigadeExemptionController::class)->group(
 // Notifications Routes
 
 // Brigade list routes
-Route::get('/brigade/rdv-list/{id}', [BrigadeRendezVousController::class, 'index'])->name('brigade.rdv-list');
-Route::get('/brigade/rdv-list/{id}/search', [BrigadeRendezVousController::class, 'search'])->name('brigade.rdv-list.search');
+Route::get('/brigade/rdv-list/{id}', [BrigadeRendezVousController::class, 'index'])->name('brigade.rdv-list')->middleware('auth');
+Route::get('/brigade/rdv-list/{id}/search', [BrigadeRendezVousController::class, 'search'])->name('brigade.rdv-list.search')->middleware('auth');
 
-Route::get('/brigade/exemption-list/{id}', [BrigadeExemptionController::class, 'index'])->name('brigade.exemption-list');
-Route::get('/brigade/exemption-list/{id}/search', [BrigadeExemptionController::class, 'search'])->name('brigade.exemption-list.search');
+Route::get('/brigade/exemption-list/{id}', [BrigadeExemptionController::class, 'index'])->name('brigade.exemption-list')->middleware('auth');
+Route::get('/brigade/exemption-list/{id}/search', [BrigadeExemptionController::class, 'search'])->name('brigade.exemption-list.search')->middleware('auth');
 
-Route::get('/brigade/convocation-list/{id}', [BrigadeConvocationController::class, 'index'])->name('brigade.convocation-list');
-Route::get('/brigade/convocation-list/{id}/search', [BrigadeConvocationController::class, 'search'])->name('brigade.convocation-list.search');
+Route::get('/brigade/convocation-list/{id}', [BrigadeConvocationController::class, 'index'])->name('brigade.convocation-list')->middleware('auth');
+Route::get('/brigade/convocation-list/{id}/search', [BrigadeConvocationController::class, 'search'])->name('brigade.convocation-list.search')->middleware('auth');
 
 Route::get("test1", function () {
     $students = Student::all();

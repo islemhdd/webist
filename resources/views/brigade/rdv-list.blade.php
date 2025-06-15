@@ -1,12 +1,13 @@
-<x-brigade>
-    <div class="max-w-7xl mx-auto py-8 px-4" x-data="rdvList()">
+<x-brigade css="rdv-list">
+    <div class="max-w-7xl mx-auto py-8 px-4" x-data="rdvList()" x-init="init()">
         <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-6">
             <!-- Header -->
             <div class="flex justify-between items-center mb-6">
                 <div>
                     <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">Rendez-vous de Demain</h2>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        {{ now()->addDay()->format('d/m/Y') }} - {{ $rdvs->count() }} rendez-vous programmés
+                        {{ now()->addDay()->format('d/m/Y') }} - <span x-text="rdvs.length"></span> rendez-vous
+                        programmés
                     </p>
                 </div>
                 <div class="flex items-center space-x-3">
@@ -58,10 +59,7 @@
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Service
                             </th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Date & Heure
-                            </th>
+
                             <th
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Créé le
@@ -69,129 +67,109 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                        <template x-for="rdv in paginatedRdvs" :key="rdv.id">
+                        <template x-for="rdv in paginatedRdvs">
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div
-                                            class="bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 rounded-full w-10 h-10 flex items-center justify-center text-sm font-bold mr-3">
-                                            <span x-text="rdv.matricule.toString().substring(0, 2)"></span>
-                                        </div>
-                                        <div>
-                                            <div class="text-sm font-medium text-gray-900 dark:text-gray-100"
-                                                x-text="rdv.student_name"></div>
-                                            <div class="text-sm text-gray-500 dark:text-gray-400"
-                                                x-text="'Matricule: ' + rdv.matricule"></div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100"
-                                    x-text="rdv.section"></td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span
-                                        :class="rdv.motif === 'urgences' ?
-                                            'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200' :
-                                            'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'"
-                                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full capitalize"
-                                        x-text="rdv.motif"></span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100"
-                                    x-text="rdv.service"></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100"
-                                    x-text="rdv.formatted_date"></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"
-                                    x-text="rdv.created_at"></td>
-                            </tr>
-                        </template>
 
-                        <!-- No results message -->
-                        <tr x-show="filteredRdvs.length === 0 && !loading">
-                            <td colspan="6" class="px-6 py-8 text-center">
-                                <div class="text-gray-500 dark:text-gray-400">
-                                    <i class="fas fa-calendar-times text-3xl mb-4"></i>
-                                    <p class="text-lg font-medium">Aucun rendez-vous trouvé</p>
-                                    <p class="text-sm" x-show="searchQuery">Essayez de modifier vos critères de
-                                        recherche</p>
-                                    <p class="text-sm" x-show="!searchQuery">Aucun rendez-vous programmé pour demain</p>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900 dark:text-gray-100"
+                                            x-text="rdv.student_name"></div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400"
+                                            x-text="'Matricule: ' + rdv.matricule"></div>
+                                    </div>
+            </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100" x-text="rdv.section"></td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <span
+                    :class="rdv.motif === 'urgences' ?
+                        'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200' :
+                        'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'"
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full capitalize"
+                    x-text="rdv.motif"></span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100" x-text="rdv.service"></td>
+
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400" x-text="rdv.created_at">
+            </td>
+            </tr>
+            </template>
+
+            <!-- No results message -->
+            <tr x-show="filteredRdvs.length === 0 && !loading">
+                <td colspan="6" class="px-6 py-8 text-center">
+                    <div class="text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-calendar-times text-3xl mb-4"></i>
+                        <p class="text-lg font-medium">Aucun rendez-vous trouvé</p>
+                        <p class="text-sm" x-show="searchQuery">Essayez de modifier vos critères de
+                            recherche</p>
+                        <p class="text-sm" x-show="!searchQuery">Aucun rendez-vous programmé pour demain</p>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div x-show="!loading && filteredRdvs.length > perPage"
+            class="mt-6 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-6">
+            <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-700 dark:text-gray-300">Afficher</span>
+                <select x-model="perPage" @change="updatePagination()"
+                    class="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+                <span class="text-sm text-gray-700 dark:text-gray-300">par page</span>
             </div>
 
-            <!-- Pagination -->
-            <div x-show="!loading && filteredRdvs.length > perPage"
-                class="mt-6 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-6">
-                <div class="flex items-center space-x-2">
-                    <span class="text-sm text-gray-700 dark:text-gray-300">Afficher</span>
-                    <select x-model="perPage" @change="updatePagination()"
-                        class="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                        <option value="50">50</option>
-                    </select>
-                    <span class="text-sm text-gray-700 dark:text-gray-300">par page</span>
-                </div>
+            <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-700 dark:text-gray-300"
+                    x-text="`Affichage ${startIndex + 1} à ${Math.min(endIndex, filteredRdvs.length)} sur ${filteredRdvs.length} résultats`"></span>
+            </div>
 
-                <div class="flex items-center space-x-2">
-                    <span class="text-sm text-gray-700 dark:text-gray-300"
-                        x-text="`Affichage ${startIndex + 1} à ${Math.min(endIndex, filteredRdvs.length)} sur ${filteredRdvs.length} résultats`"></span>
-                </div>
+            <div class="flex items-center space-x-1">
+                <button @click="goToPage(1)" :disabled="currentPage === 1"
+                    :class="currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50 dark:hover:bg-gray-700'"
+                    class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded-l">
+                    <i class="fas fa-angle-double-left"></i>
+                </button>
+                <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1"
+                    :class="currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50 dark:hover:bg-gray-700'"
+                    class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 border-t border-b border-gray-300 dark:border-gray-600">
+                    <i class="fas fa-angle-left"></i>
+                </button>
 
-                <div class="flex items-center space-x-1">
-                    <button @click="goToPage(1)" :disabled="currentPage === 1"
-                        :class="currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50 dark:hover:bg-gray-700'"
-                        class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded-l">
-                        <i class="fas fa-angle-double-left"></i>
-                    </button>
-                    <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1"
-                        :class="currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50 dark:hover:bg-gray-700'"
-                        class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 border-t border-b border-gray-300 dark:border-gray-600">
-                        <i class="fas fa-angle-left"></i>
-                    </button>
+                <template x-for="page in visiblePages">
+                    <button @click="goToPage(page)"
+                        :class="page === currentPage ? 'bg-blue-500 text-white' :
+                            'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'"
+                        class="px-3 py-2 text-sm border-t border-b border-gray-300 dark:border-gray-600"
+                        x-text="page"></button>
+                </template>
 
-                    <template x-for="page in visiblePages" :key="page">
-                        <button @click="goToPage(page)"
-                            :class="page === currentPage ? 'bg-blue-500 text-white' :
-                                'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'"
-                            class="px-3 py-2 text-sm border-t border-b border-gray-300 dark:border-gray-600"
-                            x-text="page"></button>
-                    </template>
-
-                    <button @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages"
-                        :class="currentPage === totalPages ? 'opacity-50 cursor-not-allowed' :
-                            'hover:bg-gray-50 dark:hover:bg-gray-700'"
-                        class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 border-t border-b border-gray-300 dark:border-gray-600">
-                        <i class="fas fa-angle-right"></i>
-                    </button>
-                    <button @click="goToPage(totalPages)" :disabled="currentPage === totalPages"
-                        :class="currentPage === totalPages ? 'opacity-50 cursor-not-allowed' :
-                            'hover:bg-gray-50 dark:hover:bg-gray-700'"
-                        class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded-r">
-                        <i class="fas fa-angle-double-right"></i>
-                    </button>
-                </div>
+                <button @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages"
+                    :class="currentPage === totalPages ? 'opacity-50 cursor-not-allowed' :
+                        'hover:bg-gray-50 dark:hover:bg-gray-700'"
+                    class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 border-t border-b border-gray-300 dark:border-gray-600">
+                    <i class="fas fa-angle-right"></i>
+                </button>
+                <button @click="goToPage(totalPages)" :disabled="currentPage === totalPages"
+                    :class="currentPage === totalPages ? 'opacity-50 cursor-not-allowed' :
+                        'hover:bg-gray-50 dark:hover:bg-gray-700'"
+                    class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded-r">
+                    <i class="fas fa-angle-double-right"></i>
+                </button>
             </div>
         </div>
+    </div>
     </div>
     <script>
         function rdvList() {
             return {
-                rdvs: @json(
-                    $rdvs->map(function ($rdv) {
-                        return [
-                            'id' => $rdv->id,
-                            'matricule' => $rdv->matricule,
-                            'student_name' => $rdv->student->nom . ' ' . $rdv->student->prenom,
-                            'section' => $rdv->student->section->name ?? 'N/A',
-                            'motif' => $rdv->motif,
-                            'service' => $rdv->service,
-                            'date' => $rdv->date->format('Y-m-d H:i'),
-                            'formatted_date' => $rdv->date->format('d/m/Y H:i'),
-                            'created_at' => $rdv->created_at->format('d/m/Y'),
-                        ];
-                    })),
+                rdvs: [],
                 filteredRdvs: [],
                 paginatedRdvs: [],
                 searchQuery: '',
@@ -201,9 +179,40 @@
                 currentPage: 1,
                 perPage: 10,
 
-                init() {
-                    this.filteredRdvs = this.rdvs;
-                    this.updatePagination();
+                async init() {
+                    await this.loadRdvs();
+                },
+
+                async loadRdvs() {
+                    this.loading = true;
+                    try {
+                        const response = await fetch('{{ route('brigade.rdv-list', $officer->id) }}', {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            this.rdvs = data.rdvs || [];
+                            console.log(data);
+                            this.filteredRdvs = this.rdvs;
+                            this.updatePagination();
+                        } else {
+                            console.error('Failed to load RDVs:', response.status);
+                            this.rdvs = [];
+                            this.filteredRdvs = [];
+                        }
+                    } catch (error) {
+                        console.error('Error loading RDVs:', error);
+                        this.rdvs = [];
+                        this.filteredRdvs = [];
+                    } finally {
+                        this.loading = false;
+                    }
                 },
 
                 get totalPages() {
@@ -273,6 +282,7 @@
                         const data = await response.json();
                         this.filteredRdvs = data.rdvs;
                         this.updatePagination();
+                        console.log(data.rdvs);
                     } catch (error) {
                         console.error('Search error:', error);
                         this.filteredRdvs = [];

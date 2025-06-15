@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Officer;
 use App\Models\ListeRdv;
+use App\Models\Section;
 use App\Models\Student;
 use Illuminate\Http\Request;
 
@@ -14,23 +15,46 @@ class BrigadeRendezVousController extends Controller
      */
     public function index(Officer $id)
     {
+
         $officer = $id;
 
         // Get students based on officer role
         $studentsQuery = $this->getStudentsQueryByRole($officer);
+
         $studentMatricules = $studentsQuery->pluck('matricule');
 
+
         // Get tomorrow's rendez-vous
-        $tomorrow = now()->addDay()->startOfDay();
-        $endOfTomorrow = now()->addDay()->endOfDay();
+        $tomorrow = now()->addDay()->startOfDay()->format('Y-m-d');
+
+
 
         $rdvs = ListeRdv::whereIn('matricule', $studentMatricules)
-            ->whereBetween('date', [$tomorrow, $endOfTomorrow])
-            ->with(['student.section'])
+            ->where('date', $tomorrow)
             ->orderBy('date', 'asc')
             ->get();
 
-        return view('brigade.rdv-list', compact('officer', 'rdvs'));
+
+        // Check if this is an AJAX request
+        if (request()->expectsJson() || request()->header('X-Requested-With') === 'XMLHttpRequest') {
+            return response()->json([
+                'rdvs' => $rdvs->map(function ($rdv) {
+                    return [
+                        'id' => $rdv->id,
+                        'matricule' => $rdv->matricule,
+                        'student_name' => $rdv->student->nom . ' ' . $rdv->student->prenom,
+                        'section' => $rdv->student->section_id ?? 'N/A',
+                        'motif' => $rdv->motif,
+                        'service' => $rdv->service,
+                        // 'date' => $rdv->date->format('Y-m-d H:i'),
+                        // 'formatted_date' => $rdv->date->format('d/m/Y H:i'),
+                        'created_at' => $rdv->created_at->format('d/m/Y')
+                    ];
+                })
+            ]);
+        }
+
+        return view('brigade.rdv-list', ['officer' => $officer, 'rdvs' => collect()]);
     }
 
     /**
@@ -43,15 +67,17 @@ class BrigadeRendezVousController extends Controller
 
         // Get students based on officer role
         $studentsQuery = $this->getStudentsQueryByRole($officer);
+
         $studentMatricules = $studentsQuery->pluck('matricule');
 
         // Get tomorrow's rendez-vous
-        $tomorrow = now()->addDay()->startOfDay();
-        $endOfTomorrow = now()->addDay()->endOfDay();
 
         $rdvsQuery = ListeRdv::whereIn('matricule', $studentMatricules)
-            ->whereBetween('date', [$tomorrow, $endOfTomorrow])
             ->with(['student.section']);
+
+        $rd = $rdvsQuery->get();
+
+
 
         if (!empty($query)) {
             $rdvsQuery->where(function ($q) use ($query) {
@@ -70,15 +96,15 @@ class BrigadeRendezVousController extends Controller
         return response()->json([
             'rdvs' => $rdvs->map(function ($rdv) {
                 return [
+
                     'id' => $rdv->id,
                     'matricule' => $rdv->matricule,
                     'student_name' => $rdv->student->nom . ' ' . $rdv->student->prenom,
-                    'section' => $rdv->student->section->name ?? 'N/A',
+                    'section' => $rdv->student->section_id ?? 'N/A',
                     'motif' => $rdv->motif,
                     'service' => $rdv->service,
-                    'date' => $rdv->date->format('Y-m-d H:i'),
-                    'formatted_date' => $rdv->date->format('d/m/Y H:i'),
-                    'created_at' => $rdv->created_at->format('d/m/Y')
+
+
                 ];
             })
         ]);
@@ -90,12 +116,15 @@ class BrigadeRendezVousController extends Controller
     private function getStudentsQueryByRole(Officer $officer)
     {
         if ($officer->role->name === 'Chef de compagnie') {
+
             // Chef de compagnie sees only their section students
-            return Student::where('section_id', $officer->section_id);
+            $officerSections = Section::where("officer_id", $officer->id)->get()->pluck('id');
+
+            return Student::wherein('section_id', $officerSections);
         } elseif ($officer->role->name === 'Chef de bataillant') {
             // Chef de bataillant sees all students in their battalion
-            $sectionIds = $officer->battalion->sections->pluck('id');
-            return Student::whereIn('section_id', $sectionIds);
+
+            return Student::where('bat', $officer->bat);
         } else {
             // Other roles see all students
             return Student::query();
