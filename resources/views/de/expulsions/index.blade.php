@@ -1,10 +1,10 @@
 <x-de title="Exclusions de Classe - Direction d'Études">
-    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="min-h-screen bg-white dark:bg-gray-900 py-8 rounded-lg shadow-lg mt-8 px-8 ">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8  ">
             <!-- Header -->
             <div class="mb-8 text-center">
-                <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-                    <i class="fas fa-user-times text-red-500 mr-3"></i>
+                <h1 class="text-4xl font-bold text-sky-400 dark:text-white mb-2">
+                    <i class="fas fa-user-times text-sky-600 mr-3"></i>
                     Exclusions de Classe
                 </h1>
                 <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">Gestion et suivi des exclusions de classe des étudiants</p>
@@ -77,9 +77,17 @@
                 </div>
             </div>
         </div>
-
+ <div class=" flex justify-end"> <!-- New Expulsion Button -->
+    <button type="button"
+    onclick="openAddModal()"
+    class="w-[20%] inline-flex items-center justify-center px-4 py-3  bg-sky-500  hover:bg-sky-400 text-white text-sm font-medium rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-600">
+  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+  </svg>
+  Nouvelle Exclusion
+  </button></div>
         <!-- Enhanced Filters Section -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg mb-6 border border-gray-200 dark:border-gray-700">
+        <div class="bg-white dark:bg-gray-800  my-6 ">
             <div class="p-6">
                 <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
                     <!-- Left side - Search and Grade filters (Real-time) -->
@@ -107,8 +115,8 @@
                                 <label class="inline-flex items-center cursor-pointer group">
                                     <input type="radio" name="grade_filter" value="all" class="sr-only grade-radio"
                                            {{ (request('grade') ?? 'all') === 'all' ? 'checked' : '' }} onchange="applyRealTimeFilters()">
-                                    <div class="grade-btn bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 hover:from-gray-200 hover:to-gray-300 dark:hover:from-gray-600 dark:hover:to-gray-500 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 transition-all duration-200 text-sm font-medium">
-                                        <span class="text-gray-800 dark:text-gray-200 font-semibold">Toutes</span>
+                                    <div class="grade-btn bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 hover:from-blue-200 hover:to-blue-300 dark:hover:from-blue-800/50 dark:hover:to-blue-700/50 border-2 border-blue-300 dark:border-blue-600 rounded-lg px-4 py-2 transition-all duration-200 text-sm font-medium">
+                                        <span class="text-blue-800 dark:text-blue-200 font-semibold">Toutes</span>
                                     </div>
                                 </label>
                                 <label class="inline-flex items-center cursor-pointer group">
@@ -200,7 +208,7 @@
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead class="bg-gray-50 dark:bg-gray-700">
-                        <tr>
+                        <tr class="bg-sky-100">
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Matricule
                             </th>

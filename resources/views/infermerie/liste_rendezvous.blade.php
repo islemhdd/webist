@@ -2,12 +2,12 @@
     <div class="container mx-auto">
         <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
             <div class="p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">Liste des rendez-vous</h1>
-                    <a href="{{ route('liste_rdv.create') }}"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600">
+                <div class="  mb-6">
+                    <h1 class="text-2xl font-semibold text-sky-400 dark:text-gray-200 flex justify-center">Liste des rendez-vous</h1>
+                    <div class="flex justify-end"><a href="{{ route('liste_rdv.create') }}"
+                        class="px-4 py-2 bg-sky-500 text-white rounded-md hover:bg-sky-400  shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600">
                         Nouveau rendez-vous
-                    </a>
+                    </a></div>
                 </div>
 
                 <!-- Filtres -->
@@ -36,7 +36,7 @@
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead class="bg-gray-50 dark:bg-gray-700">
-                            <tr>
+                            <tr class="bg-sky-100">
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                     Matricule</th>
@@ -116,6 +116,7 @@
                                         </form>
                                     </td>
                                 </tr>
+                              
                             @endforeach
                         </tbody>
                     </table>

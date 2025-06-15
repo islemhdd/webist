@@ -1,41 +1,48 @@
 <x-de title="Tableau de bord - Direction d'Études">
-    <div class="max-w-7xl mx-auto">
+    <div class="max-w-7xl mx-auto bg-white rounded-lg shadow-lg mt-6  p-6 ">
         <!-- Header -->
         <div class="mb-8 text-center">
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Tableau de bord</h1>
-            <p class="mt-2 text-gray-600 dark:text-gray-400">Vue d'ensemble des activités et statistiques</p>
+            <h1 class="text-3xl font-bold text-sky-400 pt-8 ">Tableau de bord</h1>
+           
+                <div class=" rounded-lg  text-center w-full flex justify-end pr-8">
+                    <p class="text-sm font-medium text-gray-600 ">
+                        <i class="fas fa-calendar-alt mr-1"></i>
+                        {{ date('d/m/Y') }}
+                    </p>
+                   
+                </div>
+            
+           
         </div>
 
         <!-- Enhanced Filters Section -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg mb-6 border border-gray-200 dark:border-gray-700">
+        <div class="bg-white dark:bg-gray-800  my-6  ">
             <div class="p-6">
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                     <!-- Left side - Search and Grade filters (Real-time) -->
                     <div class="flex-1 space-y-4">
                         <!-- Search Filter -->
-                        <div>
-                            <label for="search-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                <i class="fas fa-search mr-1"></i>
-                                Rechercher un élève
-                            </label>
-                            <input
-                                type="text"
-                                id="search-input"
-                                name="matricule"
-                                value="{{ request('matricule') ?? '' }}"
-                                placeholder="Rechercher par matricule..."
-                                class="block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                onkeyup="applyRealTimeFilters()"
-                            >
-                        </div>
+                      
+                            <div class="mb-6 w-full">
+                                <form method="GET" action="{{ route('liste_convoncu') }}" class="relative flex ">
+                                    <div class="flex items-center w-[95%]">
+                                        <input type="text" id="search" name="search" placeholder="Rechercher un étudiant..."
+                                            value="{{ request('search') }}"
+                                            class="w-full px-4 py-2 rounded-full border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 hover:bg-gray-100">
+                                        </div>
+                                        <div class="flex items-center justify-end bg-sky-500 hover:bg-sky-400">
+                                        <button type="submit"
+                                            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-white  dark:hover:text-gray-200 bg-sky-500 hover:bg-sky-400 rounded-full">
+                                            <i class="fa-solid fa-magnifying-glass m-3"></i>
+                                        </button></div>
+                                    
+                                </form>
+                            </div>
 
                         <!-- Grade Filter -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                                <i class="fas fa-graduation-cap mr-1"></i>
-                                Année d'étude
-                            </label>
-                            <div class="flex flex-wrap gap-2">
+                            
+                            <div class="flex flex-wrap gap-2 justify-around mt-8">
                                 <label class="inline-flex items-center cursor-pointer group">
                                     <input type="radio" name="grade_filter" value="all" class="sr-only grade-radio"
                                            {{ ($grade ?? 'all') === 'all' ? 'checked' : '' }} onchange="applyRealTimeFilters()">
@@ -68,28 +75,15 @@
                         </div>
                     </div>
 
-                    <!-- Date indicator and loading -->
-                    <div class="lg:w-80 flex flex-col items-center justify-center">
-                        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800 text-center w-full">
-                            <p class="text-sm font-medium text-blue-600 dark:text-blue-300">
-                                <i class="fas fa-calendar-alt mr-1"></i>
-                                Données du {{ date('d/m/Y') }}
-                            </p>
-                            <div class="mt-2">
-                                <div id="loading-indicator" class="hidden">
-                                    <i class="fas fa-spinner fa-spin text-blue-600"></i>
-                                    <span class="text-xs text-blue-600 dark:text-blue-400 ml-2">Mise à jour...</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                 
+                    
                 </div>
             </div>
         </div>
         <!-- Statistics Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <!-- Total Students in Infirmary -->
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-xl">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden  rounded-xl hover:shadow-lg hover:relative bottom-[8%] shadow-md transition-all duration-200">
                 <div class="p-6">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
@@ -107,11 +101,11 @@
             </div>
 
             <!-- RHP Validated -->
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-xl">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden  rounded-xl hover:shadow-lg hover:relative bottom-[8%] shadow-md transition-all duration-200">
                 <div class="p-6">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+                            <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center ">
                                 <i class="fas fa-check-circle text-green-600 dark:text-green-400 text-xl"></i>
                             </div>
                         </div>
@@ -125,7 +119,7 @@
             </div>
 
             <!-- Pending RHP Validation -->
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-xl">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden rounded-xl hover:shadow-lg hover:relative bottom-[8%] shadow-md transition-all duration-200">
                 <div class="p-6">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
@@ -143,7 +137,7 @@
             </div>
 
             <!-- Total Expulsions -->
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-xl">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden  rounded-xl hover:shadow-lg hover:relative bottom-[8%] shadow-md transition-all duration-200">
                 <div class="p-6">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
@@ -744,4 +738,5 @@
             box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
         }
     </style>
+    
 </x-de>

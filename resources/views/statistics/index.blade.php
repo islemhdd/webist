@@ -2,42 +2,42 @@
     @push('styles')
     <link rel="stylesheet" href="/css/statistics.css">
     @endpush
-    <div class="container mx-auto p-6">
+    <div class="container ">
         <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
-            <div class="p-6">                <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-200">Statistiques Médicales</h1>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">
+            <div class="p-6">                <div class="   mb-6">
+                    <h1 class="text-3xl font-bold text-sky-400 dark:text-gray-200 flex justify-center">Statistiques Médicales</h1>
+                    <div class="text-sm text-gray-500 dark:text-gray-400 flex justify-end">
                         {{ date('d/m/Y') }}
                     </div>
                 </div>
 
                 <!-- Grade Filter Section -->
-                <div class="mb-8">
-                    <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+                <div class="mb-6">
+                    <div class="bg-white dark:bg-gray-700/50  p-4 ">
                         <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 text-center">
                             Filtrer par Année d'Étude
                         </h3>
-                        <div class="flex justify-center">
+                        <div class="flex justify-center mt-6">
                             <div class="flex flex-wrap gap-3 justify-center">
-                                <label class="flex items-center cursor-pointer group">
+                                <label class="flex items-center cursor-pointer group mx-12">
                                     <input type="radio" name="grade_filter" value="all" class="sr-only" checked>
                                     <div class="grade-radio-custom bg-gray-100 dark:bg-gray-700 group-hover:bg-gray-200 dark:group-hover:bg-gray-600 border-2 border-gray-300 dark:border-gray-600 group-hover:border-gray-400 dark:group-hover:border-gray-500 rounded-lg px-3 py-2 transition-all duration-200 text-sm">
                                         <span class="text-gray-700 dark:text-gray-300 font-medium">Toutes</span>
                                     </div>
                                 </label>
-                                <label class="flex items-center cursor-pointer group">
+                                <label class="flex items-center cursor-pointer group mx-12">
                                     <input type="radio" name="grade_filter" value="1" class="sr-only">
                                     <div class="grade-radio-custom bg-gray-100 dark:bg-gray-700 group-hover:bg-gray-200 dark:group-hover:bg-gray-600 border-2 border-gray-300 dark:border-gray-600 group-hover:border-gray-400 dark:group-hover:border-gray-500 rounded-lg px-3 py-2 transition-all duration-200 text-sm">
                                         <span class="text-gray-700 dark:text-gray-300 font-medium">1ère année</span>
                                     </div>
                                 </label>
-                                <label class="flex items-center cursor-pointer group">
+                                <label class="flex items-center cursor-pointer group mx-12">
                                     <input type="radio" name="grade_filter" value="2" class="sr-only">
                                     <div class="grade-radio-custom bg-gray-100 dark:bg-gray-700 group-hover:bg-gray-200 dark:group-hover:bg-gray-600 border-2 border-gray-300 dark:border-gray-600 group-hover:border-gray-400 dark:group-hover:border-gray-500 rounded-lg px-3 py-2 transition-all duration-200 text-sm">
                                         <span class="text-gray-700 dark:text-gray-300 font-medium">2ème année</span>
                                     </div>
                                 </label>
-                                <label class="flex items-center cursor-pointer group">
+                                <label class="flex items-center cursor-pointer group mx-12">
                                     <input type="radio" name="grade_filter" value="3" class="sr-only">
                                     <div class="grade-radio-custom bg-gray-100 dark:bg-gray-700 group-hover:bg-gray-200 dark:group-hover:bg-gray-600 border-2 border-gray-300 dark:border-gray-600 group-hover:border-gray-400 dark:group-hover:border-gray-500 rounded-lg px-3 py-2 transition-all duration-200 text-sm">
                                         <span class="text-gray-700 dark:text-gray-300 font-medium">3ème année</span>
@@ -53,12 +53,39 @@
                         </div>
                     </div>
                 </div>
-
+                <hr class="mx-12 mb-6">
+                 <!-- Summary Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8  ">
+                    <a href="#patient"> <div class="bg-white dark:bg-gray-700 rounded-lg p-4 border-l-4 border-blue-500 hover:shadow-lg hover:relative bottom-[8%] shadow-md transition-all duration-200 ">
+                        <div class="text-2xl font-bold text-blue-600 dark:text-blue-400" id="total-patients">
+                            {{ $validPatientsToday + $invalidPatientsToday }}
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Patients Aujourd'hui</div>
+                    </div></a>
+                  <a href="#rndv">  <div class="bg-white dark:bg-gray-700 rounded-lg p-4 border-l-4 border-purple-500 hover:shadow-lg hover:relative bottom-[8%] shadow-md transition-all duration-200">
+                    <div class="text-2xl font-bold text-purple-600 dark:text-purple-400" id="total-rdv">
+                        {{ $consultationRdvToday + $urgenceRdvToday }}
+                    </div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">RDV Aujourd'hui</div>
+                </div></a>
+                    <a href="#convocation"><div class="bg-white dark:bg-gray-700 rounded-lg p-4 border-l-4 border-green-500 hover:shadow-lg hover:relative bottom-[8%] shadow-md transition-all duration-200">
+                        <div class="text-2xl font-bold text-green-600 dark:text-green-400" id="total-convocations">
+                            {{ $convocationsWithPsy + $convocationsWithoutPsy }}
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Convocations Total</div>
+                    </div></a>
+                    <a href="#exemption"><div class="bg-white dark:bg-gray-700 rounded-lg p-4 border-l-4 border-orange-500 hover:shadow-lg hover:relative bottom-[8%] shadow-md transition-all duration-200 ">
+                        <div class="text-2xl font-bold text-orange-600 dark:text-orange-400" id="total-exemptions">
+                            {{ $exemptionsToday->sum('count') }}
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Exemptions Aujourd'hui</div>
+                    </div></a>
+                </div>
                 <!-- Statistics Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
 
                     <!-- Patients Validation Chart -->
-                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-6 shadow-sm">
+                    <div id="patient" class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-6 shadow-sm">
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center">
                             Patients - Aujourd'hui
                         </h3>
@@ -93,7 +120,7 @@
                     </div>
 
                     <!-- Appointments Chart -->
-                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-xl p-6 shadow-sm">
+                    <div id="rndv" class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-xl p-6 shadow-sm">
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center">
                             Rendez-vous - Aujourd'hui
                         </h3>
@@ -128,7 +155,7 @@
                     </div>
 
                     <!-- Convocations Chart -->
-                    <div class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl p-6 shadow-sm">
+                    <div id="convocation" class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl p-6 shadow-sm">
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center">
                             Convocations - Total
                         </h3>
@@ -163,7 +190,7 @@
                     </div>
 
                     <!-- Exemptions Chart -->
-                    <div class="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 rounded-xl p-6 shadow-sm">
+                    <div id="exemption" class="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 rounded-xl p-6 shadow-sm">
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center">
                             Exemptions par Motif - Aujourd'hui
                         </h3>
@@ -207,33 +234,8 @@
                         </div>
                     </div>                </div>
 
-                <!-- Summary Cards -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-                    <div class="bg-white dark:bg-gray-700 rounded-lg p-4 border-l-4 border-blue-500">
-                        <div class="text-2xl font-bold text-blue-600 dark:text-blue-400" id="total-patients">
-                            {{ $validPatientsToday + $invalidPatientsToday }}
-                        </div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400">Patients Aujourd'hui</div>
-                    </div>
-                    <div class="bg-white dark:bg-gray-700 rounded-lg p-4 border-l-4 border-purple-500">
-                        <div class="text-2xl font-bold text-purple-600 dark:text-purple-400" id="total-rdv">
-                            {{ $consultationRdvToday + $urgenceRdvToday }}
-                        </div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400">RDV Aujourd'hui</div>
-                    </div>
-                    <div class="bg-white dark:bg-gray-700 rounded-lg p-4 border-l-4 border-green-500">
-                        <div class="text-2xl font-bold text-green-600 dark:text-green-400" id="total-convocations">
-                            {{ $convocationsWithPsy + $convocationsWithoutPsy }}
-                        </div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400">Convocations Total</div>
-                    </div>
-                    <div class="bg-white dark:bg-gray-700 rounded-lg p-4 border-l-4 border-orange-500">
-                        <div class="text-2xl font-bold text-orange-600 dark:text-orange-400" id="total-exemptions">
-                            {{ $exemptionsToday->sum('count') }}
-                        </div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400">Exemptions Aujourd'hui</div>
-                    </div>
-                </div>
+               
+               
             </div>
         </div>
     </div>

@@ -1,5 +1,5 @@
 <x-de>
-    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+    <div class="max-w-7xl mx-auto bg-white rounded-lg shadow-lg mt-6  p-6">
         <div class="max-w-7xl mx-auto">
             <!-- Header -->
             <div class="mb-6 flex items-center justify-between">

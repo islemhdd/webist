@@ -3,9 +3,9 @@
 <div class="flex items-center justify-between h-full px-6">
 
     <!-- Profil utilisateur avec contrôles -->
-    <div class="flex items-center space-x-4">
+    <div  class="flex items-center space-x-4  ">
         <!-- Avatar et nom -->
-        <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-3 space-x-reverse">
             <img src="/profile.jpg" alt="Profile" class="h-8 w-8 rounded-full">
             <span class="text-gray-700 dark:text-gray-100">{{ auth()->user()->username ?? 'Utilisateur' }}</span>
         </div>
@@ -65,19 +65,11 @@
                             <p class="text-sm text-gray-500 dark:text-gray-400">Aucune nouvelle notification</p>
                         @endforelse
                     </div>
-                    <!-- Footer -->
-                    {{-- todo <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <a href="{{  route('notifications.index') }}"
-                            class="block text-sm text-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">
-                            Voir toutes les notifications
-                        </a>
-                    </div> --}}
+              
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Espace réservé pour d'autres éléments de menu à droite si nécessaire -->
-    <div class="flex items-center space-x-4">
-    </div>
+    
 </div>

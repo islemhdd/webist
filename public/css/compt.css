@@ -86,14 +86,5 @@
     justify-content: space-between;
     align-items: center;
   }
-  button:not(.envoi button,.not button,.but){
-    width: 70%;
-    border: 1.6px;
-    height: 3em;
-    padding: 0.5em;
-    border-radius: 15px;
-  }
-  button:hover:not(.envoi button ,.not button,.but){
-    background-color: #8ECAE6;
-    color: white;
-  }
+
+ 

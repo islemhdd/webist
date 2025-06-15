@@ -22,11 +22,13 @@
                 </h1>
 
                 <div class="mb-6">
-                    <form method="GET" action="{{ route('liste_convoncu') }}" class="relative">
-                        <div class="flex items-center">
+                    <form method="GET" action="{{ route('liste_convoncu') }}" class="relative flex ">
+                        <div class="flex items-center w-[95%]">
                             <input type="text" id="search" name="search" placeholder="Rechercher un étudiant..."
                                 value="{{ request('search') }}"
-                                class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
+                                class="w-full px-4 py-2 rounded-full border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 hover:bg-gray-100">
+                            </div>
+                            <div class="flex items-center justify-end bg-sky-500 hover:bg-sky-400">
                             <button type="submit"
                                 class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
                                 <i class="fa-solid fa-magnifying-glass"></i>

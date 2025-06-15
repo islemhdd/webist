@@ -1,25 +1,27 @@
 <x-de>
-    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+    <div class="max-w-7xl mx-auto bg-white rounded-lg shadow-lg mt-6  p-6">
         <div class="max-w-7xl mx-auto">
             <!-- Header -->
-            <div class="mb-6 flex items-center justify-between">
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                    <i class="fas fa-shield-alt mr-3"></i>Gestion RHP
+            <div class="mb-6 flex items-center justify-center">
+                <h1 class="text-3xl font-bold text-sky-400 dark:text-white">
+                    <i class="fas fa-shield-alt mr-3 text-sky-600"></i>Gestion RHP
                 </h1>
-                <button onclick="showAddModal()"
-                        class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
-                    <i class="fas fa-plus mr-2"></i>
-                    Nouvelle assignation
-                </button>
+              
             </div>
+            <div class=" flex justify-end"> 
+                 <button onclick="showAddModal()"
+                class="inline-flex items-center hover:shadow-lg  font-medium transition-colors px-4 py-2 bg-sky-500 text-white mx-10 w-[18%] rounded hover:bg-sky-400">
+            <i class="fas fa-plus mr-2"></i>
+            Nouvelle assignation
+        </button></div>
 
             <!-- Calendar View -->
-            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-xl p-6">
+            <div class="bg-white dark:bg-gray-800  p-6">
 
 
                 <!-- Current Week RHP Table -->
                 <div class="mb-8">
-                    <h3 class="text-xl font-semibold text-gray-900 text-center dark:text-white mb-4">Planning RHP de la semaine</h3>
+                    <h3 class="text-xl font-semibold text-gray-900 text-center dark:text-white mb-4 flex ">Planning RHP de la semaine</h3>
 
                     @php
                         $daysNames = [
