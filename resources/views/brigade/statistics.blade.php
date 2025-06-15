@@ -12,50 +12,58 @@
                         {{ date('d/m/Y') }}
                     </div>
                 </div>
-
-                <!-- Grade Filter Section -->
-                <div class="mb-8">
-                    <div
-                        class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
-                        <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 text-center">Filter by Year
-                        </h3>
-                        <div class="flex justify-center">
-                            <div class="flex flex-wrap gap-3 justify-center">
-                                <label class="flex items-center cursor-pointer group">
-                                    <input type="radio" name="grade_filter" value="all" class="sr-only" checked>
-                                    <div
-                                        class="grade-radio-custom bg-gray-100 dark:bg-gray-700 group-hover:bg-gray-200 dark:group-hover:bg-gray-600 border-2 border-gray-300 dark:border-gray-600 group-hover:border-gray-400 dark:group-hover:border-gray-500 rounded-lg px-3 py-2 transition-all duration-200 text-sm">
-                                        <span class="text-gray-700 dark:text-gray-300 font-medium">All</span>
-                                    </div>
-                                </label>
-                                @for ($year = 1; $year <= 3; $year++)
+                @unless (in_array(auth()->user()->role->name, ['Chef de compagnie', 'chef de bataillant']))
+                    <!-- Grade Filter Section -->
+                    <div class="mb-8">
+                        <div
+                            class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+                            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 text-center">Filter by Year
+                            </h3>
+                            <div class="flex justify-center">
+                                <div class="flex flex-wrap gap-3 justify-center">
                                     <label class="flex items-center cursor-pointer group">
-                                        <input type="radio" name="grade_filter" value="{{ $year }}"
-                                            class="sr-only">
+                                        <input type="radio" name="grade_filter" value="all" class="sr-only" checked>
                                         <div
                                             class="grade-radio-custom bg-gray-100 dark:bg-gray-700 group-hover:bg-gray-200 dark:group-hover:bg-gray-600 border-2 border-gray-300 dark:border-gray-600 group-hover:border-gray-400 dark:group-hover:border-gray-500 rounded-lg px-3 py-2 transition-all duration-200 text-sm">
-                                            <span
-                                                class="text-gray-700 dark:text-gray-300 font-medium">{{ $year }}st
-                                                Year</span>
+                                            <span class="text-gray-700 dark:text-gray-300 font-medium">All</span>
                                         </div>
                                     </label>
-                                @endfor
+                                    @for ($year = 1; $year <= 3; $year++)
+                                        <label class="flex items-center cursor-pointer group">
+                                            <input type="radio" name="grade_filter" value="{{ $year }}"
+                                                class="sr-only">
+                                            <div
+                                                class="grade-radio-custom bg-gray-100 dark:bg-gray-700 group-hover:bg-gray-200 dark:group-hover:bg-gray-600 border-2 border-gray-300 dark:border-gray-600 group-hover:border-gray-400 dark:group-hover:border-gray-500 rounded-lg px-3 py-2 transition-all duration-200 text-sm">
+                                                <span
+                                                    class="text-gray-700 dark:text-gray-300 font-medium">{{ $year }}st
+                                                    Year</span>
+                                            </div>
+                                        </label>
+                                    @endfor
+                                </div>
                             </div>
-                        </div>
-                        <div class="text-center mt-3">
-                            <div id="loading-indicator" class="hidden">
-                                <i class="fas fa-spinner fa-spin text-blue-500 mr-2"></i>
-                                <span class="text-gray-600 dark:text-gray-400 text-sm">Updating...</span>
+                            <div class="text-center mt-3">
+                                <div id="loading-indicator" class="hidden">
+                                    <i class="fas fa-spinner fa-spin text-blue-500 mr-2"></i>
+                                    <span class="text-gray-600 dark:text-gray-400 text-sm">Updating...</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                @endunless
 
                 <!-- Statistics Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
                     <!-- Weekend Permissions Chart -->
                     <div
-                        class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-6 shadow-sm">
+                        class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-6 shadow-sm relative">
+                        <!-- Details Button -->
+                        <button
+                            onclick="window.location.href='{{ route('brigade.statistics.weekend', ['id' => $officer->id]) }}'"
+                            class="absolute top-4 right-4 w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center transition-colors duration-200 shadow-sm hover:shadow-md">
+                            <i class="fas fa-plus text-sm"></i>
+                        </button>
+
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center">Weekend
                             Permissions</h3>
                         <div class="flex justify-center">
@@ -114,7 +122,14 @@
 
                     <!-- Sanctions Chart -->
                     <div
-                        class="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-xl p-6 shadow-sm">
+                        class="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-xl p-6 shadow-sm relative">
+                        <!-- Details Button -->
+                        <button
+                            onclick="window.location.href='{{ route('brigade.statistics.sanctions', ['id' => $officer->id]) }}'"
+                            class="absolute top-4 right-4 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-colors duration-200 shadow-sm hover:shadow-md">
+                            <i class="fas fa-plus text-sm"></i>
+                        </button>
+
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center">Sanctions
                         </h3>
                         <div class="flex justify-center">
@@ -174,9 +189,16 @@
 
                     <!-- Patine Chart -->
                     <div
-                        class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl p-6 shadow-sm">
-                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center">Patine
-                            Reports</h3>
+                        class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl p-6 shadow-sm relative">
+                        <!-- Details Button -->
+                        <button
+                            onclick="window.location.href='{{ route('brigade.statistics.patients', ['id' => $officer->id]) }}'"
+                            class="absolute top-4 right-4 w-8 h-8 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center transition-colors duration-200 shadow-sm hover:shadow-md">
+                            <i class="fas fa-plus text-sm"></i>
+                        </button>
+
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center">Patient
+                            history</h3>
                         <div class="flex justify-center">
                             <div class="relative w-48 h-48">
                                 <canvas id="patineChart" class="w-full h-full"></canvas>
@@ -184,7 +206,8 @@
                                     <div class="text-center">
                                         <div class="text-2xl font-bold text-gray-800 dark:text-gray-200"
                                             id="total-patine">
-                                            {{ $patineStats['total'] }}
+
+                                            {{ $patientsStats['total'] }}
                                         </div>
                                         <div class="text-sm text-gray-600 dark:text-gray-400">Total</div>
                                     </div>
@@ -195,11 +218,11 @@
                             <div class="text-center">
                                 <div class="flex items-center justify-center">
                                     <div class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
-                                    <span class="text-gray-700 dark:text-gray-300">Pending</span>
+                                    <span class="text-gray-700 dark:text-gray-300">notValidated</span>
                                 </div>
                                 <div class="font-semibold text-yellow-600 dark:text-yellow-400"
                                     id="pending-patine-detail">
-                                    {{ $patineStats['pending'] }}
+                                    {{ $patientsStats['notValidated'] }}
                                 </div>
                             </div>
                             <div class="text-center">
@@ -208,7 +231,7 @@
                                     <span class="text-gray-700 dark:text-gray-300">Rejected</span>
                                 </div>
                                 <div class="font-semibold text-red-600 dark:text-red-400" id="rejected-patine-detail">
-                                    {{ $patineStats['rejected'] }}
+                                    {{ $patientsStats['deleted'] }}
                                 </div>
                             </div>
                             <div class="text-center">
@@ -218,7 +241,7 @@
                                 </div>
                                 <div class="font-semibold text-green-600 dark:text-green-400"
                                     id="validated-patine-detail">
-                                    {{ $patineStats['validated'] }}
+                                    {{ $patientsStats['validated'] }}
                                 </div>
                             </div>
                         </div>
@@ -226,7 +249,14 @@
 
                     <!-- Summary Stats -->
                     <div
-                        class="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-800/20 rounded-xl p-6 shadow-sm">
+                        class="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-800/20 rounded-xl p-6 shadow-sm relative">
+                        <!-- Details Button -->
+                        <button
+                            onclick="window.location.href='{{ route('brigade.statistics.students', ['id' => $officer->id]) }}'"
+                            class="absolute top-4 right-4 w-8 h-8 bg-indigo-500 hover:bg-indigo-600 text-white rounded-full flex items-center justify-center transition-colors duration-200 shadow-sm hover:shadow-md">
+                            <i class="fas fa-plus text-sm"></i>
+                        </button>
+
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center">Summary
                         </h3>
                         <div class="space-y-4">
@@ -246,7 +276,7 @@
                             <div class="bg-white dark:bg-gray-700 rounded-lg p-4 border-l-4 border-purple-500">
                                 <div class="text-2xl font-bold text-purple-600 dark:text-purple-400"
                                     id="patine-approval-rate">
-                                    {{ number_format($patineStats['total'] > 0 ? ($patineStats['validated'] / $patineStats['total']) * 100 : 0, 1) }}%
+                                    {{ number_format($patientsStats['total'] > 0 ? ($patientsStats['validated'] / $patientsStats['total']) * 100 : 0, 1) }}%
                                 </div>
                                 <div class="text-sm text-gray-600 dark:text-gray-400">Patine Approval Rate</div>
                             </div>
@@ -330,16 +360,16 @@
                 },
                 options: commonOptions
             });
-
+            //! important
             let patineChart = new Chart(patineCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Pending', 'Rejected', 'Validated'],
+                    labels: ['notValidated', 'Rejected', 'Validated'],
                     datasets: [{
                         data: [
-                            {{ $patineStats['pending'] }},
-                            {{ $patineStats['rejected'] }},
-                            {{ $patineStats['validated'] }}
+                            {{ $patientsStats['notValidated'] }},
+                            {{ $patientsStats['deleted'] }},
+                            {{ $patientsStats['validated'] }}
                         ],
                         backgroundColor: ['#eab308', '#ef4444', '#22c55e'],
                         borderWidth: 0

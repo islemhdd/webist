@@ -9,19 +9,21 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('exemptions', function (Blueprint $table) {
-            $table->unsignedInteger('matricule');
+        Schema::create('liste_rdvs', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('matricule');
             $table->string('motif');
-            $table->date('date_debut');
-            $table->date('date_fin');
+            $table->string('service');
+            $table->datetime('date');
+            $table->timestamps();
 
             $table->foreign('matricule')
                 ->references('matricule')
-                ->on('Students')
-                ->onDelete('cascade');
-            $table->timestamps();
+                ->on('students')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
         });
     }
 
@@ -30,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('exemptions');
+        Schema::dropIfExists('liste_rdvs');
     }
 };

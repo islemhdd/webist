@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Sanction extends Model
 {
-     protected $guarded = [];
+    protected $guarded = [];
     public function student(): BelongsTo
     {
         return $this->belongsTo(Student::class, 'matricule', 'matricule');

@@ -14,7 +14,8 @@ class Exemption extends Model
         'date_debut',
         'date_fin'
     ];
-    public function Student()
+
+    public function student()
     {
         return $this->belongsTo(Student::class, 'matricule', 'matricule');
     }

@@ -2,7 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\BrigadeStatisticsController;
+use App\Http\Controllers\BrigadeExemptionController;
+use App\Http\Controllers\BrigadeRendezVousController;
+use App\Http\Controllers\BrigadeConvocationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ConvoncuController;
 use App\Http\Controllers\DashbaordController;
@@ -14,6 +16,9 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SanctionController;
 use App\Http\Controllers\StatisticsController;
+use App\Http\Controllers\BrigadeStatisticsController;
+use App\Http\Controllers\StudentController;
+use App\Models\Student;
 use App\Http\Controllers\DEController;
 use App\Http\Controllers\RHPController;
 use App\Http\Controllers\ExpulsionController;
@@ -144,7 +149,7 @@ Route::controller(DashbaordController::class)
     ->group(
         function () {
 
-            Route::get("principale", "principale")->name("principale");
+            // Route::get("principale", "principale")->name("principale");
             Route::get("cons", "cons")->name("cons");
             Route::get("parametre", "parametre")->name("parametre");
             // Route::get("logout", "logout")->name("logout");
@@ -152,6 +157,16 @@ Route::controller(DashbaordController::class)
             Route::get("infermerie", "infermerie")->name("infermerie");
         }
     );
+
+// Brigade Statistics Routes
+Route::get('{id}/statistics', [BrigadeStatisticsController::class, 'index'])->name('brigade.statistics');
+Route::get('{id}/statistics/filter', [BrigadeStatisticsController::class, 'filter'])->name('brigade.statistics.filter');
+Route::get('{id}/statistics/weekend', [BrigadeStatisticsController::class, 'weekendDetails'])->name('brigade.statistics.weekend');
+Route::get('{id}/statistics/sanctions', [BrigadeStatisticsController::class, 'sanctionsDetails'])->name('brigade.statistics.sanctions');
+Route::get('{id}/statistics/reports', [BrigadeStatisticsController::class, 'reportsDetails'])->name('brigade.statistics.reports');
+Route::get('{id}/statistics/patients', [BrigadeStatisticsController::class, 'patientsDetails'])->name('brigade.statistics.patients');
+Route::get('{id}/statistics/students', [BrigadeStatisticsController::class, 'studentsDetails'])->name('brigade.statistics.students');
+Route::match(['GET', 'POST'], '{id}/statistics/graph-data', [BrigadeStatisticsController::class, 'getGraphData'])->name('brigade.statistics.graph-data');
 
 Route::middleware('auth')->group(function () {
     Route::controller(SanctionController::class)->group(function () {
@@ -167,6 +182,7 @@ Route::prefix('{id}')->controller(ReportController::class)->group(function () {
 
     Route::get('create', 'create')->name('report.create');
     Route::get('reports', 'index')->name('report.index');
+    Route::post('reports/search', 'search')->name('report.search');
     Route::get('show/{report_id}', 'show')->name('report.show');
     Route::post('avis/{report}', 'avis')->name('report.avis');
 
@@ -176,14 +192,45 @@ Route::prefix('{id}')->controller(ReportController::class)->group(function () {
     Route::post('refuse/{report}', 'refuse')->name('report.refuse');
     Route::get('showNotification/{report_id}', 'unsetReportNotificationAndRedirect')->name('report.unsetNotificationAndShowReport');
 });
+Route::controller(StudentController::class)->middleware('auth')->group(function () {
+    Route::get("students", "index")->name("students.index");
+    Route::post("search", "search")->name("student.search");
+    Route::get("show/{matricule}", "show")->name("student.show");
+    Route::match(['GET', 'POST'], 'student/{matricule}/graph-data', 'getStudentGraphData')->name('student.graph-data');
+    Route::match(['GET', 'POST'], 'student/{matricule}/all-graph-data', 'getStudentAllGraphData')->name('student.all-graph-data');
+    Route::match(['GET', 'POST'], 'student/{matricule}/all-graph-data', 'getStudentAllGraphData')->name('student.all-graph-data');
+});
+
+
+
+
+
+Route::controller(BrigadeExemptionController::class)->group(
+    function () {
+        Route::get("exemptions", "index")->name("brigade.exemptions");
+    }
+);
 
 // Notifications Routes
 
-Route::get("test1", function () {
+// Brigade list routes
+Route::get('/brigade/rdv-list/{id}', [BrigadeRendezVousController::class, 'index'])->name('brigade.rdv-list')->middleware('auth');
+Route::get('/brigade/rdv-list/{id}/search', [BrigadeRendezVousController::class, 'search'])->name('brigade.rdv-list.search')->middleware('auth');
 
-    return dd(Hash::make("123456789"));
+Route::get('/brigade/exemption-list/{id}', [BrigadeExemptionController::class, 'index'])->name('brigade.exemption-list')->middleware('auth');
+Route::get('/brigade/exemption-list/{id}/search', [BrigadeExemptionController::class, 'search'])->name('brigade.exemption-list.search')->middleware('auth');
+
+Route::get('/brigade/convocation-list/{id}', [BrigadeConvocationController::class, 'index'])->name('brigade.convocation-list')->middleware('auth');
+Route::get('/brigade/convocation-list/{id}/search', [BrigadeConvocationController::class, 'search'])->name('brigade.convocation-list.search')->middleware('auth');
+
+Route::get("test1", function () {
+    $students = Student::all();
+
+    return view("brigade.students", compact("students"));
 });
 
+// Route::
+// Route::resource('patients', PatientController::class);
 Route::resource('patients', PatientController::class);
 
 // Temporary test routes for debugging (remove in production)

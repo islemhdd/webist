@@ -131,6 +131,8 @@ class StatisticsController extends Controller
             ->where('valider', 1)->count();
         $invalidPatientsToday = Patient::whereDate('created_at', $today)
             ->where('valider', 0)->count();
+        // $invalidPatientsToday = Patient::whereDate('created_at', $today)
+        //     ->where('valider', 2)->count();
 
         $consultationRdvToday = ListeRdv::whereDate('date', $today)
             ->where('motif', 'consultation')->count();

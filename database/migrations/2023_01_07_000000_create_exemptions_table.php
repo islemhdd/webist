@@ -11,17 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sanctions', function (Blueprint $table) {
+        Schema::create('exemptions', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
-
-            $table->unsignedBigInteger('matricule');  // Add this line
-
-            $table->enum('type', ['consigne', 'arret', 'blame', 'avert']);
-            $table->foreign('matricule')->references('matricule')->on('students')->onDelete('cascade');
+            $table->unsignedBigInteger('matricule');
+            $table->text('motif')->nullable();
             $table->date('date_debut');
             $table->date('date_fin');
-            $table->string('motif');
+            $table->timestamps();
+
+            $table->foreign('matricule')->references('matricule')->on('students')
+                ->onDelete('cascade')->onUpdate('cascade');
         });
     }
 
@@ -30,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('senctions');
+        Schema::dropIfExists('exemptions');
     }
 };

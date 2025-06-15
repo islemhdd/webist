@@ -112,6 +112,7 @@ class Officer extends User
                     $report->owner->notify(new ReportPassed());
                 } else {
                     throw new \Exception("No Chef de brigade found");
+                    throw new \Exception("No Chef de brigade found");
                 }
                 break;
             case CHEF_DE_BRIGADE:
@@ -158,6 +159,7 @@ class Officer extends User
 
             case DIRECTEUR_GENERAL:
                 // Inform owner with DesitionMade
+
                 $report->status = "DONE";
 
                 $report->owner->notify(new DesitionMade($report));
@@ -246,7 +248,9 @@ class Officer extends User
     {
         $query = Sanction::join('students', 'sanctions.matricule', '=', 'students.matricule');
 
+
         // Filter by officer role
+        if ($this->role->name === "Chef de compagnie") {
         if ($this->role->name === "Chef de compagnie") {
             $query->join('sections', 'students.section_id', '=', 'sections.id')
                 ->where('sections.officer_id', $this->id);
@@ -256,25 +260,23 @@ class Officer extends User
 
         // Calculate relevant dates
         $today = Carbon::today();
-        $nextThursday = $today->copy()->next(Carbon::THURSDAY);
+
         $nextFriday = $today->copy()->next(Carbon::FRIDAY);
         $nextSaturday = $today->copy()->next(Carbon::SATURDAY);
 
         // Filter sanctions based on their type and dates
-        $query->where(function ($q) use ($today, $nextThursday, $nextFriday, $nextSaturday) {
+        $query->where(function ($q) use ($today,  $nextFriday, $nextSaturday) {
             // Active "arret" sanctions
             $q->where(function ($sub) use ($today) {
                 $sub->where('sanctions.type', 'arret')
                     ->where('sanctions.date_fin', '>=', $today);
             })
                 // Active "consigne" sanctions for next weekend
-                ->orWhere(function ($sub) use ($nextThursday, $nextFriday, $nextSaturday) {
+                ->orWhere(function ($sub) use ($nextFriday) {
                     $sub->where('sanctions.type', 'consigne')
-                        ->where(function ($dates) use ($nextThursday, $nextFriday, $nextSaturday) {
-                            $dates->whereDate('sanctions.date_debut', '<=', $nextSaturday)
-                                ->whereDate('sanctions.date_fin', '>=', $nextThursday);
-                        });
+                        ->whereDate('sanctions.date_debut', '=', $nextFriday);
                 })
+
                 // Include all "avert" and "blame" sanctions
                 ->orWhere(function ($sub) {
                     $sub->whereIn('sanctions.type', ['avert', 'blame']);

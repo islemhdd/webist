@@ -7,6 +7,10 @@
     $user = auth()->user();
 
     $officer = $user->isOfficer();
+    if (!$user) {
+        return redirect()->route('home');
+    }
+
     if ($officer) {
         $officerid = $officer->id;
     } else {
@@ -213,11 +217,11 @@
         </div>
     </div>
 @else
-    {{-- Principale --}}
-    <a href="{{ route('brigade.statistics',["id"=>$officerid]) }}"
+    {{-- Statistiques --}}
+    <a href="{{ route('brigade.statistics', ['id' => auth()->user()->id]) }}"
         class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-        <i class="fa-solid fa-house w-5 h-5"></i>
-        <span class="ml-3">Principale</span>
+        <i class="fa-solid fa-chart-pie w-5 h-5"></i>
+        <span class="ml-3">Statistiques</span>
     </a>
 
     {{-- Paramètre --}}
@@ -234,8 +238,7 @@
         <span class="ml-3">Sancions</span>
     </a>
 
-    @if ($officer && $officer->role && ($officer->role->name == 'Chef de compagnie' || $officer->role->name == 'Chef de batallaint'))
-        {{-- Liste des étudiants --}}
+    @if ($officer->role->name == 'Chef de compagnie' || $officer->role->name == 'Chef de batallaint')
         {{-- Week-end --}}
         <a href="{{ route('weekends', ['id' => $officerid]) }}"
             class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
@@ -259,22 +262,37 @@
                     <i class="fa-solid fa-list w-5 h-5"></i>
                     <span class="ml-3">Liste des patients</span>
                 </a>
+                <a href="{{ route('brigade.rdv-list', ['id' => $officerid]) }}"
+                    class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fa-solid fa-calendar-check w-5 h-5"></i>
+                    <span class="ml-3">Rendez-vous de demain</span>
+                </a>
+                <a href="{{ route('brigade.exemption-list', ['id' => $officerid]) }}"
+                    class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fa-solid fa-user-shield w-5 h-5"></i>
+                    <span class="ml-3">Exemptions actives</span>
+                </a>
+                <a href="{{ route('brigade.convocation-list', ['id' => $officerid]) }}"
+                    class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fa-solid fa-user-clock w-5 h-5"></i>
+                    <span class="ml-3">Convocations médicales</span>
+                </a>
 
-                <a href="#"
+                {{-- <a href="#"
                     class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                     <i class="fa-solid fa-plus w-5 h-5"></i>
                     <span class="ml-3">Nouveau patient</span>
-                </a>
-                <a href="#"
+                </a> --}}
+                {{-- <a href="#"
                     class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                     <i class="fa-solid fa-file-medical w-5 h-5"></i>
                     <span class="ml-3">Rapports médicaux</span>
-                </a>
+                </a> --}}
             </div>
         </div>
 
         {{-- ? Étudiants :m3mbalich wach hada --}}
-        <a href="{{ route('cons', ['id' => $officerid]) }}"
+        <a href="{{ route('students.index') }}"
             class=" flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors orange-500">
             <i class="fa-solid fa-graduation-cap w-5 h-5"></i>
             <span class="ml-3">Étudiants</span>

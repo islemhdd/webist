@@ -127,12 +127,12 @@ return [
     ],
 
     'STATUS' => [
-        'CC',
-        'CBt',
-        'CBr',
-        'MED',
-        'DIV',
-        'DG',
+        'Chef de compagnie',
+        'Chef de batallaint',
+        'Chef de brigade',
+        'Medecin',
+        'Chef division',
+        'Directeur général',
 
     ],
 

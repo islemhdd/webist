@@ -16,38 +16,22 @@ class SanctionController extends Controller
     {
         $query = $id->officerSanctions();
 
-        if ($request->filled('type')) {
+
+        if ($request->has('type') && $request->type != '') {
+
+            // If type filter is specified, show all sanctions of that type
             $query->where('sanctions.type', $request->type);
         }
+        // Default view: consignes for this weekend and active/upcoming arrets
 
-        if ($request->filled('status')) {
-            $isActive = $request->status === 'active';
-            if ($isActive) {
-                $query->where('sanctions.date_fin', '>=', Carbon::today());
-            } else {
-                $query->where('sanctions.date_fin', '<', Carbon::today());
-            }
-        }
+        $sanctions = $query->orderBy('date_debut', 'asc')->paginate(15);
 
-        $sanctions = $query->get()
-            ->map(function ($sanction) {
-                return [
-                    'id' => $sanction->id,
-                    'matricule' => $sanction->matricule,
-                    'full_name' => $sanction->nom . ' ' . $sanction->prenom,
-                    'type' => $sanction->type,
-                    'motif' => $sanction->motif,
-                    'date_debut' => $sanction->date_debut,
-                    'date_fin' => $sanction->date_fin,
-                    'is_active' => Carbon::parse($sanction->date_fin)->gte(Carbon::today())
-                ];
-            });
 
-        if ($request->wantsJson()) {
-            return response()->json($sanctions);
-        }
-
-        return view('brigade.sanctions', compact('sanctions', 'id'));
+        return view('brigade.sanctions', [
+            'sanctions' => $sanctions,
+            'id' => $id->id,
+            'selectedType' => $request->type
+        ]);
     }
 
     /**
@@ -65,23 +49,50 @@ class SanctionController extends Controller
      */
     public function store(Officer $id, Request $request)
     {
-        $validated = $request->validate([
+        // Règles de validation de base
+
+        $rules = [
             'matricule' => 'required|exists:students,matricule',
             'type' => 'required|in:consigne,arret,blame,avert',
-            'motif' => 'required|string',
-            'date_debut' => 'required|date',
-            'date_fin' => 'required|date|after_or_equal:date_debut'
-        ]);
+            'motif' => 'required|string'
+        ];
 
-        $sanction = new Sanction($validated);
-        $sanction->save();
-
-        if ($request->wantsJson()) {
-            return response()->json([
-                'message' => 'Sanction créée avec succès',
-                'sanction' => $sanction
-            ]);
+        // Ajouter les règles de validation des dates uniquement pour les arrêts
+        if ($request->type === 'arret') {
+            $rules['from'] = 'required|date';
+            $rules['to'] = 'required|date|after_or_equal:from';
         }
+
+        $validated = $request->validate($rules);
+
+        // Préparer les données de la sanction
+        $sanctionData = [
+            'matricule' => $validated['matricule'],
+            'type' => $validated['type'],
+            'motif' => $validated['motif'],
+        ];
+
+        // Ajouter les dates si c'est un arrêt
+        if ($validated['type'] === 'arret') {
+            $sanctionData['date_debut'] = $validated['from'];
+            $sanctionData['date_fin'] = $validated['to'];
+        } elseif ($validated['type'] === 'consigne') {
+            // Pour consigne, date_debut = prochain vendredi, date_fin = samedi suivant
+            $now = now();
+            // Prochain vendredi
+            $friday = $now->copy()->next(Carbon::FRIDAY);
+            // Samedi qui suit
+            $saturday = $friday->copy()->addDay();
+            $sanctionData['date_debut'] = $friday;
+            $sanctionData['date_fin'] = $saturday;
+        } else {
+            // Pour les autres types, date_debut = aujourd'hui, date_fin = aujourd'hui
+            $sanctionData['date_debut'] = now();
+            $sanctionData['date_fin'] = now();
+        }
+
+        $sanction = new Sanction($sanctionData);
+        $sanction->save();
 
         return redirect()->route('sanctions.index', $id)
             ->with('success', 'Sanction créée avec succès');

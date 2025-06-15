@@ -22,7 +22,7 @@ class AuthController extends Controller
         ]);
 
         // Utilise le guard par défaut (web)
-        if (Auth::attempt($credentials)) {  // Utilisation de Auth::attempt sans spécifier de guard
+        if (Auth::attempt($credentials, true)) {  // Utilisation de Auth::attempt sans spécifier de guard
             $request->session()->regenerate();
 
             // Redirect based on user role

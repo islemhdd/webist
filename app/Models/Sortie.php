@@ -16,8 +16,12 @@ class Sortie extends Model
     {
         return $this->hasOne('sortie');
     }
-    public function student(): HasMany
+    public function students()
     {
-        return $this->hasMany('student');
+        return $this->belongsToMany(Student::class, 'sortie_student', 'sortie_id', 'student_matricule');
+    }
+    public function student()
+    {
+        return $this->belongsTo(Student::class, 'student_id', 'matricule');
     }
 }

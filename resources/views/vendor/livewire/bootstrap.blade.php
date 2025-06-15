@@ -1,3 +1,4 @@
+
 @php
 if (! isset($scrollTo)) {
     $scrollTo = 'body';
