@@ -53,8 +53,10 @@
         <!-- Main Content -->
         <div class="ml-64 flex-1">
             <!-- Top Navigation -->
-            <header
-                class="bg-white dark:bg-gray-800 border-b dark:border-gray-700 h-16 fixed w-full z-20 transition-colors duration-200">
+
+            <!-- Top Navigation -->
+            <header dir="rtl"
+                class="bg-white dark:bg-gray-800 border-b dark:border-gray-700 h-16 fixed z-20 transition-colors duration-200 rounded-3xl shadow-xl  w-[77%] mx-12 space-x-reverse  ">
                 @include('components.header-brigade', ['officer' => $officer])
             </header>
 

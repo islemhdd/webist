@@ -5,21 +5,32 @@
         <!-- Avatar et nom -->
         <div class="flex items-center space-x-3 space-x-reverse">
             <div class="relative" x-data="{ open: false }">
-                <button @click="open = !open" type="button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" id="user-menu-button">
+                <button @click="open = !open" type="button"
+                    class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    id="user-menu-button">
                     <img class="h-8 w-8 rounded-full" src="{{ asset('profile.jpg') }}" alt="">
                 </button>
-    
-                <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute right-0 z-50 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5" role="menu">
+
+                <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                    x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100"
+                    x-transition:leave-end="opacity-0 scale-95"
+                    class="absolute right-0 z-50 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+                    role="menu">
                     <div class="py-1" role="none">
-                    
-                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" role="menuitem">
+
+                        <a href="#"
+                            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            role="menuitem">
                             <i class="fas fa-cog mr-2"></i>
                             Paramètres
                         </a>
                         <div class="border-t border-gray-100 dark:border-gray-700"></div>
                         <form method="POST" action="{{ route('logout') }}" role="none">
                             @csrf
-                            <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" role="menuitem">
+                            <button type="submit"
+                                class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                role="menuitem">
                                 <i class="fas fa-sign-out-alt mr-2"></i>
                                 Déconnexion
                             </button>
@@ -27,63 +38,205 @@
                     </div>
                 </div>
             </div>
-            <span class="text-gray-700 dark:text-gray-100">{{ auth()->user()->username ?? 'Directeur d\'Études' }}</span>
+            <span
+                class="text-gray-700 dark:text-gray-100">{{ auth()->user()->username ?? 'Directeur d\'Études' }}</span>
         </div>
 
         <!-- Switch thème -->
-        <button @click="$store.theme.toggle()" type="button" class="text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
+        <button @click="$store.theme.toggle()" type="button"
+            class="text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
             <!-- Icône Soleil (mode clair) -->
-            <i class="fas fa-sun text-xl text-yellow-500 hidden theme-toggle-light-icon" x-show="$store.theme.current === 'light'"></i>
+            <i class="fas fa-sun text-xl text-yellow-500 hidden theme-toggle-light-icon"
+                x-show="$store.theme.current === 'light'"></i>
             <!-- Icône Lune (mode sombre) -->
-            <i class="fas fa-moon text-xl text-blue-500 hidden theme-toggle-dark-icon" x-show="$store.theme.current === 'dark'"></i>
+            <i class="fas fa-moon text-xl text-blue-500 hidden theme-toggle-dark-icon"
+                x-show="$store.theme.current === 'dark'"></i>
         </button>
-   
 
-    <!-- Notifications et contrôles droite -->
-    <div class="flex items-center space-x-4">
-        <!-- Notifications -->
-        <div class="relative" x-data="{ open: false }">
-            <button @click="open = !open" type="button" class="relative p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg">
-                <i class="fas fa-bell text-xl"></i>
-                <!-- Badge de notification -->
-                <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
-                    3
-                </span>
-            </button>
 
-            <!-- Dropdown notifications -->
-            <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute right-0 z-50 mt-2 w-80 bg-white dark:bg-gray-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
-                <div class="py-1" role="menu">
-                    <div class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border-b dark:border-gray-700">
-                        <strong>Notifications</strong>
+        <!-- Notifications et contrôles droite -->
+        <div class="flex items-center space-x-4">
+            <!-- Notifications -->
+            <div x-data="{ open: false, notificationCount: 3 }" class="relative">
+                <button @click="open = !open"
+                    class="relative p-2 text-gray-500 hover:text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
+                    <template x-if="notificationCount > 0">
+                        <span class="absolute -top-1 -right-1 flex h-5 w-5">
+                            <span
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span
+                                class="relative inline-flex rounded-full h-5 w-5 bg-red-500 text-xs text-white justify-center items-center font-medium shadow-md"
+                                x-text="notificationCount"></span>
+                        </span>
+                    </template>
+                    <i class="fa-regular fa-bell text-xl"></i>
+                </button>
+
+                <!-- Menu dropdown des notifications -->
+                <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                    x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100"
+                    x-transition:leave-end="opacity-0 scale-95"
+                    class="absolute right-0 mt-2 w-96 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
+                    <div class="p-4">
+                        <div
+                            class="flex items-center justify-between mb-3 pb-2 border-b border-gray-100 dark:border-gray-700">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 flex items-center">
+                                <i class="far fa-bell mr-2 text-indigo-500"></i> Notifications
+                            </h3>
+                            <span
+                                class="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full"
+                                x-text="notificationCount + ' nouveau' + (notificationCount > 1 ? 'x' : '')"></span>
+                        </div>
+                        <div class="space-y-4 max-h-96 overflow-y-auto">
+                            <!-- Notification 1 -->
+                            <div
+                                class="flex justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 transform hover:translate-x-1 shadow-sm hover:shadow">
+                                <a href="#" class="flex-grow">
+                                    <div class="ml-3">
+                                        <div class="flex items-center">
+                                            <span
+                                                class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 mr-2">
+                                                Validation requise
+                                            </span>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">
+                                                Il y a 5 minutes
+                                            </span>
+                                        </div>
+                                        <p class="text-sm font-medium text-gray-800 dark:text-gray-200 mt-1 truncate">
+                                            Patient en attente de validation RHP
+                                        </p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-0.5 truncate">
+                                            Nouvelle validation requise
+                                        </p>
+                                    </div>
+                                </a>
+                                <button onclick="markAsRead('1', 'de')"
+                                    class="text-gray-400 hover:text-red-500 dark:hover:text-red-400 p-2 transition-colors duration-200">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Notification 2 -->
+                            <div
+                                class="flex justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 transform hover:translate-x-1 shadow-sm hover:shadow">
+                                <a href="#" class="flex-grow">
+                                    <div class="ml-3">
+                                        <div class="flex items-center">
+                                            <span
+                                                class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200 mr-2">
+                                                Exclusion
+                                            </span>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">
+                                                Il y a 15 minutes
+                                            </span>
+                                        </div>
+                                        <p class="text-sm font-medium text-gray-800 dark:text-gray-200 mt-1 truncate">
+                                            Étudiant exclu de classe
+                                        </p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-0.5 truncate">
+                                            Nouvelle exclusion
+                                        </p>
+                                    </div>
+                                </a>
+                                <button onclick="markAsRead('2', 'de')"
+                                    class="text-gray-400 hover:text-red-500 dark:hover:text-red-400 p-2 transition-colors duration-200">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Notification 3 -->
+                            <div
+                                class="flex justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 transform hover:translate-x-1 shadow-sm hover:shadow">
+                                <a href="#" class="flex-grow">
+                                    <div class="ml-3">
+                                        <div class="flex items-center">
+                                            <span
+                                                class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 mr-2">
+                                                Approuvé
+                                            </span>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">
+                                                Il y a 1 heure
+                                            </span>
+                                        </div>
+                                        <p class="text-sm font-medium text-gray-800 dark:text-gray-200 mt-1 truncate">
+                                            Dossier médical validé
+                                        </p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-0.5 truncate">
+                                            Validation complétée avec succès
+                                        </p>
+                                    </div>
+                                </a>
+                                <button onclick="markAsRead('3', 'de')"
+                                    class="text-gray-400 hover:text-red-500 dark:hover:text-red-400 p-2 transition-colors duration-200">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" role="menuitem">
-                        <div class="flex items-center">
-                            <i class="fas fa-user-injured text-blue-500 mr-3"></i>
-                            <div>
-                                <p class="font-medium">Nouvelle validation requise</p>
-                                <p class="text-xs text-gray-500">Patient en attente de validation RHP</p>
-                            </div>
-                        </div>
-                    </a>
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" role="menuitem">
-                        <div class="flex items-center">
-                            <i class="fas fa-door-open text-red-500 mr-3"></i>
-                            <div>
-                                <p class="font-medium">Nouvelle exclusion</p>
-                                <p class="text-xs text-gray-500">Étudiant exclu de classe</p>
-                            </div>
-                        </div>
-                    </a>
                 </div>
             </div>
+
+
+
+            <!-- Menu utilisateur -->
+
         </div>
-
-        
-
-        <!-- Menu utilisateur -->
-       
     </div>
- </div>
 
 </div>
+
+<script>
+    function markAsRead(notificationId, userId) {
+        // For DE header, we'll simulate the functionality since we don't have the same backend structure
+        // You can modify this to match your actual notification handling
+
+        // Remove the notification from the DOM with enhanced animation
+        const notificationElement = document.querySelector(`[onclick="markAsRead('${notificationId}', '${userId}')"]`)
+            .closest('.flex');
+        if (notificationElement) {
+            // First, scale down slightly and start fade
+            notificationElement.style.transition = 'all 200ms ease-in-out';
+            notificationElement.style.transform = 'scale(0.98)';
+            notificationElement.style.opacity = '0.7';
+
+            // After a short delay, slide out to the right with fade out
+            setTimeout(() => {
+                notificationElement.style.transform = 'translateX(100%)';
+                notificationElement.style.opacity = '0';
+                notificationElement.style.maxHeight = '0';
+                notificationElement.style.margin = '0';
+                notificationElement.style.padding = '0';
+
+                // Wait for animation to complete before removing
+                setTimeout(() => {
+                    notificationElement.remove();
+
+                    // Update the notification count
+                    const countElement = document.querySelector('[x-data*="notificationCount"]').__x
+                        .$data;
+                    countElement.notificationCount = Math.max(0, countElement.notificationCount - 1);
+
+                    // If no more notifications, update the empty state
+                    const notificationsContainer = document.querySelector('.space-y-4');
+                    if (notificationsContainer && !notificationsContainer.querySelector('.flex')) {
+                        notificationsContainer.innerHTML =
+                            '<div class="text-center py-6">' +
+                            '<i class="fas fa-bell-slash text-2xl text-gray-400 dark:text-gray-600 mb-2"></i>' +
+                            '<p class="text-sm text-gray-500 dark:text-gray-400">Aucune nouvelle notification</p>' +
+                            '</div>';
+                    }
+                }, 300);
+            }, 100);
+        }
+    }
+</script>
