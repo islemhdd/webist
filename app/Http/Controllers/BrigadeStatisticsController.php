@@ -19,22 +19,24 @@ class BrigadeStatisticsController extends Controller
     {
         $query = Student::query();
 
+
         switch ($officer->role->name) {
-            case 'Chef de compagnie':
-                // Students in the officer's sections
+            case 'Chef de compagnie': // Chef de compagnie - show only their sections
+
                 return $query->whereIn('section_id', function ($q) use ($officer) {
                     $q->select('id')
                         ->from('sections')
                         ->where('officer_id', $officer->id);
                 });
-
-            case 'Chef de brigade':
-                // Students in the same battalion (grade)
+            case 'Chef de batallaint': // Chef de bataillon - show students in their battalion
                 return $query->where('grade', $officer->bat);
-
+            case 'Chef de brigade': // Chef de brigade
+            case 'Chef division': // Division
+                return $query; // Show all students
             default:
                 return $query;
         }
+
     }
 
 

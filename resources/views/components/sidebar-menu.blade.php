@@ -17,6 +17,8 @@
         $officerid = $user->id;
     }
 
+
+
 @endphp
 
 
@@ -116,23 +118,20 @@
                 <i class="fa-solid fa-chevron-down ml-auto" :class="{ 'rotate-180': exemptionOpen }"></i>
             </button>
 
-            <div x-show="exemptionOpen" class="pl-4 mt-1 space-y-1">
-                <a href="{{ route('exemptions.create') }}"
-                    class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <i class="fa-solid fa-plus w-5 h-5"></i>
-                    <span class="ml-3">Nouvelle exemption</span>
-                </a>
-                <a href="{{ route('exemptions.index') }}"
-                    class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <i class="fa-solid fa-list w-5 h-5"></i>
-                    <span class="ml-3">Liste des exemptions</span>
-                </a>
-            </div>
+        <div x-show="rdvOpen" class="pl-4 mt-1 space-y-1">
+            <a href="{{ route('exemptions.create') }}"
+                class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                <i class="fa-solid fa-plus w-5 h-5"></i>
+                <span class="ml-3">Nouveau Exemption</span>
+            </a>
+            <a href="{{ route('exemptions.index') }}"
+                class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                <i class="fa-solid fa-list w-5 h-5"></i>
+                <span class="ml-3">Liste des exemptions</span>
+            </a>
         </div>
-    @endif
+        {{-- Statistiques --}}
 
-    {{-- Statistiques (adaptées selon le rôle) --}}
-    @if($user->role->name === 'Medecin')
         <a href="{{ route('statistics.index') }}"
             class="flex items-center p-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
             <i class="fa-solid fa-chart-pie w-5 h-5"></i>
