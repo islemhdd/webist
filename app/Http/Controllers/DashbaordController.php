@@ -16,6 +16,7 @@ class DashbaordController extends Controller
 
     public function parametre($id)
     {
+        todo("ajoute une page pour les parmettre");
         return view('brigade.parametre');
     }
     public function principale($id)

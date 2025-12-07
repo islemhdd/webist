@@ -1,4 +1,4 @@
-  
+
         // Animation d'entrée
         document.addEventListener('DOMContentLoaded', function() {
             // Ajouter des délais d'animation pour les cartes
@@ -44,10 +44,13 @@
         const loginForm = document.getElementById('loginForm');
         const submitBtn = document.querySelector('.btn-login');
 
-        loginForm.addEventListener('submit', function(e) {
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Connexion...';
-            submitBtn.disabled = true;
-        });
+        if (loginForm && submitBtn) {
+            loginForm.addEventListener('submit', function(e) {
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Connexion...';
+                submitBtn.disabled = true;
+                // Laisser le formulaire se soumettre normalement
+            });
+        }
 
         // Auto-hide alerts
         setTimeout(function() {

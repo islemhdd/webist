@@ -1,4 +1,5 @@
 <?php
+//TODO make this schedualed
 
 namespace App\Console\Commands;
 

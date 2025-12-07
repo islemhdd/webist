@@ -18,9 +18,10 @@ class ReportController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index($id, Request $request)
+    public function index($officer, Request $request)
     {
-        $officer = Officer::find($id);
+
+
 
         $query = $officer->reports()->with(['student']);
 
@@ -94,9 +95,9 @@ class ReportController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create($id)
+    public function create($officer)
     {
-        $officer = Officer::find($id);
+
         return view('report.create', ["officer" => $officer]);
     }
 
@@ -109,9 +110,9 @@ class ReportController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id, $report_id)
+    public function show($officer, $report_id)
     {
-        $officer = Officer::find($id);
+
 
         $report = Report::find($report_id);
 

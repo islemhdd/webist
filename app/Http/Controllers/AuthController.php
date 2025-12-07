@@ -2,6 +2,7 @@
 // app/Http/Controllers/AuthController.php
 namespace App\Http\Controllers;
 
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -15,6 +16,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+
         // Valide les champs
         $credentials = $request->validate([
             'username' => ['required'],
@@ -25,9 +27,14 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, true)) {  // Utilisation de Auth::attempt sans spécifier de guard
             $request->session()->regenerate();
 
-            if (Auth::user()->role->name != 'MED')
-            
-                return redirect()->route('brigade.statistics', ['id' => auth()->user()->isOfficer()->id]);
+            /** @var \App\Models\User $user */
+            $user = Auth::user();
+            if ($user && $user->role && $user->role->name != 'MED') {
+                $officer = $user->isOfficer();
+                if ($officer && isset($officer->id)) {
+                    return redirect()->route('brigade.statistics', ['id' => $officer->id]);
+                }
+            }
             return redirect()->route('statistics.index');
         }
 
