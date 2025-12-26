@@ -13,6 +13,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->append(\Illuminate\Http\Middleware\HandleCors::class);
+
         // Définition du group "web"
         $middleware->group('web', [
             \Illuminate\Cookie\Middleware\EncryptCookies::class,

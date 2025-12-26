@@ -1,0 +1,28 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark, cupcake;
+}
+
+/* Custom scrollbar for the whole page */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #d97706 #fff7ed;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #fff7ed;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #d97706;
+  border-radius: 999px;
+  border: 2px solid #fff7ed;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #b45309;
+}
