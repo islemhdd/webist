@@ -134,11 +134,7 @@ class Student extends Model
         return $this->hasMany(Exemption::class, "matricule", "matricule");
     }
 
-    // Relationship with patients table
-    public function patients(): HasMany
-    {
-        return $this->hasMany(Patient::class, 'matricule', 'matricule');
-    }
+ 
 
     // Relationship with expulsions table
     public function expulsions(): HasMany

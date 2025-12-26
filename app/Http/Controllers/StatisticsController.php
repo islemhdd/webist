@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Patient;
+
 use App\Models\ListeRdv;
 use App\Models\Convoncu;
 use App\Models\Exemption;
@@ -33,19 +33,11 @@ class StatisticsController extends Controller
         // Filtre par matricule si spécifié
         $matriculeFilter = $request->filled('search_matricule') ? $request->search_matricule : null;
 
-        // Récupérer les statistiques des patients
-        $validPatientsQuery = Patient::whereBetween(\DB::raw('DATE(created_at)'), [$dateDebut->format('Y-m-d'), $dateFin->format('Y-m-d')])
-            ->where('valider', 1);
-        $invalidPatientsQuery = Patient::whereBetween(\DB::raw('DATE(created_at)'), [$dateDebut->format('Y-m-d'), $dateFin->format('Y-m-d')])
-            ->where('valider', 0);
+     
 
-        if ($matriculeFilter) {
-            $validPatientsQuery->where('matricule', 'LIKE', '%' . $matriculeFilter . '%');
-            $invalidPatientsQuery->where('matricule', 'LIKE', '%' . $matriculeFilter . '%');
-        }
+     
 
-        $validPatientsToday = $validPatientsQuery->count();
-        $invalidPatientsToday = $invalidPatientsQuery->count();
+      
 
         // Récupérer les statistiques des rendez-vous
         $consultationRdvQuery = ListeRdv::whereBetween(\DB::raw('DATE(date)'), [$dateDebut->format('Y-m-d'), $dateFin->format('Y-m-d')])
@@ -85,8 +77,7 @@ class StatisticsController extends Controller
             ->get();
 
         return view('statistics.index', compact(
-            'validPatientsToday',
-            'invalidPatientsToday',
+          
             'consultationRdvToday',
             'urgenceRdvToday',
             'convocationsWithPsy',

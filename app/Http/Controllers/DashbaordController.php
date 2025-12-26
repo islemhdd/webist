@@ -61,12 +61,5 @@ class DashbaordController extends Controller
         ]);
     }
 
-    public function infermerie(Officer $id)
-    {
-        $officer = $id;
-
-        // Cette méthode redirige vers la liste des patients de l'officier
-        // selon le système existant
-        return redirect()->route('brigade.list_patients', ['id' => $officer->id]);
-    }
+  
 }

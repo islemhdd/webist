@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Officer;
-use App\Models\Patient;
+
 use App\Models\Sanction;
 use App\Models\Student;
 use App\Models\Report;
@@ -117,24 +117,7 @@ class BrigadeStatisticsController extends Controller
         ];
     }
 
-    private function getPatientsStats($studentMatricules)
-    {
-
-
-        return [
-            'notValidated' => Patient::whereIn('matricule', $studentMatricules)
-                ->where('valider', 0)
-                ->count(),
-            'validated' => Patient::whereIn('matricule', $studentMatricules)
-                ->where('valider', 1)
-                ->count(),
-            'deleted' => Patient::whereIn('matricule', $studentMatricules)
-                ->where('valider', 2)
-                ->count(),
-            'total' => Patient::whereIn('matricule', $studentMatricules)
-                ->count()
-        ];
-    }
+ 
 
     private function getTotalStudents($studentMatricules)
     {
@@ -153,8 +136,8 @@ class BrigadeStatisticsController extends Controller
         // Get statistics
         $weekendStats = $this->getWeekendStats($studentMatricules);
         $sanctionsStats = $this->getSanctionsStats($studentMatricules);
-        $patineStats = $this->getPatineStats($studentMatricules);
-        $patientsStats = $this->getPatientsStats($studentMatricules);
+
+       
 
 
         $totalStudents = $this->getTotalStudents($studentMatricules);
@@ -163,7 +146,7 @@ class BrigadeStatisticsController extends Controller
             'weekendStats',
             'sanctionsStats',
 
-            'patientsStats',
+          
             'totalStudents',
             'officer'
         ));
@@ -191,7 +174,7 @@ class BrigadeStatisticsController extends Controller
                 'weekendStats' => $this->getWeekendStats($studentMatricules),
                 'sanctionsStats' => $this->getSanctionsStats($studentMatricules),
                 'patineStats' => $this->getPatineStats($studentMatricules),
-                'patientsStats' => $this->getPatientsStats($studentMatricules),
+              
                 'totalStudents' => $this->getTotalStudents($studentMatricules)
             ];
 
@@ -254,19 +237,7 @@ class BrigadeStatisticsController extends Controller
         return view('brigade.students-details', compact('officer', 'students'));
     }
 
-    public function patientsDetails(Officer $id)
-    {
-        $officer = $id;
-        $studentsQuery = $this->getStudentsQueryByRole($officer);
-        $studentMatricules = $studentsQuery->pluck('matricule');
-
-        $patients = Patient::whereIn('matricule', $studentMatricules)
-            ->with(['student.section'])
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return view('brigade.patients-details', compact('officer', 'patients'));
-    }
+ 
 
     public function getGraphData(Request $request, Officer $id)
     {
@@ -401,10 +372,7 @@ class BrigadeStatisticsController extends Controller
                     ->whereDate('created_at', $date)
                     ->count();
 
-            case 'patients':
-                return Patient::whereIn('matricule', $studentMatricules)
-                    ->whereDate('created_at', $date)
-                    ->count();
+          
 
             default:
                 return 0;
@@ -430,10 +398,7 @@ class BrigadeStatisticsController extends Controller
                     ->whereBetween('created_at', [$start, $end])
                     ->count();
 
-            case 'patients':
-                return Patient::whereIn('matricule', $studentMatricules)
-                    ->whereBetween('created_at', [$start, $end])
-                    ->count();
+         
 
             default:
                 return 0;
