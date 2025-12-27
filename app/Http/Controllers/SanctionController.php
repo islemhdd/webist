@@ -14,7 +14,9 @@ class SanctionController extends Controller
      */
     public function index(Officer $id, Request $request)
     {
+
         $query = $id->officerSanctions();
+
 
 
         if ($request->has('type') && $request->type != '') {
@@ -23,7 +25,7 @@ class SanctionController extends Controller
             $query->where('sanctions.type', $request->type);
         }
         // Default view: consignes for this weekend and active/upcoming arrets
-
+        // dd($sanctions)
         $sanctions = $query->orderBy('date_debut', 'asc')->paginate(15);
 
 

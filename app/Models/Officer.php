@@ -229,23 +229,13 @@ class Officer extends User
             ->get();
     }
 
-    public function patients(): Builder
-    {
-        $patients = Patient::join('students', 'patients.matricule', '=', 'students.matricule')
-            ->join('sections', 'students.section_id', '=', 'sections.id')
-            ->where('sections.officer_id', $this->id)
-            ->select('patients.*');
-
-        return $patients;
-    }
-
     public function officerSanctions()
     {
         $query = Sanction::join('students', 'sanctions.matricule', '=', 'students.matricule');
 
 
         // Filter by officer role
-        if ($this->role->name === "Chef de compagnie") {
+
             if ($this->role->name === "Chef de compagnie") {
                 $query->join('sections', 'students.section_id', '=', 'sections.id')
                     ->where('sections.officer_id', $this->id);
@@ -282,6 +272,6 @@ class Officer extends User
                                 CONCAT(students.nom, ' ', students.prenom) as full_name,
                                 CASE WHEN sanctions.date_fin >= CURRENT_DATE THEN 1 ELSE 0 END as is_active")
                 ->orderByDesc('sanctions.created_at');
-        }
     }
-}
+    }
+

@@ -34,11 +34,7 @@ Route::post('/login', action: [AuthController::class, 'login'])->name('login.sub
 Route::post('/logout', action: [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // Routes authentifiées
-Route::get('/infermerie/compt', fn() => view('infermerie.compt'))
-    ->name('compt')->middleware('auth');
-
 Route::get('/brigade/principale', fn() => view('brigade.principale'));
-// ? routes de l'infermerie de islem
 
 Route::controller(DashbaordController::class)
     ->prefix('{id}')
@@ -50,7 +46,6 @@ Route::controller(DashbaordController::class)
             Route::get("parametre", "parametre")->name("parametre");
             // Route::get("logout", "logout")->name("logout");
             Route::get("weekends", "weekends")->name("weekends");
-            Route::get("infermerie", "infermerie")->name("infermerie");
         }
     );
 
@@ -60,7 +55,6 @@ Route::get('{id}/statistics/filter', [BrigadeStatisticsController::class, 'filte
 Route::get('{id}/statistics/weekend', [BrigadeStatisticsController::class, 'weekendDetails'])->name('brigade.statistics.weekend');
 Route::get('{id}/statistics/sanctions', [BrigadeStatisticsController::class, 'sanctionsDetails'])->name('brigade.statistics.sanctions');
 Route::get('{id}/statistics/reports', [BrigadeStatisticsController::class, 'reportsDetails'])->name('brigade.statistics.reports');
-Route::get('{id}/statistics/patients', [BrigadeStatisticsController::class, 'patientsDetails'])->name('brigade.statistics.patients');
 Route::get('{id}/statistics/students', [BrigadeStatisticsController::class, 'studentsDetails'])->name('brigade.statistics.students');
 Route::match(['GET', 'POST'], '{id}/statistics/graph-data', [BrigadeStatisticsController::class, 'getGraphData'])->name('brigade.statistics.graph-data');
 

@@ -18,7 +18,6 @@ class RoleSeeder extends Seeder
             ['name' => 'Chef de brigade', 'description' => 'Brigade leader'],
             ['name' => 'Chef de batallaint', 'description' => 'Battalion leader'],
             ['name' => 'Chef division', 'description' => 'Division leader'],
-            ['name' => 'Medecin', 'description' => 'Medical doctor'],
             ['name' => 'Directeur général', 'description' => 'General director']
         ];
 

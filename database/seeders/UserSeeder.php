@@ -19,7 +19,7 @@ class UserSeeder extends Seeder
 
 
         // Create users with specific roles
-        $roles = ['Chef de compagnie', 'Chef de brigade', 'Chef de batallaint', 'Chef division', 'Medecin'];
+        $roles = ['Chef de compagnie', 'Chef de brigade', 'Chef de batallaint', 'Chef division'];
         foreach ($roles as $index => $role) {
             User::create([
                 'username' => $role . ' User',
