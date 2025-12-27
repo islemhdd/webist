@@ -1,10 +1,9 @@
 @props(['officer'])
-
-
 <!-- Header principal -->
-<div class="flex items-center justify-between h-full px-6 ">
-    <!-- Profil utilisateur avec contrôles -->
-    <div class="flex items-center   space-x-4 space-x-reverse">
+<div class="flex items-center justify-between h-full px-6">
+
+     .
+    <div class="flex items-center space-x-4 space-x-reverse">
         <!-- Avatar et nom -->
         <div class="flex items-center space-x-3 space-x-reverse">
             <div class="relative" x-data="{ open: false }">
@@ -21,7 +20,6 @@
                     class="absolute right-0 z-50 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
                     role="menu">
                     <div class="py-1" role="none">
-
                         <a href="#"
                             class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                             role="menuitem">
@@ -169,11 +167,6 @@
                     </div>
                 </div>
             </div>
-
-
-
-            <!-- Menu utilisateur -->
-
         </div>
     </div>
 

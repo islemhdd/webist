@@ -14,7 +14,6 @@ class Create extends Component
     public $corps = "";
     public $title = "";
     public $id = null;
-    public $isMedical = false;
     public $destination = null;
     public $successMessage = false;
     public $officer_id;
@@ -93,7 +92,7 @@ class Create extends Component
 
             $r = new Report();
 
-            if (!$r->init($this->mat, auth()->user()->id, auth()->user()->role->name, $this->title, $this->corps, $this->isMedical, $this->destination)) {
+            if (!$r->init($this->mat, auth()->user()->id, auth()->user()->role->name, $this->title, $this->corps, $this->destination)) {
                 $this->errorMessage = 'Erreur lors de l\'initialisation du rapport.';
                 session()->flash('error', $this->errorMessage);
                 return;

@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Convoncu;
 use App\Models\Exemption;
 use App\Models\ListeRdv;
 use App\Models\Officer;
-use App\Models\Patient;
 use App\Models\Report;
 use App\Models\Sanction;
 use App\Models\Section;
@@ -179,7 +177,6 @@ class StudentController extends Controller
             // Get all related data
             $studentData = [
                 'student' => $this->getBasicStudentInfo($student),
-                'medical' => $this->getStudentMedicalInfo($matricule),
                 'exemptions' => $this->getStudentExemptions($matricule),
                 'rdvs' => $this->getStudentRdvs($matricule),
                 'sorties' => $this->getStudentSorties($matricule),
@@ -262,55 +259,7 @@ class StudentController extends Controller
         ];
     }
 
-    /**
-     * Get student medical information
-     */
-    private function getStudentMedicalInfo($matricule)
-    {
-        // Get patient records
-        $patients = Patient::where('matricule', $matricule)
-            ->orderBy('created_at', 'desc')
-            ->get();
 
-        // Get convocation data
-        $convocation = Convoncu::where('matricule', $matricule)->first();
-
-        // Get medical exemptions
-        $exemptions = Exemption::where('matricule', $matricule)
-            ->orderBy('date_debut', 'desc')
-            ->get();
-
-        return [
-            'patients' => $patients->map(function ($patient) {
-                return [
-                    'id' => $patient->id,
-                    'valider' => $patient->valider,
-                    'validated_at' => $patient->validated_at,
-                    'type_medecin' => $patient->type_medecin,
-                    'avis_medecin' => $patient->avis_medecin,
-                    'valider_rhp' => $patient->valider_rhp,
-                    'motif_suppression' => $patient->motif_suppression,
-                    'created_at' => $patient->created_at
-                ];
-            }),
-            'convocation' => $convocation ? [
-                'psy' => $convocation->psy,
-                'medGen' => $convocation->medGen,
-                'chirDent' => $convocation->chirDent,
-                'avisSpe' => $convocation->avisSpe,
-                'created_at' => $convocation->created_at
-            ] : null,
-            'exemptions' => $exemptions->map(function ($exemption) {
-                return [
-                    'motif' => $exemption->motif,
-                    'date_debut' => $exemption->date_debut,
-                    'date_fin' => $exemption->date_fin,
-                    'is_active' => $exemption->date_fin >= now(),
-                    'created_at' => $exemption->created_at
-                ];
-            })
-        ];
-    }
 
     /**
      * Get student reports (patines)
@@ -549,11 +498,6 @@ class StudentController extends Controller
             case 'Directeur général':
                 // Can access all students
                 return true;
-
-            case 'Medecin':
-                // Can access students with medical records
-                return Patient::where('matricule', $matricule)->exists() ||
-                    Convoncu::where('matricule', $matricule)->exists();
 
             default:
                 return false;
@@ -799,8 +743,6 @@ class StudentController extends Controller
                 return $this->generateSortiesGraphData($matricule, $graphType, $from, $to, $unit);
             case 'sanctions':
                 return $this->generateSanctionsGraphData($matricule, $graphType, $from, $to, $unit);
-            case 'medical':
-                return $this->generateMedicalGraphData($matricule, $graphType, $from, $to, $unit);
             case 'reports':
                 return $this->generateReportsGraphData($matricule, $graphType, $from, $to, $unit);
             case 'rdvs':
@@ -953,79 +895,6 @@ class StudentController extends Controller
                 'data' => $data,
                 'borderColor' => '#FF6384',
                 'backgroundColor' => $graphType === 'bar' ? '#FF6384' : 'rgba(255, 99, 132, 0.2)',
-                'tension' => 0.4
-            ]]
-        ];
-    }
-
-    /**
-     * Generate medical graph data
-     */
-    private function generateMedicalGraphData($matricule, $graphType, $from, $to, $unit)
-    {
-        $fromDate = Carbon::parse($from);
-        $toDate = Carbon::parse($to);
-
-        if ($graphType === 'pie' || $graphType === 'doughnut') {
-            $patients = Patient::where('matricule', $matricule)
-                ->whereBetween('created_at', [$fromDate, $toDate])
-                ->get();
-
-            $validatedCount = $patients->where('valider', 1)->count();
-            $pendingCount = $patients->where('valider', 0)->count();
-
-            return [
-                'type' => $graphType,
-                'labels' => ['Validés', 'En attente'],
-                'datasets' => [[
-                    'data' => [$validatedCount, $pendingCount],
-                    'backgroundColor' => ['#4BC0C0', '#FFCE56'],
-                    'label' => 'État des consultations'
-                ]]
-            ];
-        }
-
-        $labels = [];
-        $data = [];
-        $current = $fromDate->copy();
-
-        while ($current->lte($toDate)) {
-            switch ($unit) {
-                case 'days':
-                    $labels[] = $current->format('d/m');
-                    $count = Patient::where('matricule', $matricule)
-                        ->whereDate('created_at', $current)
-                        ->count();
-                    $current->addDay();
-                    break;
-                case 'weeks':
-                    $weekEnd = $current->copy()->endOfWeek();
-                    $labels[] = $current->format('d/m') . ' - ' . $weekEnd->format('d/m');
-                    $count = Patient::where('matricule', $matricule)
-                        ->whereBetween('created_at', [$current, $weekEnd])
-                        ->count();
-                    $current->addWeek();
-                    break;
-                case 'months':
-                    $labels[] = $current->format('M Y');
-                    $monthEnd = $current->copy()->endOfMonth();
-                    $count = Patient::where('matricule', $matricule)
-                        ->whereBetween('created_at', [$current, $monthEnd])
-                        ->count();
-                    $current->addMonth();
-                    break;
-            }
-            $data[] = $count;
-        }
-
-        return [
-            'type' => $graphType,
-            'labels' => $labels,
-            'datasets' => [[
-                'label' => 'Consultations médicales',
-                'data' => $data,
-                'borderColor' => '#4BC0C0',
-                'backgroundColor' => $graphType === 'bar' ? '#4BC0C0' : 'rgba(75, 192, 192, 0.2)',
                 'tension' => 0.4
             ]]
         ];

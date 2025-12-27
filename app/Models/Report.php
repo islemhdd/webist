@@ -21,14 +21,13 @@ class Report extends Model
     {
         return $this->belongsTo(Officer::class, 'officer_id', 'id');
     }
-    public function init($student_id, $officer_id, $role, $title,  $corps, $isMedical = 0, $destination = null)
+    public function init($student_id, $officer_id, $role, $title,  $corps, $destination = null)
     {
         $this->student_id = $student_id;
         $this->officer_id = $officer_id;
         $this->status = $role;
         $this->title = $title;
         $this->corps = $corps;
-        $this->is_medical = $isMedical;
 
         $this->destination = $destination;
         return 1;
@@ -50,15 +49,14 @@ class Report extends Model
      */
     public function identicale(Report $r)
     {
-        return ($this->student_id == $r->student_id && $this->officer_id == $r->officer_id && $this->title == $r->title && $this->corps == $r->corps && $this->is_medical == $r->is_medical && $this->destination == $r->destination);
+        return ($this->student_id == $r->student_id && $this->officer_id == $r->officer_id && $this->title == $r->title && $this->corps == $r->corps && $this->destination == $r->destination);
     }
     public function existing()
     {
         $query = Report::where('student_id', $this->student_id)
             ->where('officer_id', $this->officer_id)
             ->where('title', $this->title)
-            ->where('corps', $this->corps)
-            ->where('is_medical', $this->is_medical);
+            ->where('corps', $this->corps);
 
         if ($this->destination) {
             $query->where('destination', $this->destination);

@@ -258,7 +258,6 @@
             // Initialize charts
             const weekendCtx = document.getElementById('weekendChart').getContext('2d');
             const sanctionsCtx = document.getElementById('sanctionsChart').getContext('2d');
-            const patineCtx = document.getElementById('patineChart').getContext('2d');
 
             // Create charts
             let weekendChart = new Chart(weekendCtx, {
@@ -380,14 +379,6 @@
                         data.sanctionsStats.warnings
                     ];
                     sanctionsChart.update('active');
-
-                    // Update Patine chart
-                    patineChart.data.datasets[0].data = [
-                        data.patineStats.pending,
-                        data.patineStats.rejected,
-                        data.patineStats.validated
-                    ];
-                    patineChart.update('active');
                 }
 
                 function updateDetailCards(data) {
@@ -403,11 +394,6 @@
                     document.getElementById('weekend-restrictions-detail').textContent = data.sanctionsStats
                         .weekendRestrictions;
                     document.getElementById('warnings-detail').textContent = data.sanctionsStats.warnings;
-
-                    // Update Patine details
-                    document.getElementById('pending-patine-detail').textContent = data.patineStats.pending;
-                    document.getElementById('rejected-patine-detail').textContent = data.patineStats.rejected;
-                    document.getElementById('validated-patine-detail').textContent = data.patineStats.validated;
                 }
 
                 function updateSummaryCards(data) {
@@ -419,11 +405,6 @@
                         .toFixed(1) :
                         '0.0';
                     document.getElementById('weekend-approval-rate').textContent = `${weekendApprovalRate}%`;
-
-                    const patineApprovalRate = data.patineStats.total > 0 ?
-                        (data.patineStats.validated / data.patineStats.total * 100).toFixed(1) :
-                        '0.0';
-                    document.getElementById('patine-approval-rate').textContent = `${patineApprovalRate}%`;
                 }
             });
         </script>
