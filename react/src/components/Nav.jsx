@@ -1,16 +1,23 @@
 ﻿import React, { useEffect, useRef, useState } from "react";
 import logo from "../assets/unnamed.png";
-
+import { Link } from 'react-router-dom'
+import { 
+  HiHome, 
+  HiBriefcase, 
+  HiFolder, 
+  HiInformationCircle 
+} from "react-icons/hi2";
+import { HiArrowRightOnRectangle } from "react-icons/hi2";
 export default function Nav() {
   const [open, setOpen] = useState(false);
   const panelRef = useRef(null);
+const navItems = [
+  { name: "Accueil", href: "/", icon: <HiHome className="w-4 h-4" /> },
+  { name: "Services", href: "services", icon: <HiBriefcase className="w-4 h-4" /> },
+  { name: "Connexion", href: "login", icon: <HiArrowRightOnRectangle className="w-4 h-4" /> },
+  { name: "À propos", href: "about", icon: <HiInformationCircle className="w-4 h-4" /> },
+];
 
-  const navItems = [
-    { name: "Accueil", href: "#accueil" },
-    { name: "Services", href: "#services" },
-    { name: "Projets", href: "#projets" },
-    { name: "À propos", href: "#about" },
-  ];
 
   // Fermer avec Esc + click outside
   useEffect(() => {
@@ -98,12 +105,14 @@ export default function Nav() {
               <ul className="menu menu-horizontal px-1 gap-1">
                 {navItems.map((item) => (
                   <li key={item.name}>
-                    <a
-                      href={item.href}
-                      className="rounded-xl font-medium hover:bg-base-200"
-                    >
-                      {item.name}
-                    </a>
+                   <a
+  href={item.href}
+  className="rounded-xl font-medium hover:bg-base-200 flex items-center gap-2"
+>
+  {item.icon}
+  <span>{item.name}</span>
+</a>
+
                   </li>
                 ))}
               </ul>
@@ -111,7 +120,7 @@ export default function Nav() {
 
             {/* Right */}
             <div className="navbar-end gap-2">
-              <button
+              <Link to='/about'
                 className="btn btn-ghost btn-circle"
                 aria-label="Recherche"
               >
@@ -129,7 +138,7 @@ export default function Nav() {
                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                   />
                 </svg>
-              </button>
+              </Link>
 
               
 
@@ -180,13 +189,14 @@ export default function Nav() {
                 <ul className="menu">
                   {navItems.map((item) => (
                     <li key={item.name}>
-                      <a
-                        href={item.href}
-                        className="rounded-xl"
-                        onClick={() => setOpen(false)}
-                      >
-                        {item.name}
-                      </a>
+                  <a
+  href={item.href}
+  className="rounded-xl font-medium hover:bg-base-200 flex items-center gap-2"
+>
+  {item.icon}
+  <span>{item.name}</span>
+</a>
+
                     </li>
                   ))}
                   <li className="mt-2">

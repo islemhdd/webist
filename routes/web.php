@@ -13,6 +13,7 @@ use App\Http\Controllers\SanctionController;
 
 use App\Http\Controllers\BrigadeStatisticsController;
 use App\Http\Controllers\StudentController;
+use App\Models\User;
 
 
 // Routes publiques des pages home
@@ -32,6 +33,20 @@ Route::post('/login', action: [AuthController::class, 'login'])->name('login.sub
 
 // Route de déconnexion (POST uniquement)
 Route::post('/logout', action: [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+
+// Notifications (mark as read)
+Route::post('/notifications/{officerId}/mark-as-read/{notificationId}', function ($officerId, $notificationId) {
+    $user = User::findOrFail($officerId);
+    $officer = $user->isOfficer();
+    if (!$officer) {
+        abort(403, 'Access denied: User is not an officer');
+    }
+
+    $notification = $officer->notifications()->where('id', $notificationId)->firstOrFail();
+    $notification->markAsRead();
+
+    return response()->json(['success' => true]);
+})->middleware('auth')->name('notifications.markAsRead');
 
 // Routes authentifiées
 Route::get('/infermerie/compt', fn() => view('infermerie.compt'))
@@ -78,6 +93,7 @@ Route::prefix('{id}')->controller(ReportController::class)->group(function () {
 
     Route::get('create', 'create')->name('report.create');
     Route::get('reports', 'index')->name('report.index');
+    Route::post('reports', 'store')->name('report.store');
     Route::post('reports/search', 'search')->name('report.search');
     Route::get('show/{report_id}', 'show')->name('report.show');
     Route::post('avis/{report}', 'avis')->name('report.avis');

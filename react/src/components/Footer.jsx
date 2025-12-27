@@ -44,9 +44,9 @@ export default function Footer() {
           <div>
             <h4 className="text-sm font-semibold text-slate-900">Contact</h4>
             <ul className="mt-3 space-y-2 text-slate-600">
-              <li>hello@lumen.com</li>
-              <li>+212 6 00 00 00 00</li>
-              <li>Casablanca, Maroc</li>
+              <li>webmaster@emp.mdn.dz</li>
+              <li>023 95.37.05</li>
+              <li>alger, Algerie</li>
             </ul>
             <div className="mt-4 inline-flex gap-2">
               <button className="btn btn-sm bg-amber-500 text-white border-0 hover:bg-amber-600">
@@ -60,7 +60,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-amber-100 pt-6 text-xs text-slate-500">
-          <span>© 2025 Lumen. Tous droits reserves.</span>
+          <span>© 2026 EMP. Tous droits reserves.</span>
           <div className="flex gap-4">
             <a className="hover:text-amber-500" href="#privacy">
               Confidentialite
