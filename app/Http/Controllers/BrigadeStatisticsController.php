@@ -19,23 +19,17 @@ class BrigadeStatisticsController extends Controller
     {
         $query = Student::query();
 
+        $roleId = (int) $officer->role_id;
 
-        switch ($officer->role->name) {
-            case 'Chef de compagnie': // Chef de compagnie - show only their sections
-
-                return $query->whereIn('section_id', function ($q) use ($officer) {
-                    $q->select('id')
-                        ->from('sections')
-                        ->where('officer_id', $officer->id);
-                });
-            case 'Chef de batallaint': // Chef de bataillon - show students in their battalion
-                return $query->where('grade', $officer->bat);
-            case 'Chef de brigade': // Chef de brigade
-            case 'Chef division': // Division
-                return $query; // Show all students
-            default:
-                return $query;
+        if (in_array($roleId, [1, 2], true)) {
+            return $query->where('grade', $officer->bat);
         }
+
+        if (in_array($roleId, [3, 4, 5, 6], true)) {
+            return $query;
+        }
+
+        return $query;
 
     }
 
@@ -155,8 +149,13 @@ class BrigadeStatisticsController extends Controller
     public function filter(Request $request, Officer $id)
     {
         try {
-            $grade = $request->query('grade');
             $officer = $id;
+            $roleId = (int) $officer->role_id;
+            $grade = $request->query('grade');
+
+            if (in_array($roleId, [1, 2], true)) {
+                $grade = $officer->bat;
+            }
 
             // Get base query for students based on officer role
             $baseStudentsQuery = $this->getStudentsQueryByRole($officer);

@@ -12,10 +12,12 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home.index', [
+        return response()->json([
             'title' => 'Accueil - ENPEI Système de Gestion Scolaire',
             'description' => 'Découvrez le système de gestion scolaire complet d\'ENPEI couvrant l\'infirmerie, la brigade élève, la scolarité et le suivi pédagogique.'
         ]);
+        
+
     }
 
     /**

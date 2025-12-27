@@ -1,9 +1,7 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\SanctionController;
+use App\Http\Controllers\Api\HomeApiController;
+use App\Http\Controllers\StatisticsController;
 
-Route::middleware(['auth', 'web'])->group(function () {
-    // Sanctions API endpoints - These are now handled in web.php
-});
+Route::get('/home', [HomeApiController::class, 'index']);

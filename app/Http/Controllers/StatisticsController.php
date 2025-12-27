@@ -76,6 +76,16 @@ class StatisticsController extends Controller
             ->groupBy('motif')
             ->get();
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'consultationRdvToday' => $consultationRdvToday,
+                'urgenceRdvToday' => $urgenceRdvToday,
+                'convocationsWithPsy' => $convocationsWithPsy,
+                'convocationsWithoutPsy' => $convocationsWithoutPsy,
+                'exemptionsToday' => $exemptionsToday,
+            ]);
+        }
+
         return view('statistics.index', compact(
           
             'consultationRdvToday',
