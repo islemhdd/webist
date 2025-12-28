@@ -270,8 +270,8 @@ class Officer extends User
 
             return $query->selectRaw("sanctions.*,
                                 CONCAT(students.nom, ' ', students.prenom) as full_name,
+                                students.section_id as section_id,
                                 CASE WHEN sanctions.date_fin >= CURRENT_DATE THEN 1 ELSE 0 END as is_active")
                 ->orderByDesc('sanctions.created_at');
     }
     }
-

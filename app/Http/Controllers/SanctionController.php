@@ -28,6 +28,31 @@ class SanctionController extends Controller
         // dd($sanctions)
         $sanctions = $query->orderBy('date_debut', 'asc')->paginate(15);
 
+        if ($request->wantsJson()) {
+            $items = collect($sanctions->items())->map(function ($sanction) {
+                return [
+                    'id' => $sanction->id,
+                    'matricule' => $sanction->matricule,
+                    'type' => $sanction->type,
+                    'motif' => $sanction->motif,
+                    'date_debut' => $sanction->date_debut,
+                    'date_fin' => $sanction->date_fin,
+                    'full_name' => $sanction->full_name ?? null,
+                    'section_id' => $sanction->section_id ?? null,
+                    'is_active' => (bool) $sanction->is_active,
+                ];
+            });
+
+            return response()->json([
+                'sanctions' => $items,
+                'pagination' => [
+                    'current_page' => $sanctions->currentPage(),
+                    'last_page' => $sanctions->lastPage(),
+                    'per_page' => $sanctions->perPage(),
+                    'total' => $sanctions->total(),
+                ],
+            ]);
+        }
 
         return view('brigade.sanctions', [
             'sanctions' => $sanctions,
@@ -95,6 +120,13 @@ class SanctionController extends Controller
 
         $sanction = new Sanction($sanctionData);
         $sanction->save();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Sanction created successfully',
+                'sanction' => $sanction
+            ], 201);
+        }
 
         return redirect()->route('sanctions.index', $id)
             ->with('success', 'Sanction créée avec succès');

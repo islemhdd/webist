@@ -12,5 +12,7 @@ class VerifyCsrfToken extends Middleware
         '*/avis/*',
         '*/refuse/*',
         '*/reports',
+        '*/sanctions*',
+        '*/weekends*',
     ];
 }

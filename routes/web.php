@@ -61,6 +61,8 @@ Route::controller(DashbaordController::class)
             Route::get("parametre", "parametre")->name("parametre");
             // Route::get("logout", "logout")->name("logout");
             Route::get("weekends", "weekends")->name("weekends");
+            Route::post("weekends/lock", "toggleWeekendLock")->name("weekends.lock");
+            Route::post("weekends/sorties", "updateWeekendSortie")->name("weekends.sorties");
         }
     );
 

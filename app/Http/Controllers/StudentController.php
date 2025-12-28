@@ -30,32 +30,14 @@ class StudentController extends Controller
             }
 
             $query = Student::with('section');
+            $roleId = $user->role_id;
 
-            switch ($officer->role->name) {
-                case 'Chef de compagnie':
-                    // L'utilisateur dirige certaines sections
-                    if (method_exists($officer, 'sections')) {
-                        $sectionIds = $officer->sections()->pluck('id');
-                        $query->whereIn('section_id', $sectionIds);
-                    }
-                    break;
-
-                case 'Chef de batallaint':
-                    // L'utilisateur est responsable d'un bataillon, comparé à grade
-                    if (isset($user->bat)) {
-                        $query->where('grade', $user->bat);
-                    }
-                    break;
-
-                default:
-                    // Autres statuts : accès complet (aucun filtre)
-                    break;
+            if (in_array($roleId, [1, 2], true) && isset($user->bat)) {
+                $query->where('grade', $user->bat);
             }
 
-            // ✅ Pas de pagination : collection complète
             $students = $query->get();
 
-            // Check if this is an AJAX request
             if (request()->expectsJson() || request()->header('X-Requested-With') === 'XMLHttpRequest') {
                 return response()->json([
                     'students' => $students
@@ -74,16 +56,12 @@ class StudentController extends Controller
         }
     }
 
-
-
-
     /**
      * Search for students by matricule
      */
     public function search(Request $request)
     {
         try {
-            // Authentication check
             $user = auth()->user();
 
             if (!$user) {
@@ -101,7 +79,6 @@ class StudentController extends Controller
 
             $search = trim($request->input("search"));
 
-            // Convert to integer if it's numeric
             if (!is_numeric($search)) {
                 return response()->json([
                     'students' => [],
@@ -109,42 +86,24 @@ class StudentController extends Controller
                 ], 400);
             }
 
-            $searchInt = (int)$search;
+            $searchInt = (int) $search;
             $searchLength = strlen($search);
 
-            // Get base query with role-based filtering
             $query = Student::with('section');
+            $roleId = $user->role_id;
 
-            // Apply role-based filters
-            switch ($officer->role->name) {
-                case 'Chef de compagnie':
-                    if (method_exists($officer, 'sections')) {
-                        $sectionIds = $officer->sections()->pluck('id');
-                        $query->whereIn('section_id', $sectionIds);
-                    }
-                    break;
-
-                case 'Chef de batallaint':
-                    if (isset($officer->bat)) {
-                        $query->where('grade', $officer->bat);
-                    }
-                    break;
-
-                default:
-                    // Other roles: full access
-                    break;
+            if (in_array($roleId, [1, 2], true) && isset($officer->bat)) {
+                $query->where('grade', $officer->bat);
             }
 
             if ($searchLength == 7) {
-                // Exact match for 7-digit matricule
                 $students = $query->where('matricule', $searchInt)->get();
             } elseif ($searchLength < 7) {
-                // Prefix search for partial matricule
                 $lowerBound = $searchInt * pow(10, 7 - $searchLength);
                 $upperBound = (($searchInt + 1) * pow(10, 7 - $searchLength)) - 1;
                 $students = $query->whereBetween('matricule', [$lowerBound, $upperBound])->get();
             } else {
-                $students = collect(); // Empty collection for invalid search
+                $students = collect();
             }
 
             return response()->json([
@@ -482,26 +441,13 @@ class StudentController extends Controller
         if (!$officer->role) {
             return false;
         }
+        $roleId = $officer->role_id;
 
-        switch ($officer->role->name) {
-            case 'Chef de compagnie':
-                // Can only access students in their sections
-                $officerSections = Section::where('officer_id', $officer->id)->pluck('id');
-                return $officerSections->contains($student->section_id);
-
-            case 'Chef de batallaint':
-                // Can access students in their battalion
-                return $student->grade == $officer->bat;
-
-            case 'Chef de brigade':
-            case 'Chef division':
-            case 'Directeur général':
-                // Can access all students
-                return true;
-
-            default:
-                return false;
+        if (in_array($roleId, [1, 2], true)) {
+            return $student->grade == $officer->bat;
         }
+
+        return true;
     }
 
     /**

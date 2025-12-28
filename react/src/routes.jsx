@@ -11,6 +11,9 @@ import ReportsCreated from "./components/ReportsCreated.jsx";
 import ReportsReceived from "./components/ReportsReceived.jsx";
 import ReportsShow from "./components/ReportsShow.jsx";
 import ReportsCreate from "./components/ReportsCreate.jsx";
+import Sanctions from "./components/Sanctions.jsx";
+import Students from "./components/Students.jsx";
+import Weekends from "./components/Weekends.jsx";
 function HomeLayout() {
   return (
     <>
@@ -100,7 +103,22 @@ const router = createBrowserRouter([
     path: "/reports/:reportId",
     element: <ReportsShow />,
     loader: requireAuth,
-  }
+  },
+  {
+    path: "/sanctions",
+    element: <Sanctions />,
+    loader: requireAuth,
+  },
+  {
+    path: "/students",
+    element: <Students />,
+    loader: requireAuth,
+  },
+  {
+    path: "/weekends",
+    element: <Weekends />,
+    loader: requireAuth,
+  },
 ]);
 
 export default router;

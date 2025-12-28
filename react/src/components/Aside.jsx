@@ -17,6 +17,8 @@ import {
 function Aside() {
   const [openReports, setOpenReports] = useState(false);
   const [logoutLoading, setLogoutLoading] = useState(false);
+  const roleId = Number(localStorage.getItem("auth_role_id") || 0);
+  const hideWeekend = !roleId || [3, 4, 5, 6].includes(roleId);
 
   const handleLogout = async () => {
     if (logoutLoading) return;
@@ -58,6 +60,14 @@ function Aside() {
           <HiChartPie className="w-5 h-5" />
           <span>Statistiques</span>
         </Link>
+
+        <Link
+          to="/sanctions"
+          className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-600 hover:bg-amber-50 hover:text-amber-700 transition-colors"
+        >
+          <HiShieldExclamation className="w-5 h-5" />
+          <span>Sanctions</span>
+        </Link>
       
         <Link
           to="/reports-create"
@@ -66,15 +76,17 @@ function Aside() {
           <HiPencilSquare className="w-5 h-5" />
           <span>Nouveau report</span>
         </Link>
+        {!hideWeekend && (
+          <Link
+            to="/weekends"
+            className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-600 hover:bg-amber-50 hover:text-amber-700 transition-colors"
+          >
+            <HiCalendarDays className="w-5 h-5" />
+            <span>Week-end</span>
+          </Link>
+        )}
         <Link
-          to="/services"
-          className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-600 hover:bg-amber-50 hover:text-amber-700 transition-colors"
-        >
-          <HiCalendarDays className="w-5 h-5" />
-          <span>Week-end</span>
-        </Link>
-        <Link
-          to="/services"
+          to="/students"
           className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-600 hover:bg-amber-50 hover:text-amber-700 transition-colors"
         >
           <HiAcademicCap className="w-5 h-5" />
