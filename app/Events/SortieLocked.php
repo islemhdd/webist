@@ -17,22 +17,25 @@ class SortieLocked implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(public int $bat) {}
+    public function __construct(public int $bat, public bool $lockStatus) {}
 
     /**
      * Get the channels the event should broadcast on.
      *
      * @return array<int, \Illuminate\Broadcasting\Channel>
      */
-    public function broadcastOn(): Channel
+    public function broadcastOn(): array
     {
-
-        return new Channel('lock');
+        return [
+            new Channel('lock'),
+            new Channel('sortie-locked.' . $this->bat)
+        ];
     }
     public function broadcastWith(): array
     {
         return [
             'bat' => $this->bat,
+            'lockStatus' => $this->lockStatus
         ];
     }
 }
