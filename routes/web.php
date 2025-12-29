@@ -28,6 +28,7 @@ Route::get('/api/statistics', [HomeController::class, 'getStatistics'])->name('h
 Route::get('/login', [AuthController::class, 'index'])->name('login');
 
 Route::post('/login', action: [AuthController::class, 'login'])->name('login.submit');
+Route::get('/me', action: [AuthController::class, 'me'])->name('auth.me')->middleware('auth');
 
 
 

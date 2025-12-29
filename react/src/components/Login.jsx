@@ -48,16 +48,59 @@ function Login() {
       if (payload?.role_id !== undefined && payload?.role_id !== null) {
         localStorage.setItem("auth_role_id", String(payload.role_id));
       }
+      if (payload?.role_name) {
+        localStorage.setItem("auth_role_name", String(payload.role_name));
+      }
+      if (payload?.user_name) {
+        localStorage.setItem("auth_user_name", String(payload.user_name));
+      }
+      if (payload?.companies) {
+        localStorage.setItem("auth_companies", JSON.stringify(payload.companies));
+      }
 
       if (payload?.unread_reports !== undefined && payload?.unread_reports !== null) {
         localStorage.setItem("auth_unread_reports", String(payload.unread_reports));
         localStorage.removeItem("auth_unread_reports_seen");
       }
 
-      const redirectUrl = payload?.redirect;
-      const match = redirectUrl?.match(/\/(\d+)\/statistics/);
-      if (match && match[1]) {
-        localStorage.setItem("auth_user_id", match[1]);
+      const hasValidUserId = payload?.user_id !== undefined && payload?.user_id !== null;
+      if (hasValidUserId) {
+        localStorage.setItem("auth_user_id", String(payload.user_id));
+      } else {
+        const redirectUrl = payload?.redirect;
+        const match = redirectUrl?.match(/\/(\d+)\/statistics/);
+        if (match && match[1]) {
+          localStorage.setItem("auth_user_id", match[1]);
+        } else {
+          try {
+            const meResponse = await fetch("http://localhost:8000/me", {
+              headers: {
+                Accept: "application/json",
+              },
+              credentials: "include",
+            });
+            if (meResponse.ok) {
+              const mePayload = await meResponse.json();
+              if (mePayload?.user_id !== undefined && mePayload?.user_id !== null) {
+                localStorage.setItem("auth_user_id", String(mePayload.user_id));
+              }
+              if (mePayload?.role_id !== undefined && mePayload?.role_id !== null) {
+                localStorage.setItem("auth_role_id", String(mePayload.role_id));
+              }
+              if (mePayload?.role_name) {
+                localStorage.setItem("auth_role_name", String(mePayload.role_name));
+              }
+              if (mePayload?.user_name) {
+                localStorage.setItem("auth_user_name", String(mePayload.user_name));
+              }
+              if (mePayload?.companies) {
+                localStorage.setItem("auth_companies", JSON.stringify(mePayload.companies));
+              }
+            }
+          } catch (meError) {
+            // Ignore and allow the app to handle missing ID downstream.
+          }
+        }
       }
 
       window.location.href = "/stats";

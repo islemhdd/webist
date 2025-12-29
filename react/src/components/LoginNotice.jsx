@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Toast from "./Toast";
 
 function LoginNotice() {
   const [count, setCount] = useState(0);
@@ -23,28 +24,19 @@ function LoginNotice() {
   };
 
   return (
-    <div className="border-b border-red-200 bg-red-50/90">
-      <div className="max-w-6xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-3 animate-fade-up">
-        <div className="text-sm text-red-700 font-medium">
-          {count === 1 ? "Un rapport recu." : `${count} rapports recus.`}
-        </div>
-        <div className="flex items-center gap-2">
-          <a
-            href="/reports-received"
-            className="text-xs font-semibold uppercase tracking-widest text-red-700 hover:text-red-800"
-          >
-            Voir
-          </a>
-          <button
-            type="button"
-            onClick={handleDismiss}
-            className="btn btn-xs bg-red-600 text-white border-0 hover:bg-red-700"
-          >
-            Fermer
-          </button>
-        </div>
-      </div>
-    </div>
+    <Toast
+      message={count === 1 ? "Un rapport recu." : `${count} rapports recus.`}
+      duration={4000}
+      onClose={handleDismiss}
+      action={
+        <a
+          href="/reports-received"
+          className="text-red-700 hover:text-red-800"
+        >
+          Voir
+        </a>
+      }
+    />
   );
 }
 

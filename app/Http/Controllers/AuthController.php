@@ -66,6 +66,10 @@ class AuthController extends Controller
                             'message' => 'Connexion reussie.',
                             'redirect' => $redirectUrl,
                             'role_id' => $user?->role_id,
+                            'role_name' => $user?->role?->name,
+                            'user_name' => $user?->username,
+                            'user_id' => $officer?->id ?? $user?->id,
+                            'companies' => $officer ? $officer->companie() : [],
                             'unread_reports' => $unreadReports,
                         ]);
                     }
@@ -79,6 +83,10 @@ class AuthController extends Controller
                     'message' => 'Connexion reussie.',
                     'redirect' => $redirectUrl,
                     'role_id' => $user?->role_id,
+                    'role_name' => $user?->role?->name,
+                    'user_name' => $user?->username,
+                    'user_id' => $officer?->id ?? $user?->id,
+                    'companies' => $officer ? $officer->companie() : [],
                     'unread_reports' => $unreadReports,
                 ]);
             }
@@ -103,5 +111,23 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('login');
+    }
+
+    public function me(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $officer = $user->isOfficer();
+
+        return response()->json([
+            'user_id' => $officer?->id ?? $user?->id,
+            'role_id' => $user?->role_id,
+            'role_name' => $user?->role?->name,
+            'user_name' => $user?->username,
+            'companies' => $officer ? $officer->companie() : [],
+        ]);
     }
 }

@@ -112,6 +112,19 @@
   animation: pop-in 0.4s ease-out both;
 }
 
+@keyframes toast-countdown {
+  0% {
+    width: 100%;
+  }
+  100% {
+    width: 0%;
+  }
+}
+
+.toast-countdown {
+  animation: toast-countdown var(--toast-duration, 4000ms) linear forwards;
+}
+
 @keyframes shine {
   0% {
     background-position: 0% 50%;

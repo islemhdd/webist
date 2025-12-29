@@ -32,7 +32,16 @@ class StudentController extends Controller
             $query = Student::with('section');
             $roleId = $user->role_id;
 
-            if (in_array($roleId, [1, 2], true) && isset($user->bat)) {
+            if ($roleId === 1) {
+                $companies = $officer->companie();
+                if (!empty($companies)) {
+                    $query->whereHas('section', function ($sectionQuery) use ($companies) {
+                        $sectionQuery->whereIn('companie', $companies);
+                    });
+                } else {
+                    $query->whereRaw('1 = 0');
+                }
+            } elseif ($roleId === 2 && isset($user->bat)) {
                 $query->where('grade', $user->bat);
             }
 
@@ -92,7 +101,16 @@ class StudentController extends Controller
             $query = Student::with('section');
             $roleId = $user->role_id;
 
-            if (in_array($roleId, [1, 2], true) && isset($officer->bat)) {
+            if ($roleId === 1) {
+                $companies = $officer->companie();
+                if (!empty($companies)) {
+                    $query->whereHas('section', function ($sectionQuery) use ($companies) {
+                        $sectionQuery->whereIn('companie', $companies);
+                    });
+                } else {
+                    $query->whereRaw('1 = 0');
+                }
+            } elseif ($roleId === 2 && isset($officer->bat)) {
                 $query->where('grade', $officer->bat);
             }
 
@@ -443,7 +461,13 @@ class StudentController extends Controller
         }
         $roleId = $officer->role_id;
 
-        if (in_array($roleId, [1, 2], true)) {
+        if ($roleId === 1) {
+            $companies = $officer->companie();
+            return !empty($companies)
+                && in_array((int) $student->section->companie, $companies, true);
+        }
+
+        if ($roleId === 2) {
             return $student->grade == $officer->bat;
         }
 

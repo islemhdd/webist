@@ -19,7 +19,13 @@
 
 @endphp
 
-
+<div class="mb-4 px-3">
+    <div class="rounded-xl border border-amber-100 bg-amber-50/70 p-3">
+        <div class="text-xs uppercase tracking-widest text-amber-700 font-semibold">Connecte</div>
+        <div class="text-sm font-semibold text-gray-800 dark:text-gray-100">{{ $user->username }}</div>
+        <div class="text-xs text-gray-600 dark:text-gray-300">{{ $user->role?->name }}</div>
+    </div>
+</div>
 
 {{-- Statistiques --}}
 <a href="{{ route('brigade.statistics', ['id' => auth()->user()->id]) }}"

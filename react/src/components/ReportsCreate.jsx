@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Aside from "./Aside";
 import LoginNotice from "./LoginNotice";
 
+const isMissingOfficerId = (value) => value === null || value === undefined || value === "";
 function ReportsCreate() {
   const [mat, setMat] = useState("");
   const [title, setTitle] = useState("");
@@ -19,7 +20,7 @@ function ReportsCreate() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!officerId) {
+    if (isMissingOfficerId(officerId)) {
       setError("ID utilisateur manquant pour creer un rapport.");
       return;
     }

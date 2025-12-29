@@ -39,6 +39,7 @@ class SanctionController extends Controller
                     'date_fin' => $sanction->date_fin,
                     'full_name' => $sanction->full_name ?? null,
                     'section_id' => $sanction->section_id ?? null,
+                    'companie' => $sanction->companie ?? null,
                     'is_active' => (bool) $sanction->is_active,
                 ];
             });

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/unnamed.png";
 import {
@@ -18,7 +18,44 @@ function Aside() {
   const [openReports, setOpenReports] = useState(false);
   const [logoutLoading, setLogoutLoading] = useState(false);
   const roleId = Number(localStorage.getItem("auth_role_id") || 0);
+  const userName = localStorage.getItem("auth_user_name") || "";
+  const roleName = localStorage.getItem("auth_role_name") || "";
   const hideWeekend = !roleId || [3, 4, 5, 6].includes(roleId);
+  const storedUserId = localStorage.getItem("auth_user_id") || "";
+
+  useEffect(() => {
+    if (storedUserId && Number(storedUserId) > 0) return;
+    const resolveUser = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/me", {
+          headers: {
+            Accept: "application/json",
+          },
+          credentials: "include",
+        });
+        if (!response.ok) return;
+        const payload = await response.json();
+        if (payload?.user_id) {
+          localStorage.setItem("auth_user_id", String(payload.user_id));
+        }
+        if (payload?.role_id !== undefined && payload?.role_id !== null) {
+          localStorage.setItem("auth_role_id", String(payload.role_id));
+        }
+        if (payload?.role_name) {
+          localStorage.setItem("auth_role_name", String(payload.role_name));
+        }
+        if (payload?.user_name) {
+          localStorage.setItem("auth_user_name", String(payload.user_name));
+        }
+        if (payload?.companies) {
+          localStorage.setItem("auth_companies", JSON.stringify(payload.companies));
+        }
+      } catch (error) {
+        // ignore
+      }
+    };
+    resolveUser();
+  }, [storedUserId]);
 
   const handleLogout = async () => {
     if (logoutLoading) return;
@@ -34,6 +71,10 @@ function Aside() {
     } finally {
       localStorage.removeItem("auth_token");
       localStorage.removeItem("auth_user_id");
+      localStorage.removeItem("auth_role_id");
+      localStorage.removeItem("auth_role_name");
+      localStorage.removeItem("auth_user_name");
+      localStorage.removeItem("auth_companies");
       window.location.href = "/login";
     }
   };
@@ -51,6 +92,20 @@ function Aside() {
           </div>
         </div>
       </div>
+
+      {(userName || roleName) && (
+        <div className="px-5 py-4 border-b border-slate-200">
+          <div className="rounded-2xl bg-amber-50/70 border border-amber-100 px-3 py-3">
+            <div className="text-xs uppercase tracking-widest text-amber-700 font-semibold">
+              Connecte
+            </div>
+            {userName && (
+              <div className="text-sm font-semibold text-slate-800">{userName}</div>
+            )}
+            {roleName && <div className="text-xs text-slate-600">{roleName}</div>}
+          </div>
+        </div>
+      )}
 
       <nav className="px-4 py-6 space-y-2">
         <Link

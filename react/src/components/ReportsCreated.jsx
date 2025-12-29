@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Aside from "./Aside";
 import LoginNotice from "./LoginNotice";
 
+const isMissingOfficerId = (value) => value === null || value === undefined || value === "";
 const StatusBadge = ({ status, refused }) => {
   const label = refused
     ? "Refuse"
@@ -36,6 +37,14 @@ function ReportsCreated() {
   const params = new URLSearchParams(window.location.search);
   const storedId = localStorage.getItem("auth_user_id");
   const officerId = params.get("id") || storedId;
+  const roleId = Number(localStorage.getItem("auth_role_id") || 0);
+  const companies = useMemo(() => {
+    try {
+      return JSON.parse(localStorage.getItem("auth_companies") || "[]");
+    } catch (error) {
+      return [];
+    }
+  }, []);
 
   const queryString = useMemo(() => {
     const qs = new URLSearchParams();
@@ -49,7 +58,7 @@ function ReportsCreated() {
 
   useEffect(() => {
     const loadReports = async () => {
-      if (!officerId) {
+      if (isMissingOfficerId(officerId)) {
         setError("ID utilisateur manquant pour charger les rapports.");
         setLoading(false);
         return;
@@ -85,6 +94,13 @@ function ReportsCreated() {
     const timer = setTimeout(loadReports, 300);
     return () => clearTimeout(timer);
   }, [officerId, queryString]);
+
+  const visibleReports = useMemo(() => {
+    if (roleId !== 1 || !companies.length) return reports;
+    return reports.filter((report) =>
+      companies.includes(Number(report.student?.companie))
+    );
+  }, [reports, roleId, companies]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50/50 text-slate-900">
@@ -189,7 +205,7 @@ function ReportsCreated() {
                   </tr>
                 </thead>
                 <tbody>
-                  {reports.map((report) => (
+                  {visibleReports.map((report) => (
                     <tr key={report.id}>
                       <td>
                         <div className="font-semibold text-slate-900">
@@ -229,7 +245,7 @@ function ReportsCreated() {
                       </td>
                     </tr>
                   ))}
-                  {reports.length === 0 && (
+                  {visibleReports.length === 0 && (
                     <tr>
                       <td colSpan="7" className="text-center text-slate-500">
                         Aucun rapport trouve.

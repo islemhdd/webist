@@ -2,7 +2,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import Aside from "./Aside";
 import LoginNotice from "./LoginNotice";
+import Toast from "./Toast";
 
+const isMissingOfficerId = (value) => value === null || value === undefined || value === "";
 const StatusBadge = ({ status, refused }) => {
   const label = refused
     ? "Refuse"
@@ -33,10 +35,18 @@ function ReportsReceived() {
   const params = new URLSearchParams(window.location.search);
   const storedId = localStorage.getItem("auth_user_id");
   const officerId = params.get("id") || storedId;
+  const roleId = Number(localStorage.getItem("auth_role_id") || 0);
+  const companies = useMemo(() => {
+    try {
+      return JSON.parse(localStorage.getItem("auth_companies") || "[]");
+    } catch (error) {
+      return [];
+    }
+  }, []);
 
   useEffect(() => {
     const loadReports = async () => {
-      if (!officerId) {
+      if (isMissingOfficerId(officerId)) {
         setError("ID utilisateur manquant pour charger les rapports.");
         setLoading(false);
         return;
@@ -77,9 +87,15 @@ function ReportsReceived() {
   }, [officerId]);
 
   const filteredReports = useMemo(() => {
-    if (!search) return reports;
+    const scopedReports =
+      roleId === 1 && companies.length
+        ? reports.filter((report) =>
+            companies.includes(Number(report.student?.companie))
+          )
+        : reports;
+    if (!search) return scopedReports;
     const term = search.toLowerCase();
-    return reports.filter((report) => {
+    return scopedReports.filter((report) => {
       const student = `${report.student.nom} ${report.student.prenom}`.toLowerCase();
       return (
         report.title.toLowerCase().includes(term) ||
@@ -109,11 +125,6 @@ function ReportsReceived() {
                 rapidement.
               </p>
             </div>
-            {newAlert && (
-              <div className="rounded-full bg-red-500 text-white px-4 py-2 text-sm font-semibold animate-pop-in">
-                {newAlert}
-              </div>
-            )}
           </div>
 
           <div className="mt-8 grid gap-4 lg:grid-cols-3">
@@ -142,9 +153,11 @@ function ReportsReceived() {
             </div>
           )}
           {newAlert && (
-            <div className="mt-4 alert alert-success bg-emerald-50 border-emerald-200 text-emerald-800 animate-pop-in">
-              <span>{newAlert}</span>
-            </div>
+            <Toast
+              message={newAlert}
+              duration={4000}
+              onClose={() => setNewAlert("")}
+            />
           )}
 
           {!loading && !error && (
@@ -155,7 +168,7 @@ function ReportsReceived() {
                     <th>Rapport</th>
                     <th>Etudiant</th>
                     <th>Section</th>
-                    <th>Type</th>
+                    
                     <th>Statut</th>
                     <th>Date</th>
                     <th></th>
@@ -181,9 +194,7 @@ function ReportsReceived() {
                       <td className="text-sm text-slate-600">
                         {report.student.section_code}
                       </td>
-                      <td className="text-sm text-slate-600">
-                        {report.is_medical ? "Medical" : "Standard"}
-                      </td>
+                    
                       <td>
                         <StatusBadge status={report.status} refused={report.refused} />
                       </td>
@@ -218,4 +229,3 @@ function ReportsReceived() {
 }
 
 export default ReportsReceived;
-

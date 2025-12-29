@@ -77,6 +77,7 @@
                         'Directeur général',
                     ];
                     $stopped = false;
+                    $isOwner = isset($officer) && $report->officer_id === $officer->id;
 
                     // Define role colors
                     $roleColors = [
@@ -135,10 +136,12 @@
                                                 @enderror
                                             </div>
                                             <div class="flex justify-end gap-4 mt-4">
-                                                <button type="button" onclick="showRefuseModal()"
-                                                    class="px-6 py-2 bg-red-600 text-white font-medium rounded-full hover:bg-red-700 hover:scale-105 transition-all duration-300 shadow-md flex items-center">
-                                                    <i class="fas fa-times-circle mr-2"></i> Refuser
-                                                </button>
+                                                @if (!$isOwner)
+                                                    <button type="button" onclick="showRefuseModal()"
+                                                        class="px-6 py-2 bg-red-600 text-white font-medium rounded-full hover:bg-red-700 hover:scale-105 transition-all duration-300 shadow-md flex items-center">
+                                                        <i class="fas fa-times-circle mr-2"></i> Refuser
+                                                    </button>
+                                                @endif
                                                 <button type="button" onclick="showConfirm()"
                                                     class="px-6 py-2 bg-indigo-600 text-white font-medium rounded-full hover:bg-indigo-500 hover:scale-105 transition-all duration-300 shadow-md flex items-center">
                                                     <i class="fas fa-check-circle mr-2"></i> Soumettre
@@ -270,6 +273,7 @@
                 </div>
             </div>
 
+            @if (!$isOwner)
             <!-- Refuse Modal -->
             <div id="refuseModal"
                 class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md hidden z-50 transition-opacity duration-300">
@@ -285,7 +289,7 @@
                         </div>
 
                         <form action="{{ route('report.refuse', ['report' => $report->id, 'id' => $officer->id]) }}"
-                            method="post">
+                            method="post" onsubmit="return confirmRefuse()">
                             @csrf
                             <div class="space-y-4">
                                 <label class="block">
@@ -318,6 +322,7 @@
                     </div>
                 </div>
             </div>
+            @endif
 
             <script>
                 function showConfirm() {
@@ -389,6 +394,10 @@
                         modal.classList.add('hidden');
                         modalContent.classList.remove('scale-95');
                     }, 300);
+                }
+
+                function confirmRefuse() {
+                    return window.confirm('Etes-vous sur de vouloir refuser ce rapport ?');
                 }
 
                 // Add this to make text areas auto-resize

@@ -12,6 +12,8 @@ use App\Providers\AppServiceProvider;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException as ValidationValidationException;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class ReportController extends Controller
 {
@@ -82,7 +84,8 @@ class ReportController extends Controller
                             'matricule' => $report->student->matricule,
                             'nom' => $report->student->nom,
                             'prenom' => $report->student->prenom,
-                            'section_code' => $report->student->section ? $report->student->section->code() : 'N/A'
+                            'section_code' => $report->student->section ? $report->student->section->code() : 'N/A',
+                            'companie' => $report->student->companie()
                         ]
                     ];
                 })
@@ -204,6 +207,7 @@ class ReportController extends Controller
                     'refused' => $report->refused,
                     'motif' => $report->motif,
                     'is_medical' => $report->is_medical,
+                    'officer_id' => $report->officer_id,
                     'created_at' => $report->created_at->format('Y-m-d H:i'),
                     'avis_by_role' => $avisByRole,
                     'roles' => $roles,
@@ -264,7 +268,38 @@ class ReportController extends Controller
 
         // if()
 
-        $avisRole = 'Avis' . str_replace(' ', '_',  $officer->role->name);
+        $roleName = (string) $officer->role->name;
+        $normalizedRole = Str::of($roleName)->ascii()->lower()->toString();
+        if ($normalizedRole == 'medecin') {
+            if ($request->ajax()) {
+                return response()->json([
+                    'message' => 'Avis non supporte pour ce role.',
+                ], 403);
+            }
+
+            abort(403, 'Avis non supporte pour ce role.');
+        }
+
+        $targetColumnKey = 'avis' . str_replace(' ', '_', $normalizedRole);
+        $avisRole = null;
+        foreach (Schema::getColumnListing('reports') as $column) {
+            $normalizedColumn = Str::of($column)->ascii()->lower()->toString();
+            if ($normalizedColumn === $targetColumnKey) {
+                $avisRole = $column;
+                break;
+            }
+        }
+
+        if (!$avisRole) {
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'message' => 'Avis non supporte pour ce role.',
+                ], 422);
+            }
+
+            abort(422, 'Avis non supporte pour ce role.');
+        }
 
         $report->update([
             $avisRole => $avis,
@@ -305,7 +340,8 @@ class ReportController extends Controller
                             'matricule' => $report->student->matricule,
                             'nom' => $report->student->nom,
                             'prenom' => $report->student->prenom,
-                            'section_code' => $report->student->section ? $report->student->section->code() : 'N/A'
+                            'section_code' => $report->student->section ? $report->student->section->code() : 'N/A',
+                            'companie' => $report->student->companie()
                         ]
                     ];
                 })
@@ -315,8 +351,7 @@ class ReportController extends Controller
     }
     public function refuse(Officer $id, Report $report, Request $request)
     {
-        $officer = $id;
-        $officer->refuse($report, $request->input('motif'));
+        $officer = $id;        $officer->refuse($report, $request->input('motif'));
 
         if ($request->ajax()) {
             return response()->json([
@@ -408,7 +443,8 @@ class ReportController extends Controller
                         'matricule' => $report->student->matricule,
                         'nom' => $report->student->nom,
                         'prenom' => $report->student->prenom,
-                        'section_code' => $report->student->section ? $report->student->section->code() : 'N/A'
+                        'section_code' => $report->student->section ? $report->student->section->code() : 'N/A',
+                        'companie' => $report->student->companie()
                     ]
                 ];
             })
