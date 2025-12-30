@@ -14,6 +14,10 @@ import ReportsCreate from "./components/ReportsCreate.jsx";
 import Sanctions from "./components/Sanctions.jsx";
 import Students from "./components/Students.jsx";
 import Weekends from "./components/Weekends.jsx";
+import Officers from "./components/Officers.jsx";
+import OfficerCreate from "./components/OfficerCreate.jsx";
+import OfficerEdit from "./components/OfficerEdit.jsx";
+import OfficerShow from "./components/OfficerShow.jsx";
 function HomeLayout() {
   return (
     <>
@@ -117,6 +121,26 @@ const router = createBrowserRouter([
   {
     path: "/weekends",
     element: <Weekends />,
+    loader: requireAuth,
+  },
+  {
+    path: "/officers",
+    element: <Officers />,
+    loader: requireAuth,
+  },
+  {
+    path: "/officers/create",
+    element: <OfficerCreate />,
+    loader: requireAuth,
+  },
+  {
+    path: "/officers/:officerId",
+    element: <OfficerShow />,
+    loader: requireAuth,
+  },
+  {
+    path: "/officers/:officerId/edit",
+    element: <OfficerEdit />,
     loader: requireAuth,
   },
 ]);

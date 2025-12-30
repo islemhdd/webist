@@ -13,6 +13,7 @@ use App\Http\Controllers\SanctionController;
 
 use App\Http\Controllers\BrigadeStatisticsController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\OfficerController;
 use App\Models\User;
 
 
@@ -123,3 +124,10 @@ Route::middleware('auth')->group(function () {
         Route::delete('{id}/sanctions/{sanction}', 'destroy')->name('sanctions.destroy');
     });
 });
+//resource routes for officer controller with auth and CheckRole middleware
+Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':Directeur général'])->group(function () {
+    Route::get('officers/roles', [OfficerController::class, 'roles'])->name('officers.roles');
+    Route::apiResource('officers', OfficerController::class);
+});
+
+

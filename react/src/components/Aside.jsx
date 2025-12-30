@@ -12,6 +12,7 @@ import {
   HiInboxArrowDown,
   HiArrowRightOnRectangle,
   HiChevronDown,
+  HiUserGroup,
 } from "react-icons/hi2";
 
 function Aside() {
@@ -22,6 +23,12 @@ function Aside() {
   const roleName = localStorage.getItem("auth_role_name") || "";
   const hideWeekend = !roleId || [3, 4, 5, 6].includes(roleId);
   const storedUserId = localStorage.getItem("auth_user_id") || "";
+
+  // Check if user is Directeur général
+  const isDG = () => {
+    const normalized = (roleName || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    return normalized.includes("directeur") && normalized.includes("general");
+  };
 
   useEffect(() => {
     if (storedUserId && Number(storedUserId) > 0) return;
@@ -80,8 +87,8 @@ function Aside() {
   };
 
   return (
-    <aside className="w-full lg:fixed lg:inset-y-0 lg:left-0 lg:w-64 bg-white border-b lg:border-b-0 lg:border-r border-slate-200 shadow-lg">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200">
+    <aside className="w-full lg:fixed lg:inset-y-0 lg:left-0 lg:w-64 bg-white border-b lg:border-b-0 lg:border-r border-slate-200 shadow-lg lg:flex lg:flex-col lg:overflow-hidden">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 flex-shrink-0">
         <div className="flex items-center gap-3">
           <img className="w-10 h-10 rounded-2xl shadow" src={logo} alt="EMP logo" />
           <div>
@@ -94,11 +101,9 @@ function Aside() {
       </div>
 
       {(userName || roleName) && (
-        <div className="px-5 py-4 border-b border-slate-200">
+        <div className="px-5 py-4 border-b border-slate-200 flex-shrink-0">
           <div className="rounded-2xl bg-amber-50/70 border border-amber-100 px-3 py-3">
-            <div className="text-xs uppercase tracking-widest text-amber-700 font-semibold">
-              Connecte
-            </div>
+           
             {userName && (
               <div className="text-sm font-semibold text-slate-800">{userName}</div>
             )}
@@ -107,7 +112,7 @@ function Aside() {
         </div>
       )}
 
-      <nav className="px-4 py-6 space-y-2">
+      <nav className="px-4 py-6 space-y-2 flex-1 overflow-y-auto">
         <Link
           to="/stats"
           className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-600 hover:bg-amber-50 hover:text-amber-700 transition-colors"
@@ -148,6 +153,16 @@ function Aside() {
           <span>Etudiants</span>
         </Link>
 
+        {isDG() && (
+          <Link
+            to="/officers"
+            className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-600 hover:bg-amber-50 hover:text-amber-700 transition-colors"
+          >
+            <HiUserGroup className="w-5 h-5" />
+            <span>Officiers</span>
+          </Link>
+        )}
+
         <button
           type="button"
           onClick={() => setOpenReports((value) => !value)}
@@ -181,7 +196,7 @@ function Aside() {
         )}
       </nav>
 
-      <div className="px-4 pb-6 mt-auto">
+      <div className="px-4 py-6 border-t border-slate-200 flex-shrink-0">
         <button
           type="button"
           onClick={handleLogout}
