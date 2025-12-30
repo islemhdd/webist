@@ -321,7 +321,6 @@ class ReportController extends Controller
 
         $report->update([
             $avisRole => $avis,
-
         ]);
         $report->save();
 

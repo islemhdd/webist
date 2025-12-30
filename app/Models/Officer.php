@@ -71,26 +71,6 @@ class Officer extends User
         $canNotify = Schema::hasTable('notifications');
 
         switch ($this->role->name) {
-            case MEDECIN:
-                if ($report->status === MEDECIN) {
-                    // Find a DIV officer from database
-                    $div = Officer::whereHas('role', function ($query) {
-                        $query->where('name', CHEF_DIVISION);
-                    })->first();
-
-                    if ($div) {
-                        if ($canNotify) {
-                            $div->notify(new ReportArival($report));
-                        }
-                        $report->status = CHEF_DIVISION;
-                        $report->destination = $div->id;
-                        if ($canNotify) {
-                            $report->owner->notify(new ReportPassed());
-                        }
-                    }
-                }
-                break;
-
             case CHEF_DE_COMPAGNIE:
                 // Find Chef de batallain with same battalion
                 $cbt = Officer::whereHas('role', function ($query) {
@@ -180,9 +160,9 @@ class Officer extends User
 
             case DIRECTEUR_GENERAL:
                 // Inform owner with DesitionMade
-
+                    
                 $report->status = "DONE";
-
+ 
                 if ($canNotify) {
                     $report->owner->notify(new DesitionMade($report));
                 }
