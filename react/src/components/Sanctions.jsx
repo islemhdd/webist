@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { HiMagnifyingGlass, HiPlus, HiTrash, HiPencil } from "react-icons/hi2";
 import Aside from "./Aside";
 import LoginNotice from "./LoginNotice";
@@ -6,23 +7,23 @@ import LoginNotice from "./LoginNotice";
 const typeOptions = [
   { value: "all", label: "Toutes" },
   { value: "consigne", label: "Consigne" },
-  { value: "arret", label: "Arret" },
+  // { value: "arret", label: "Arret" },
   { value: "blame", label: "Blame" },
   { value: "avert", label: "Avert" },
 ];
 
 const typeTone = {
   consigne: "badge-warning",
-  arret: "badge-error",
+  // arret: "badge-error",
   blame: "badge-secondary",
   avert: "badge-info",
 };
 
 const typeLabels = {
   consigne: "Consigne",
-  arret: "Arret",
+  // arret: "Arret",
   blame: "Blame",
-  avert: "Avert",
+  avert: "blame",
 };
 
 const formatDate = (value) => {
@@ -371,6 +372,7 @@ function Sanctions() {
                 const status = isActive ? "Active" : "Terminee";
                 const tone = typeTone[sanction.type] || "badge-ghost";
                 const label = typeLabels[sanction.type] || sanction.type;
+
                 return (
                   <article
                     key={sanction.id}
@@ -387,7 +389,16 @@ function Sanctions() {
                           {sanction.section_id ? `Section ${sanction.section_id}` : "Section N/A"}
                         </p>
                       </div>
-                      <span className={`badge ${tone}`}>{label}</span>
+                      <div className="flex gap-2 items-center">
+                        {sanction.report_id && (
+                          <Link to={`/reports/${sanction.report_id}${officerId ? `?id=${officerId}` : ""}`} className="text-xs bg-slate-200 text-slate-700 px-2 py-1 rounded-full font-medium hover:bg-slate-300 transition-colors">
+                            Rapport #{sanction.report_id}
+                          </Link>
+
+                        )}
+                       
+                        <span className={`badge ${tone}`}>{label}</span>
+                      </div>
                     </div>
                     <p className="sanctions-card__motif">{sanction.motif}</p>
                     <div className="sanctions-card__footer">
@@ -550,7 +561,7 @@ function Sanctions() {
           </div>
         </div>
       )}
-
+      {/*sanctions should not be deleted */}
       {deleteTarget && (
         <div className="sanctions-modal">
           <div className="sanctions-modal__panel animate-scale-in">

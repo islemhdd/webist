@@ -72,6 +72,9 @@ class ReportController extends Controller
             return response()->json([
                 'reports' => $reports->map(function ($report) {
                     return [
+                        'arret'=>$report->arret,
+                        'sanction'=>$report->sanction,
+                        
                         'id' => $report->id,
                         'title' => $report->title,
                         'status' => $report->status,
@@ -84,6 +87,7 @@ class ReportController extends Controller
                             'prenom' => $report->student->prenom,
                             'section_code' => $report->student->section ? $report->student->section->code() : 'N/A'
                         ]
+
                     ];
                 })
             ]);
@@ -125,13 +129,15 @@ class ReportController extends Controller
             $officer->role->name,
             $validated['title'],
             $validated['corps'],
-            $isMedical,
             $validated['destination'] ?? null
         )) {
             return response()->json([
                 'message' => 'Erreur lors de l initialisation du rapport.',
             ], 500);
         }
+
+        // Set is_medical explicitly (init doesn't set it)
+        $report->is_medical = $isMedical;
 
         if ($report->existing()) {
             return response()->json([
@@ -174,7 +180,7 @@ class ReportController extends Controller
     {
 
 
-        $report = Report::with(['student.section'])->findOrFail($report_id);
+        $report = Report::with(['student.section', 'sanction'])->findOrFail($report_id);
 
         if (request()->ajax()) {
             $roles = [
@@ -195,6 +201,17 @@ class ReportController extends Controller
                 $avisByRole[$roleName] = $report->$avisKey ?? null;
             }
 
+            // Prepare arret data if sanction of type 'arret' exists
+            $arretData = null;
+            if ($report->sanction && $report->sanction->type === 'arret') {
+                $arretData = [
+                    'id' => $report->sanction->id,
+                    'date_debut' => $report->sanction->date_debut,
+                    'date_fin' => $report->sanction->date_fin,
+                    'motif' => $report->sanction->motif,
+                ];
+            }
+
             return response()->json([
                 'report' => [
                     'id' => $report->id,
@@ -207,6 +224,7 @@ class ReportController extends Controller
                     'created_at' => $report->created_at->format('Y-m-d H:i'),
                     'avis_by_role' => $avisByRole,
                     'roles' => $roles,
+                    'arret' => $arretData,
                     'student' => [
                         'matricule' => $report->student->matricule,
                         'nom' => $report->student->nom,

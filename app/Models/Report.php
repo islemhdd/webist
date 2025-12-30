@@ -17,6 +17,12 @@ class Report extends Model
     {
         return $this->belongsTo(Student::class, 'student_id', 'matricule');
     }
+
+    public function sanction()
+    {
+        
+        return $this->hasOne(Sanction::class, 'report_id', 'id');
+    }
     public function owner(): BelongsTo
     {
         return $this->belongsTo(Officer::class, 'officer_id', 'id');

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Officer;
+use App\Models\Report;
 use App\Models\Sanction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -40,6 +41,8 @@ class SanctionController extends Controller
                     'full_name' => $sanction->full_name ?? null,
                     'section_id' => $sanction->section_id ?? null,
                     'is_active' => (bool) $sanction->is_active,
+                    'report_id' => $sanction->report_id ?? null,
+                    
                 ];
             });
 
@@ -88,6 +91,7 @@ class SanctionController extends Controller
         if ($request->type === 'arret') {
             $rules['from'] = 'required|date';
             $rules['to'] = 'required|date|after_or_equal:from';
+            $rules['report_id'] = 'required|exists:reports,id';
         }
 
         $validated = $request->validate($rules);
@@ -98,11 +102,19 @@ class SanctionController extends Controller
             'type' => $validated['type'],
             'motif' => $validated['motif'],
         ];
-
-        // Ajouter les dates si c'est un arrêt
+        
+        // Ajouter les dates si c'est un arrêt et mettre à jour le rapport associé
         if ($validated['type'] === 'arret') {
             $sanctionData['date_debut'] = $validated['from'];
             $sanctionData['date_fin'] = $validated['to'];
+            $sanctionData['report_id'] = $validated['report_id'];
+            $report = Report::find($validated['report_id']);
+            $report->arret = true;
+            $report->AvisDirecteur_général="arret de".$sanctionData['date_debut']." au ".$sanctionData['date_fin'];
+            $report->save();
+            $id->officerNotify($report);
+
+            
         } elseif ($validated['type'] === 'consigne') {
             // Pour consigne, date_debut = prochain vendredi, date_fin = samedi suivant
             $now = now();

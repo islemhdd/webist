@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Aside from "./Aside";
 import LoginNotice from "./LoginNotice";
+import ArretCreate from "./ArretCreate";
 
 const StatusBadge = ({ status, refused }) => {
   const label = refused
@@ -110,6 +111,11 @@ function ReportsShow() {
   };
 
   const currentRole = officer?.role_name;
+
+  const isDG = (roleName) => {
+    const normalized = normalizeRole(roleName);
+    return normalized.includes("directeur") && normalized.includes("general");
+  };
 
   const canSubmitAvis = (roleName) => {
     if (!report || !currentRole) return false;
@@ -273,10 +279,12 @@ function ReportsShow() {
                     <div className="mt-2 text-sm text-slate-500">
                       #{report.id} · {report.created_at}
                     </div>
+                    
                   </div>
                   <StatusBadge status={report.status} refused={report.refused} />
+                 
                 </div>
-                {report.refused && report.motif && (
+                {Boolean(report.refused) && report.motif && (
                   <div className="mt-4 rounded-2xl border border-red-100 bg-red-50/70 p-4 text-sm text-red-700">
                     Motif du refus: {report.motif}
                   </div>
@@ -338,6 +346,38 @@ function ReportsShow() {
                     const isStopped =
                       report.refused &&
                       normalizeRole(report.status) === normalizeRole(roleName);
+
+                    // If DG role and report has arret, show arret details instead of avis form
+                    if (isDG(roleName) && report?.arret) {
+                      const arrêtDays = report.arret.date_debut && report.arret.date_fin
+                        ? Math.ceil(Math.abs(new Date(report.arret.date_fin) - new Date(report.arret.date_debut)) / (1000 * 60 * 60 * 24))
+                        : 0;
+
+                      return (
+                        <div
+                          key={roleName}
+                          className="rounded-2xl border border-red-200 bg-red-50/70 p-4 space-y-3"
+                        >
+                          <div className="font-semibold text-red-900">
+                            {roleName}
+                          </div>
+                          <div className="bg-white rounded-xl p-4 border border-red-100 space-y-2">
+                            <div>
+                              <p className="text-xs text-red-600 font-medium uppercase tracking-wide">Rapport conclu par arrêt</p>
+                              <p className="text-sm font-semibold text-red-900 mt-1">Durée: {arrêtDays} jour(s)</p>
+                            </div>
+                            <div className="text-xs text-red-800">
+                              <span className="font-medium">Période:</span> {new Date(report.arret.date_debut).toLocaleDateString("fr-FR")} au {new Date(report.arret.date_fin).toLocaleDateString("fr-FR")}
+                            </div>
+                            {report.arret.motif && (
+                              <div className="text-sm text-red-800">
+                                <span className="font-medium">Motif:</span> {report.arret.motif}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    }
 
                     if (isStopped) {
                       return (
@@ -416,6 +456,32 @@ function ReportsShow() {
                   })}
                 </div>
               </div>
+
+              <ArretCreate
+                report={report}
+                officer={officer}
+                onRefresh={() => {
+                  // Reload report data when arret is created/modified/deleted
+                  const params = new URLSearchParams(window.location.search);
+                  const storedId = localStorage.getItem("auth_user_id");
+                  const officerId = params.get("id") || storedId;
+                  if (officerId && reportId) {
+                    fetch(`http://localhost:8000/${officerId}/show/${reportId}`, {
+                      headers: {
+                        Accept: "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                      },
+                      credentials: "include",
+                    })
+                      .then((res) => res.json())
+                      .then((payload) => {
+                        setReport(payload.report);
+                        setOfficer(payload.officer);
+                      })
+                      .catch(() => {});
+                  }
+                }}
+              />
             </div>
           )}
         </section>
