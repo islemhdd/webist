@@ -4,6 +4,7 @@ import { HiMagnifyingGlass, HiPlus, HiTrash, HiPencil } from "react-icons/hi2";
 import Aside from "./Aside";
 import LoginNotice from "./LoginNotice";
 
+const isMissingOfficerId = (value) => value === null || value === undefined || value === "";
 const typeOptions = [
   { value: "all", label: "Toutes" },
   { value: "consigne", label: "Consigne" },
@@ -48,6 +49,14 @@ const buildQuery = ({ type, page }) => {
 
 const normalizeActive = (value) => value === true || value === 1 || value === "1";
 
+const getCompanies = () => {
+  try {
+    return JSON.parse(localStorage.getItem("auth_companies") || "[]");
+  } catch (error) {
+    return [];
+  }
+};
+
 function Sanctions() {
   const [sanctions, setSanctions] = useState([]);
   const [pagination, setPagination] = useState({
@@ -78,11 +87,59 @@ function Sanctions() {
   const params = new URLSearchParams(window.location.search);
   const storedId = localStorage.getItem("auth_user_id");
   const officerId = params.get("id") || storedId;
+  const [effectiveOfficerId, setEffectiveOfficerId] = useState(officerId ?? "");
+  const parsedOfficerId = Number(effectiveOfficerId);
+  const roleId = Number(localStorage.getItem("auth_role_id") || 0);
+  const companies = useMemo(() => getCompanies(), []);
+
+  useEffect(() => {
+    if (effectiveOfficerId) return;
+    const resolveOfficer = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/me", {
+          headers: {
+            Accept: "application/json",
+          },
+          credentials: "include",
+        });
+        if (!response.ok) {
+          throw new Error("Impossible de recuperer le compte.");
+        }
+        const payload = await response.json();
+        if (payload?.user_id) {
+          localStorage.setItem("auth_user_id", String(payload.user_id));
+        }
+        if (payload?.role_id !== undefined && payload?.role_id !== null) {
+          localStorage.setItem("auth_role_id", String(payload.role_id));
+        }
+        if (payload?.role_name) {
+          localStorage.setItem("auth_role_name", String(payload.role_name));
+        }
+        if (payload?.user_name) {
+          localStorage.setItem("auth_user_name", String(payload.user_name));
+        }
+        if (payload?.companies) {
+          localStorage.setItem("auth_companies", JSON.stringify(payload.companies));
+        }
+        setEffectiveOfficerId(payload?.user_id ? String(payload.user_id) : "");
+      } catch (err) {
+        setError("ID utilisateur manquant pour charger les sanctions.");
+        setLoading(false);
+      }
+    };
+    resolveOfficer();
+  }, [effectiveOfficerId]);
 
   useEffect(() => {
     const loadSanctions = async () => {
-      if (!officerId) {
+      if (isMissingOfficerId(effectiveOfficerId)) {
         setError("ID utilisateur manquant pour charger les sanctions.");
+        setLoading(false);
+        return;
+      }
+      if (Number.isNaN(parsedOfficerId)) {
+        setError("ID utilisateur invalide. Veuillez vous reconnecter.");
+        localStorage.removeItem("auth_user_id");
         setLoading(false);
         return;
       }
@@ -91,7 +148,7 @@ function Sanctions() {
         setLoading(true);
         const query = buildQuery({ type, page });
         const response = await fetch(
-          `http://localhost:8000/${officerId}/sanctions${query ? `?${query}` : ""}`,
+          `http://localhost:8000/${parsedOfficerId}/sanctions${query ? `?${query}` : ""}`,
           {
             headers: {
               Accept: "application/json",
@@ -124,12 +181,16 @@ function Sanctions() {
     };
 
     loadSanctions();
-  }, [officerId, type, page, refreshKey]);
+  }, [effectiveOfficerId, parsedOfficerId, type, page, refreshKey]);
 
   const filteredSanctions = useMemo(() => {
+    const scopedSanctions =
+      roleId === 1 && companies.length
+        ? sanctions.filter((item) => companies.includes(Number(item.companie)))
+        : sanctions;
     const query = search.trim().toLowerCase();
-    if (!query) return sanctions;
-    return sanctions.filter((item) => {
+    if (!query) return scopedSanctions;
+    return scopedSanctions.filter((item) => {
       const name = item.full_name || "";
       const motif = item.motif || "";
       const matricule = item.matricule || "";
@@ -139,17 +200,23 @@ function Sanctions() {
         matricule.toLowerCase().includes(query)
       );
     });
-  }, [sanctions, search]);
+  }, [sanctions, search, roleId, companies]);
 
   const summary = useMemo(() => {
-    const base = { total: sanctions.length, consigne: 0, arret: 0, blame: 0, avert: 0 };
-    sanctions.forEach((item) => {
+    const base = {
+      total: filteredSanctions.length,
+      consigne: 0,
+      arret: 0,
+      blame: 0,
+      avert: 0,
+    };
+    filteredSanctions.forEach((item) => {
       if (base[item.type] !== undefined) {
         base[item.type] += 1;
       }
     });
     return base;
-  }, [sanctions]);
+  }, [filteredSanctions]);
 
   const openCreate = () => {
     setModalMode("create");
@@ -181,7 +248,7 @@ function Sanctions() {
 
   const submitForm = async (event) => {
     event.preventDefault();
-    if (!officerId) return;
+    if (isMissingOfficerId(officerId)) return;
 
     const url =
       modalMode === "create"

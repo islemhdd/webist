@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'paths' => ['api/*', 'login', 'logout', 'statistics/*', '*/statistics/*', '*/reports*', '*/sanctions*', '*/weekends*', 'students*', 'student/*', '*/received*', '*/show/*', '*/avis/*', '*/refuse/*', 'notifications/*', '*/notifications/*'],
+    'paths' => ['api/*', 'login', 'logout', 'me', 'statistics/*', '*/statistics/*', '*/reports*', '*/sanctions*', '*/weekends*', 'students*', 'student/*', '*/received*', '*/show/*', '*/avis/*', '*/refuse/*', 'notifications/*', '*/notifications/*'],
     'allowed_methods' => ['*'],
     'allowed_origins' => [
         'http://localhost:5173',

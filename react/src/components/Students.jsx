@@ -8,12 +8,22 @@ const pickLabel = (value) => {
   return String(value);
 };
 
+const getCompanies = () => {
+  try {
+    return JSON.parse(localStorage.getItem("auth_companies") || "[]");
+  } catch (error) {
+    return [];
+  }
+};
+
 function Students() {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [gradeFilter, setGradeFilter] = useState("all");
+  const roleId = Number(localStorage.getItem("auth_role_id") || 0);
+  const companies = getCompanies();
 
   useEffect(() => {
     const loadStudents = async () => {
@@ -54,6 +64,10 @@ function Students() {
   const filteredStudents = useMemo(() => {
     const query = search.trim().toLowerCase();
     return students.filter((student) => {
+      if (roleId === 1 && companies.length) {
+        const companyValue = Number(student.section?.companie);
+        if (!companies.includes(companyValue)) return false;
+      }
       const matchesGrade = gradeFilter === "all" || student.grade === gradeFilter;
       if (!matchesGrade) return false;
       if (!query) return true;

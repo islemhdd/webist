@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import Aside from "./Aside";
 import LoginNotice from "./LoginNotice";
 
+const isMissingOfficerId = (value) => value === null || value === undefined || value === "";
 const buildConic = (segments) => {
   const total = segments.reduce((sum, item) => sum + item.value, 0);
   if (!total) {
@@ -213,7 +214,7 @@ function Stats() {
 
   useEffect(() => {
     const loadStats = async () => {
-      if (!officerId) {
+      if (isMissingOfficerId(officerId)) {
         setError("ID utilisateur manquant pour charger les statistiques.");
         setLoading(false);
         return;

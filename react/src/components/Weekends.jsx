@@ -4,6 +4,7 @@ import Aside from "./Aside";
 import LoginNotice from "./LoginNotice";
 import { getEcho } from "../echoClient";
 
+const isMissingOfficerId = (value) => value === null || value === undefined || value === "";
 const choiceLabels = {
   all: "Liste generale",
   ven: "Vendredi",
@@ -34,6 +35,14 @@ const getCsrfToken = () => {
   return decodeURIComponent(match[1]);
 };
 
+const getCompanies = () => {
+  try {
+    return JSON.parse(localStorage.getItem("auth_companies") || "[]");
+  } catch (error) {
+    return [];
+  }
+};
+
 function Weekends() {
   const [students, setStudents] = useState([]);
   const [lock, setLock] = useState(false);
@@ -49,6 +58,7 @@ function Weekends() {
   const params = new URLSearchParams(window.location.search);
   const storedId = localStorage.getItem("auth_user_id");
   const roleId = Number(localStorage.getItem("auth_role_id") || 0);
+  const companies = useMemo(() => getCompanies(), []);
   const officerId = params.get("id") || storedId;
 
   const fetchWeekends = useCallback(async () => {
@@ -57,7 +67,7 @@ function Weekends() {
       setLoading(false);
       return;
     }
-    if (!officerId) {
+    if (isMissingOfficerId(officerId)) {
       setError("ID utilisateur manquant pour charger les week-ends.");
       setLoading(false);
       return;
@@ -145,7 +155,7 @@ function Weekends() {
   }, [bat, fetchWeekends]);
 
   const handleLockToggle = async () => {
-    if (!officerId) return;
+    if (isMissingOfficerId(officerId)) return;
     try {
       const response = await fetch(
         `http://localhost:8000/${officerId}/weekends/lock`,
@@ -222,7 +232,13 @@ function Weekends() {
   const hasLockControl = role === "Chef de batallaint";
 
   const stats = useMemo(() => {
-    return students.reduce(
+    const scopedStudents =
+      roleId === 1 && companies.length
+        ? students.filter((student) =>
+            companies.includes(Number(student.section?.companie))
+          )
+        : students;
+    return scopedStudents.reduce(
       (acc, student) => {
         acc.total += 1;
         if (!student.choix) acc.pending += 1;
@@ -233,7 +249,14 @@ function Weekends() {
       },
       { total: 0, pending: 0, ven: 0, sam: 0, h48: 0 }
     );
-  }, [students]);
+  }, [students, roleId, companies]);
+
+  const visibleStudents = useMemo(() => {
+    if (roleId !== 1 || !companies.length) return students;
+    return students.filter((student) =>
+      companies.includes(Number(student.section?.companie))
+    );
+  }, [students, roleId, companies]);
 
   return (
     <div className="min-h-screen weekend-page text-slate-900">
@@ -365,7 +388,7 @@ function Weekends() {
                   </tr>
                 </thead>
                 <tbody>
-                  {students.map((student) => {
+                  {visibleStudents.map((student) => {
                     const disabled = lock || student.consigned;
                     const sectionLabel = student.section?.code || student.section?.id || "N/A";
                     const isUpdating = pendingIds.has(student.matricule);
@@ -416,7 +439,7 @@ function Weekends() {
                       </tr>
                     );
                   })}
-                  {students.length === 0 && (
+                  {visibleStudents.length === 0 && (
                     <tr>
                       <td colSpan="7" className="empty">
                         Aucun etudiant trouve.

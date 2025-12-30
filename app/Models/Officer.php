@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use stdClass;
 use Symfony\Component\Security\Core\Role\Role;
 
@@ -67,6 +68,8 @@ class Officer extends User
 
     public function officerNotify(Report $report)
     {
+        $canNotify = Schema::hasTable('notifications');
+
         switch ($this->role->name) {
             case MEDECIN:
                 if ($report->status === MEDECIN) {
@@ -76,10 +79,14 @@ class Officer extends User
                     })->first();
 
                     if ($div) {
-                        $div->notify(new ReportArival($report));
+                        if ($canNotify) {
+                            $div->notify(new ReportArival($report));
+                        }
                         $report->status = CHEF_DIVISION;
                         $report->destination = $div->id;
-                        $report->owner->notify(new ReportPassed());
+                        if ($canNotify) {
+                            $report->owner->notify(new ReportPassed());
+                        }
                     }
                 }
                 break;
@@ -91,10 +98,14 @@ class Officer extends User
                 })->where('bat', $this->bat)->first();
 
                 if ($cbt) {
-                    $cbt->notify(new ReportArival($report));
+                    if ($canNotify) {
+                        $cbt->notify(new ReportArival($report));
+                    }
                     $report->status = CHEF_DE_BATALLAIN;
                     $report->destination = $cbt->id;
-                    $report->owner->notify(new ReportPassed());
+                    if ($canNotify) {
+                        $report->owner->notify(new ReportPassed());
+                    }
                 }
                 break;
 
@@ -106,12 +117,13 @@ class Officer extends User
 
                 if ($cbr) {
                     $report->status = CHEF_DE_BRIGADE;
-                    $cbr->notify(new ReportArival($report));
+                    if ($canNotify) {
+                        $cbr->notify(new ReportArival($report));
+                    }
                     $report->destination = $cbr->id;
-                    $report->owner->notify(new ReportPassed());
-                } else {
-                    throw new \Exception("No Chef de brigade found");
-                    throw new \Exception("No Chef de brigade found");
+                    if ($canNotify) {
+                        $report->owner->notify(new ReportPassed());
+                    }
                 }
                 break;
             case CHEF_DE_BRIGADE:
@@ -122,11 +134,13 @@ class Officer extends User
 
                 if ($div) {
                     $report->status = CHEF_DIVISION;
-                    $div->notify(new ReportArival($report));
+                    if ($canNotify) {
+                        $div->notify(new ReportArival($report));
+                    }
                     $report->destination = $div->id;
-                    $report->owner->notify(new ReportPassed());
-                } else {
-                    throw new \Exception("No DIV found");
+                    if ($canNotify) {
+                        $report->owner->notify(new ReportPassed());
+                    }
                 }
                 break;
             case CHEF_DIVISION:
@@ -138,20 +152,28 @@ class Officer extends User
                     })->first();
 
                     if ($med) {
-                        $med->notify(new ReportArival($report));
+                        if ($canNotify) {
+                            $med->notify(new ReportArival($report));
+                        }
                         $report->status = MEDECIN;
                         $report->destination = $med->id;
-                        $report->owner->notify(new ReportPassed());
+                        if ($canNotify) {
+                            $report->owner->notify(new ReportPassed());
+                        }
                     }
                 } else {
                     $dg = Officer::whereHas('role', function ($query) {
                         $query->where('name', DIRECTEUR_GENERAL);
                     })->first();
                     if ($dg) {
-                        $dg->notify(new ReportArival($report));
+                        if ($canNotify) {
+                            $dg->notify(new ReportArival($report));
+                        }
                         $report->status = DIRECTEUR_GENERAL;
                         $report->destination = $dg->id;
-                        $report->owner->notify(new ReportPassed($report));
+                        if ($canNotify) {
+                            $report->owner->notify(new ReportPassed($report));
+                        }
                     }
                 }
                 break;
@@ -161,7 +183,9 @@ class Officer extends User
 
                 $report->status = "DONE";
 
-                $report->owner->notify(new DesitionMade($report));
+                if ($canNotify) {
+                    $report->owner->notify(new DesitionMade($report));
+                }
                 $report->destination = $report->officer_id;
                 break;
         }
@@ -176,7 +200,9 @@ class Officer extends User
         $report->destination = $report->officer_id;
 
         $report->save();
-        $report->owner->notify(new ReportRefused($report, $motif));
+        if (Schema::hasTable('notifications')) {
+            $report->owner->notify(new ReportRefused($report, $motif));
+        }
     }
 
     public function receivesBroadcastNotificationsOn(): string
@@ -231,14 +257,14 @@ class Officer extends User
 
     public function officerSanctions()
     {
-        $query = Sanction::join('students', 'sanctions.matricule', '=', 'students.matricule');
+        $query = Sanction::join('students', 'sanctions.matricule', '=', 'students.matricule')
+            ->leftJoin('sections', 'students.section_id', '=', 'sections.id');
 
 
         // Filter by officer role
 
             if ($this->role->name === "Chef de compagnie") {
-                $query->join('sections', 'students.section_id', '=', 'sections.id')
-                    ->where('sections.officer_id', $this->id);
+                $query->where('sections.officer_id', $this->id);
             } elseif ($this->role->name === "Chef de batallaint") {
                 $query->where('students.grade', $this->bat);
             }
@@ -271,6 +297,7 @@ class Officer extends User
             return $query->selectRaw("sanctions.*,
                                 CONCAT(students.nom, ' ', students.prenom) as full_name,
                                 students.section_id as section_id,
+                                sections.companie as companie,
                                 CASE WHEN sanctions.date_fin >= CURRENT_DATE THEN 1 ELSE 0 END as is_active")
                 ->orderByDesc('sanctions.created_at');
     }

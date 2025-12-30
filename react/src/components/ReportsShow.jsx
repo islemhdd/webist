@@ -4,6 +4,7 @@ import Aside from "./Aside";
 import LoginNotice from "./LoginNotice";
 import ArretCreate from "./ArretCreate";
 
+const isMissingOfficerId = (value) => value === null || value === undefined || value === "";
 const StatusBadge = ({ status, refused }) => {
   const label = refused
     ? "Refuse"
@@ -42,7 +43,7 @@ function ReportsShow() {
 
   useEffect(() => {
     const loadReport = async () => {
-      if (!officerId) {
+      if (isMissingOfficerId(officerId)) {
         setError("ID utilisateur manquant pour charger le rapport.");
         setLoading(false);
         return;
@@ -88,7 +89,6 @@ function ReportsShow() {
             "Chef de batallaint",
             "Chef de brigade",
             "Chef division",
-            "Medecin",
             "Directeur general",
           ],
     [report]
@@ -111,6 +111,10 @@ function ReportsShow() {
   };
 
   const currentRole = officer?.role_name;
+  const isOwner =
+    report?.officer_id && officer?.id
+      ? Number(report.officer_id) === Number(officer.id)
+      : false;
 
   const isDG = (roleName) => {
     const normalized = normalizeRole(roleName);
@@ -130,7 +134,7 @@ function ReportsShow() {
 
   const submitAvis = async () => {
     if (!avis.trim()) return;
-    if (!officerId) return;
+    if (isMissingOfficerId(officerId)) return;
     setSubmitting(true);
     setSubmitSuccess(false);
     setSuccessMessage("");
@@ -176,8 +180,9 @@ function ReportsShow() {
   };
 
   const submitRefuse = async () => {
+    if (isOwner) return;
     if (!motif.trim()) return;
-    if (!officerId) return;
+    if (isMissingOfficerId(officerId)) return;
     setSubmitting(true);
     setSubmitSuccess(false);
     setSuccessMessage("");
@@ -339,7 +344,7 @@ function ReportsShow() {
                 </h3>
                 <div className="mt-6 space-y-4">
                   {roles.map((roleName) => {
-                    if (!report.is_medical && normalizeRole(roleName) === "medecin") {
+                    if (normalizeRole(roleName) === "medecin") {
                       return null;
                     }
                     const avisValue = report.avis_by_role?.[roleName];
@@ -419,23 +424,27 @@ function ReportsShow() {
                               onChange={(event) => setAvis(event.target.value)}
                               disabled={submitting}
                             />
-                            <textarea
-                              rows="3"
-                              className="textarea textarea-bordered w-full rounded-2xl border-slate-200"
-                              placeholder="Motif du refus"
-                              value={motif}
-                              onChange={(event) => setMotif(event.target.value)}
-                              disabled={submitting}
-                            />
-                            <div className="flex flex-wrap gap-3">
-                              <button
-                                type="button"
-                                onClick={submitRefuse}
+                            {!isOwner && (
+                              <textarea
+                                rows="3"
+                                className="textarea textarea-bordered w-full rounded-2xl border-slate-200"
+                                placeholder="Motif du refus"
+                                value={motif}
+                                onChange={(event) => setMotif(event.target.value)}
                                 disabled={submitting}
-                                className="btn btn-sm bg-red-500 text-white border-0 hover:bg-red-600"
-                              >
-                                {submitting ? "Envoi..." : "Refuser"}
-                              </button>
+                              />
+                            )}
+                            <div className="flex flex-wrap gap-3">
+                              {!isOwner && (
+                                <button
+                                  type="button"
+                                  onClick={submitRefuse}
+                                  disabled={submitting}
+                                  className="btn btn-sm bg-red-500 text-white border-0 hover:bg-red-600"
+                                >
+                                  {submitting ? "Envoi..." : "Refuser"}
+                                </button>
+                              )}
                               <button
                                 type="button"
                                 onClick={submitAvis}
