@@ -27,37 +27,36 @@ Route::get('/api/statistics', [HomeController::class, 'getStatistics'])->name('h
 
 // Routes de connexion
 Route::get('/login', [AuthController::class, 'index'])->name('login');
-
 Route::post('/login', action: [AuthController::class, 'login'])->name('login.submit');
-Route::get('/me', action: [AuthController::class, 'me'])->name('auth.me')->middleware('auth');
-
-
-
-// Route de déconnexion (POST uniquement)
-Route::post('/logout', action: [AuthController::class, 'logout'])->name('logout')->middleware('auth');
-
-// Notifications (mark as read)
-Route::post('/notifications/{officerId}/mark-as-read/{notificationId}', function ($officerId, $notificationId) {
-    $user = User::findOrFail($officerId);
-    $officer = $user->isOfficer();
-    if (!$officer) {
-        abort(403, 'Access denied: User is not an officer');
-    }
-
-    $notification = $officer->notifications()->where('id', $notificationId)->firstOrFail();
-    $notification->markAsRead();
-
-    return response()->json(['success' => true]);
-})->middleware('auth')->name('notifications.markAsRead');
 
 // Routes authentifiées
-Route::get('/brigade/principale', fn() => view('brigade.principale'));
+Route::middleware('auth')->group(function () {
+    Route::get('/me', action: [AuthController::class, 'me'])->name('auth.me');
 
-Route::controller(DashbaordController::class)
-    ->prefix('{id}')
-    ->group(
-        function () {
+    // Route de déconnexion (POST uniquement)
+    Route::post('/logout', action: [AuthController::class, 'logout'])->name('logout');
 
+    // Notifications (mark as read)
+    Route::post('/notifications/{officerId}/mark-as-read/{notificationId}', function ($officerId, $notificationId) {
+        $user = User::findOrFail($officerId);
+        $officer = $user->isOfficer();
+        if (!$officer) {
+            abort(403, 'Access denied: User is not an officer');
+        }
+
+        $notification = $officer->notifications()->where('id', $notificationId)->firstOrFail();
+        $notification->markAsRead();
+
+        return response()->json(['success' => true]);
+    })->name('notifications.markAsRead');
+
+    // Brigade principale
+    Route::get('/brigade/principale', fn() => view('brigade.principale'));
+
+    // Dashboard routes
+    Route::controller(DashbaordController::class)
+        ->prefix('{id}')
+        ->group(function () {
             // Route::get("principale", "principale")->name("principale");
             Route::get("cons", "cons")->name("cons");
             Route::get("parametre", "parametre")->name("parametre");
@@ -65,19 +64,18 @@ Route::controller(DashbaordController::class)
             Route::get("weekends", "weekends")->name("weekends");
             Route::post("weekends/lock", "toggleWeekendLock")->name("weekends.lock");
             Route::post("weekends/sorties", "updateWeekendSortie")->name("weekends.sorties");
-        }
-    );
+        });
 
-// Brigade Statistics Routes
-Route::get('{id}/statistics', [BrigadeStatisticsController::class, 'index'])->name('brigade.statistics');
-Route::get('{id}/statistics/filter', [BrigadeStatisticsController::class, 'filter'])->name('brigade.statistics.filter');
-Route::get('{id}/statistics/weekend', [BrigadeStatisticsController::class, 'weekendDetails'])->name('brigade.statistics.weekend');
-Route::get('{id}/statistics/sanctions', [BrigadeStatisticsController::class, 'sanctionsDetails'])->name('brigade.statistics.sanctions');
-Route::get('{id}/statistics/reports', [BrigadeStatisticsController::class, 'reportsDetails'])->name('brigade.statistics.reports');
-Route::get('{id}/statistics/students', [BrigadeStatisticsController::class, 'studentsDetails'])->name('brigade.statistics.students');
-Route::match(['GET', 'POST'], '{id}/statistics/graph-data', [BrigadeStatisticsController::class, 'getGraphData'])->name('brigade.statistics.graph-data');
+    // Brigade Statistics Routes
+    Route::get('{id}/statistics', [BrigadeStatisticsController::class, 'index'])->name('brigade.statistics');
+    Route::get('{id}/statistics/filter', [BrigadeStatisticsController::class, 'filter'])->name('brigade.statistics.filter');
+    Route::get('{id}/statistics/weekend', [BrigadeStatisticsController::class, 'weekendDetails'])->name('brigade.statistics.weekend');
+    Route::get('{id}/statistics/sanctions', [BrigadeStatisticsController::class, 'sanctionsDetails'])->name('brigade.statistics.sanctions');
+    Route::get('{id}/statistics/reports', [BrigadeStatisticsController::class, 'reportsDetails'])->name('brigade.statistics.reports');
+    Route::get('{id}/statistics/students', [BrigadeStatisticsController::class, 'studentsDetails'])->name('brigade.statistics.students');
+    Route::match(['GET', 'POST'], '{id}/statistics/graph-data', [BrigadeStatisticsController::class, 'getGraphData'])->name('brigade.statistics.graph-data');
 
-Route::middleware('auth')->group(function () {
+    // Sanction routes
     Route::controller(SanctionController::class)->group(function () {
         Route::get('{id}/sanctions', 'index')->name('sanctions.index');
         Route::get('{id}/sanctions/create', 'create')->name('sanctions.create');
@@ -85,49 +83,33 @@ Route::middleware('auth')->group(function () {
         Route::put('{id}/sanctions/{sanction}', 'update')->name('sanctions.update');
         Route::delete('{id}/sanctions/{sanction}', 'destroy')->name('sanctions.destroy');
     });
-});
 
-Route::prefix('{id}')->controller(ReportController::class)->group(function () {
+    // Report routes
+    Route::prefix('{id}')->controller(ReportController::class)->group(function () {
+        Route::get('create', 'create')->name('report.create');
+        Route::get('reports', 'index')->name('report.index');
+        Route::post('reports', 'store')->name('report.store');
+        Route::post('reports/search', 'search')->name('report.search');
+        Route::get('show/{report_id}', 'show')->name('report.show');
+        Route::post('avis/{report}', 'avis')->name('report.avis');
+        Route::put('update/{report_id}', 'update')->name('report.update');
+        Route::get('received', 'received')->name('report.received');
+        Route::post('refuse/{report}', 'refuse')->name('report.refuse');
+        Route::get('showNotification/{report_id}', 'unsetReportNotificationAndRedirect')->name('report.unsetNotificationAndShowReport');
+    });
 
-    Route::get('create', 'create')->name('report.create');
-    Route::get('reports', 'index')->name('report.index');
-    Route::post('reports', 'store')->name('report.store');
-    Route::post('reports/search', 'search')->name('report.search');
-    Route::get('show/{report_id}', 'show')->name('report.show');
-    Route::post('avis/{report}', 'avis')->name('report.avis');
-
-
-    Route::put('update/{report_id}', 'update')->name('report.update');
-    Route::get('received', 'received')->name('report.received');
-    Route::post('refuse/{report}', 'refuse')->name('report.refuse');
-    Route::get('showNotification/{report_id}', 'unsetReportNotificationAndRedirect')->name('report.unsetNotificationAndShowReport');
-});
-Route::controller(StudentController::class)->middleware('auth')->group(function () {
-    Route::get("students", "index")->name("students.index");
-    Route::post("search", "search")->name("student.search");
-    Route::get("show/{matricule}", "show")->name("student.show");
-    Route::match(['GET', 'POST'], 'student/{matricule}/graph-data', 'getStudentGraphData')->name('student.graph-data');
-    Route::match(['GET', 'POST'], 'student/{matricule}/all-graph-data', 'getStudentAllGraphData')->name('student.all-graph-data');
-    Route::match(['GET', 'POST'], 'student/{matricule}/all-graph-data', 'getStudentAllGraphData')->name('student.all-graph-data');
-});
-
-
-
-Route::get('{id}/statistics', [BrigadeStatisticsController::class, 'index'])->name('brigade.statistics');
-Route::get('{id}/statistics/filter', [BrigadeStatisticsController::class, 'filter'])->name('brigade.statistics.filter');
-Route::middleware('auth')->group(function () {
-    Route::controller(SanctionController::class)->group(function () {
-        Route::get('{id}/sanctions', 'index')->name('sanctions.index');
-        Route::get('{id}/sanctions/create', 'create')->name('sanctions.create');
-        Route::post('{id}/sanctions', 'store')->name('sanctions.store');
-        Route::put('{id}/sanctions/{sanction}', 'update')->name('sanctions.update');
-        Route::delete('{id}/sanctions/{sanction}', 'destroy')->name('sanctions.destroy');
+    // Student routes
+    Route::controller(StudentController::class)->group(function () {
+        Route::get("students", "index")->name("students.index");
+        Route::post("search", "search")->name("student.search");
+        Route::get("show/{matricule}", "show")->name("student.show");
+        Route::match(['GET', 'POST'], 'student/{matricule}/graph-data', 'getStudentGraphData')->name('student.graph-data');
+        Route::match(['GET', 'POST'], 'student/{matricule}/all-graph-data', 'getStudentAllGraphData')->name('student.all-graph-data');
     });
 });
-//resource routes for officer controller with auth and CheckRole middleware
+
+// Resource routes for officer controller with auth and CheckRole middleware
 Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':Directeur général'])->group(function () {
     Route::get('officers/roles', [OfficerController::class, 'roles'])->name('officers.roles');
     Route::apiResource('officers', OfficerController::class);
 });
-
-
