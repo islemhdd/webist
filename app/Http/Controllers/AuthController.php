@@ -17,7 +17,7 @@ class AuthController extends Controller
 
     {
 
-       
+
 
         // Validate inputs; allow either email or username.
         $request->validate([
@@ -45,8 +45,11 @@ class AuthController extends Controller
             'password' => $request->input('password'),
         ];
 
+        // SECURITY: Don't force "remember me" - let user choose via request parameter
+        $remember = $request->boolean('remember', false);
+
         // Use default guard (web).
-        if (Auth::attempt($credentials, true)) {
+        if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
             /** @var \App\Models\User $user */

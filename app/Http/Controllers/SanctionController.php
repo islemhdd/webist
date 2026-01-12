@@ -11,10 +11,24 @@ use Illuminate\Support\Carbon;
 class SanctionController extends Controller
 {
     /**
+     * SECURITY: Verify the authenticated user matches the route parameter officer.
+     * This prevents IDOR (Insecure Direct Object Reference) attacks.
+     */
+    private function authorizeOfficerAccess($officer): void
+    {
+        $authenticatedUser = auth()->user();
+        if (!$authenticatedUser || $authenticatedUser->id != $officer->id) {
+            abort(403, 'Unauthorized: You can only access your own data');
+        }
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index(Officer $id, Request $request)
     {
+        // SECURITY: Verify authorization
+        $this->authorizeOfficerAccess($id);
 
         $query = $id->officerSanctions();
 
@@ -43,7 +57,7 @@ class SanctionController extends Controller
                     'companie' => $sanction->companie ?? null,
                     'is_active' => (bool) $sanction->is_active,
                     'report_id' => $sanction->report_id ?? null,
-                    
+
                 ];
             });
 
@@ -70,6 +84,9 @@ class SanctionController extends Controller
      */
     public function create(Officer $id)
     {
+        // SECURITY: Verify authorization
+        $this->authorizeOfficerAccess($id);
+
         return view('brigade.sanction_create', [
             'officer' => $id
         ]);
@@ -80,6 +97,9 @@ class SanctionController extends Controller
      */
     public function store(Officer $id, Request $request)
     {
+        // SECURITY: Verify authorization
+        $this->authorizeOfficerAccess($id);
+
         // Règles de validation de base
 
         $rules = [
@@ -103,7 +123,7 @@ class SanctionController extends Controller
             'type' => $validated['type'],
             'motif' => $validated['motif'],
         ];
-        
+
         // Ajouter les dates si c'est un arrêt et mettre à jour le rapport associé
         if ($validated['type'] === 'arret') {
             $sanctionData['date_debut'] = $validated['from'];
@@ -111,11 +131,9 @@ class SanctionController extends Controller
             $sanctionData['report_id'] = $validated['report_id'];
             $report = Report::find($validated['report_id']);
             $report->arret = true;
-            $report->AvisDirecteur_général="arret de".$sanctionData['date_debut']." au ".$sanctionData['date_fin'];
+            $report->AvisDirecteur_général = "arret de" . $sanctionData['date_debut'] . " au " . $sanctionData['date_fin'];
             $report->save();
             $id->officerNotify($report);
-
-            
         } elseif ($validated['type'] === 'consigne') {
             // Pour consigne, date_debut = prochain vendredi, date_fin = samedi suivant
             $now = now();
@@ -166,6 +184,9 @@ class SanctionController extends Controller
      */
     public function update(Officer $id, Sanction $sanction, Request $request)
     {
+        // SECURITY: Verify authorization
+        $this->authorizeOfficerAccess($id);
+
         $validated = $request->validate([
             'matricule' => 'required|exists:students,matricule',
             'type' => 'required|in:consigne,arret,blame,avert',
@@ -192,6 +213,9 @@ class SanctionController extends Controller
      */
     public function destroy(Officer $id, Sanction $sanction)
     {
+        // SECURITY: Verify authorization
+        $this->authorizeOfficerAccess($id);
+
         $sanction->delete();
 
         if (request()->wantsJson()) {

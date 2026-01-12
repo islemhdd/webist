@@ -30,7 +30,27 @@ define("DIRECTEUR_GENERAL", "Directeur général");
 class Officer extends User
 {
     use Authenticatable, Notifiable;
-    protected $guarded = ['role'];
+
+    /**
+     * SECURITY: Explicitly define fillable fields to prevent mass assignment attacks.
+     */
+    protected $fillable = [
+        'username',
+        'password',
+        'phone',
+        'bat'
+    ];
+
+    /**
+     * SECURITY: Guard sensitive fields that should never be mass-assigned.
+     */
+    protected $guarded = [
+        'id',
+        'role_id',
+        'created_at',
+        'updated_at'
+    ];
+
     public $incrementing = false;
     public $timestamps = false;
 
@@ -54,9 +74,8 @@ class Officer extends User
     }
     public function companie(): array //return the companies of the officer
     {
-
-
-        $comp = DB::select("SELECT distinct companie as c From sections where officer_id=$this->id");
+        // SECURITY: Use parameterized query to prevent SQL injection
+        $comp = DB::select("SELECT distinct companie as c From sections where officer_id=?", [$this->id]);
         $compArray = [];
         foreach ($comp as $c) {
             $compArray[] = $c->c;
@@ -160,9 +179,9 @@ class Officer extends User
 
             case DIRECTEUR_GENERAL:
                 // Inform owner with DesitionMade
-                    
+
                 $report->status = "DONE";
- 
+
                 if ($canNotify) {
                     $report->owner->notify(new DesitionMade($report));
                 }
@@ -243,42 +262,42 @@ class Officer extends User
 
         // Filter by officer role
 
-            if ($this->role->name === "Chef de compagnie") {
-                $query->where('sections.officer_id', $this->id);
-            } elseif ($this->role->name === "Chef de batallaint") {
-                $query->where('students.grade', $this->bat);
-            }
+        if ($this->role->name === "Chef de compagnie") {
+            $query->where('sections.officer_id', $this->id);
+        } elseif ($this->role->name === "Chef de batallaint") {
+            $query->where('students.grade', $this->bat);
+        }
 
-            // Calculate relevant dates
-            $today = Carbon::today();
+        // Calculate relevant dates
+        $today = Carbon::today();
 
-            $nextFriday = $today->copy()->next(Carbon::FRIDAY);
-            $nextSaturday = $today->copy()->next(Carbon::SATURDAY);
+        $nextFriday = $today->copy()->next(Carbon::FRIDAY);
+        $nextSaturday = $today->copy()->next(Carbon::SATURDAY);
 
-            // Filter sanctions based on their type and dates
-            $query->where(function ($q) use ($today,  $nextFriday, $nextSaturday) {
-                // Active "arret" sanctions
-                $q->where(function ($sub) use ($today) {
-                    $sub->where('sanctions.type', 'arret')
-                        ->where('sanctions.date_fin', '>=', $today);
+        // Filter sanctions based on their type and dates
+        $query->where(function ($q) use ($today,  $nextFriday, $nextSaturday) {
+            // Active "arret" sanctions
+            $q->where(function ($sub) use ($today) {
+                $sub->where('sanctions.type', 'arret')
+                    ->where('sanctions.date_fin', '>=', $today);
+            })
+                // Active "consigne" sanctions for next weekend
+                ->orWhere(function ($sub) use ($nextFriday) {
+                    $sub->where('sanctions.type', 'consigne')
+                        ->whereDate('sanctions.date_debut', '=', $nextFriday);
                 })
-                    // Active "consigne" sanctions for next weekend
-                    ->orWhere(function ($sub) use ($nextFriday) {
-                        $sub->where('sanctions.type', 'consigne')
-                            ->whereDate('sanctions.date_debut', '=', $nextFriday);
-                    })
 
-                    // Include all "avert" and "blame" sanctions
-                    ->orWhere(function ($sub) {
-                        $sub->whereIn('sanctions.type', ['avert', 'blame']);
-                    });
-            });
+                // Include all "avert" and "blame" sanctions
+                ->orWhere(function ($sub) {
+                    $sub->whereIn('sanctions.type', ['avert', 'blame']);
+                });
+        });
 
-            return $query->selectRaw("sanctions.*,
+        return $query->selectRaw("sanctions.*,
                                 CONCAT(students.nom, ' ', students.prenom) as full_name,
                                 students.section_id as section_id,
                                 sections.companie as companie,
                                 CASE WHEN sanctions.date_fin >= CURRENT_DATE THEN 1 ELSE 0 END as is_active")
-                ->orderByDesc('sanctions.created_at');
+            ->orderByDesc('sanctions.created_at');
     }
-    }
+}

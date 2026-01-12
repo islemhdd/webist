@@ -27,7 +27,10 @@ Route::get('/api/statistics', [HomeController::class, 'getStatistics'])->name('h
 
 // Routes de connexion
 Route::get('/login', [AuthController::class, 'index'])->name('login');
-Route::post('/login', action: [AuthController::class, 'login'])->name('login.submit');
+// SECURITY: Add rate limiting to prevent brute force attacks (5 attempts per minute)
+Route::post('/login', action: [AuthController::class, 'login'])
+    ->middleware('throttle:5,1')
+    ->name('login.submit');
 
 // Routes authentifiées
 Route::middleware('auth')->group(function () {
@@ -37,7 +40,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', action: [AuthController::class, 'logout'])->name('logout');
 
     // Notifications (mark as read)
+    // SECURITY: Added authorization check to verify authenticated user matches officerId
     Route::post('/notifications/{officerId}/mark-as-read/{notificationId}', function ($officerId, $notificationId) {
+        // SECURITY: Verify the authenticated user matches the requested officer
+        $authenticatedUser = auth()->user();
+        if ($authenticatedUser->id != $officerId) {
+            abort(403, 'Unauthorized: You can only manage your own notifications');
+        }
+
         $user = User::findOrFail($officerId);
         $officer = $user->isOfficer();
         if (!$officer) {

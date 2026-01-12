@@ -4,24 +4,33 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Sortie extends Model
-
 {
-    protected $guarded = [];
-    public function choice(): HasOne
+    /**
+     * The attributes that are mass assignable.
+     * Matches actual database columns: id, matricule, from, to, choix, created_at, updated_at
+     */
+    protected $fillable = [
+        'matricule',
+        'from',
+        'to',
+        'choix'
+    ];
+
+    /**
+     * The attributes that should be cast.
+     */
+    protected $casts = [
+        'from' => 'date',
+        'to' => 'date',
+    ];
+
+    /**
+     * Get the student that owns this sortie.
+     */
+    public function student(): BelongsTo
     {
-        return $this->hasOne('sortie');
-    }
-    public function students()
-    {
-        return $this->belongsToMany(Student::class, 'sortie_student', 'sortie_id', 'student_matricule');
-    }
-    public function student()
-    {
-        return $this->belongsTo(Student::class, 'student_id', 'matricule');
+        return $this->belongsTo(Student::class, 'matricule', 'matricule');
     }
 }

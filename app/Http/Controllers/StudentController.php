@@ -320,7 +320,7 @@ class StudentController extends Controller
      */
     private function getStudentSorties($matricule)
     {
-        $sorties = Sortie::where('student_id', $matricule)
+        $sorties = Sortie::where('matricule', $matricule)
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -631,7 +631,7 @@ class StudentController extends Controller
      */
     private function getStudentSortieCountForDate($matricule, $date)
     {
-        return Sortie::where('student_id', $matricule)
+        return Sortie::where('matricule', $matricule)
             ->whereDate('created_at', $date)
             ->count();
     }
@@ -641,7 +641,7 @@ class StudentController extends Controller
      */
     private function getStudentSortieCountForPeriod($matricule, $start, $end)
     {
-        return Sortie::where('student_id', $matricule)
+        return Sortie::where('matricule', $matricule)
             ->whereBetween('created_at', [$start, $end])
             ->count();
     }
@@ -734,7 +734,7 @@ class StudentController extends Controller
 
         if ($graphType === 'pie' || $graphType === 'doughnut') {
             // For pie/doughnut, show distribution by choix type
-            $sorties = Sortie::where('student_id', $matricule)
+            $sorties = Sortie::where('matricule', $matricule)
                 ->whereBetween('created_at', [$fromDate, $toDate])
                 ->get();
 
@@ -760,7 +760,7 @@ class StudentController extends Controller
             switch ($unit) {
                 case 'days':
                     $labels[] = $current->format('d/m');
-                    $count = Sortie::where('student_id', $matricule)
+                    $count = Sortie::where('matricule', $matricule)
                         ->whereDate('created_at', $current)
                         ->count();
                     $current->addDay();
@@ -768,7 +768,7 @@ class StudentController extends Controller
                 case 'weeks':
                     $weekEnd = $current->copy()->endOfWeek();
                     $labels[] = $current->format('d/m') . ' - ' . $weekEnd->format('d/m');
-                    $count = Sortie::where('student_id', $matricule)
+                    $count = Sortie::where('matricule', $matricule)
                         ->whereBetween('created_at', [$current, $weekEnd])
                         ->count();
                     $current->addWeek();
@@ -776,7 +776,7 @@ class StudentController extends Controller
                 case 'months':
                     $labels[] = $current->format('M Y');
                     $monthEnd = $current->copy()->endOfMonth();
-                    $count = Sortie::where('student_id', $matricule)
+                    $count = Sortie::where('matricule', $matricule)
                         ->whereBetween('created_at', [$current, $monthEnd])
                         ->count();
                     $current->addMonth();

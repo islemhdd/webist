@@ -43,9 +43,9 @@ function AboutLayout() {
         <Login />
         <Footer />
       </>
-    );  
+    );
 
-}   
+}
 
 function ServicesLayout() {
   return (
@@ -55,11 +55,13 @@ function ServicesLayout() {
       <Footer />
     </>
   );
-}     
+}
 
 const requireAuth = () => {
-  const token = localStorage.getItem("auth_token");
-  const userId = localStorage.getItem("auth_user_id");
+  // SECURITY: Using sessionStorage instead of localStorage for better security
+  // sessionStorage is cleared when tab closes, reducing XSS attack window
+  const token = sessionStorage.getItem("auth_token");
+  const userId = sessionStorage.getItem("auth_user_id");
   if (!token && !userId) {
     return redirect("/");
   }
@@ -76,11 +78,11 @@ const router = createBrowserRouter([
     element: <AboutLayout />,
   },
   {
-    path: "/services",  
+    path: "/services",
     element: <ServicesLayout />,
   },
   {
-    path: "/login",  
+    path: "/login",
     element: <LoginLayout />,
   },
   {

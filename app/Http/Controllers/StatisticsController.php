@@ -33,11 +33,11 @@ class StatisticsController extends Controller
         // Filtre par matricule si spécifié
         $matriculeFilter = $request->filled('search_matricule') ? $request->search_matricule : null;
 
-     
 
-     
 
-      
+
+
+
 
         // Récupérer les statistiques des rendez-vous
         $consultationRdvQuery = ListeRdv::whereBetween(\DB::raw('DATE(date)'), [$dateDebut->format('Y-m-d'), $dateFin->format('Y-m-d')])
@@ -87,7 +87,7 @@ class StatisticsController extends Controller
         }
 
         return view('statistics.index', compact(
-          
+
             'consultationRdvToday',
             'urgenceRdvToday',
             'convocationsWithPsy',
@@ -128,13 +128,6 @@ class StatisticsController extends Controller
      */
     private function getAllStatistics($today)
     {
-        $validPatientsToday = Patient::whereDate('created_at', $today)
-            ->where('valider', 1)->count();
-        $invalidPatientsToday = Patient::whereDate('created_at', $today)
-            ->where('valider', 0)->count();
-        // $invalidPatientsToday = Patient::whereDate('created_at', $today)
-        //     ->where('valider', 2)->count();
-
         $consultationRdvToday = ListeRdv::whereDate('date', $today)
             ->where('motif', 'consultation')->count();
         $urgenceRdvToday = ListeRdv::whereDate('date', $today)
@@ -155,8 +148,6 @@ class StatisticsController extends Controller
             });
 
         return response()->json([
-            'validPatientsToday' => $validPatientsToday,
-            'invalidPatientsToday' => $invalidPatientsToday,
             'consultationRdvToday' => $consultationRdvToday,
             'urgenceRdvToday' => $urgenceRdvToday,
             'convocationsWithPsy' => $convocationsWithPsy,
@@ -172,17 +163,6 @@ class StatisticsController extends Controller
     {
         // Récupérer les matricules des étudiants du grade spécifié
         $studentMatricules = Student::where('grade', $grade)->pluck('matricule');
-
-        // Patients filtrés par grade
-        $validPatientsToday = Patient::whereDate('created_at', $today)
-            ->where('valider', 1)
-            ->whereIn('matricule', $studentMatricules)
-            ->count();
-
-        $invalidPatientsToday = Patient::whereDate('created_at', $today)
-            ->where('valider', 0)
-            ->whereIn('matricule', $studentMatricules)
-            ->count();
 
         // Rendez-vous filtrés par grade
         $consultationRdvToday = ListeRdv::whereDate('date', $today)
@@ -218,8 +198,6 @@ class StatisticsController extends Controller
             });
 
         return response()->json([
-            'validPatientsToday' => $validPatientsToday,
-            'invalidPatientsToday' => $invalidPatientsToday,
             'consultationRdvToday' => $consultationRdvToday,
             'urgenceRdvToday' => $urgenceRdvToday,
             'convocationsWithPsy' => $convocationsWithPsy,

@@ -75,7 +75,7 @@ function Weekends() {
 
     try {
       setLoading(true);
-      const query = buildQuery({ choice, searchTerm, searchType });
+      const query = buildQuery({ choice, searchTerm: "", searchType: "" });
       const response = await fetch(
         `http://localhost:8000/${officerId}/weekends${query ? `?${query}` : ""}`,
         {
@@ -102,7 +102,7 @@ function Weekends() {
     } finally {
       setLoading(false);
     }
-  }, [officerId, choice, searchTerm, searchType]);
+  }, [officerId, choice]);
 
   const updateStudentLocal = useCallback((nextStudent) => {
     setStudents((prev) => {
@@ -116,12 +116,9 @@ function Weekends() {
     });
   }, []);
 
+  // Fetch data only on mount or when choice filter changes
   useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchWeekends();
-    }, 300);
-
-    return () => clearTimeout(timer);
+    fetchWeekends();
   }, [fetchWeekends]);
 
   useEffect(() => {
@@ -252,11 +249,38 @@ function Weekends() {
   }, [students, roleId, companies]);
 
   const visibleStudents = useMemo(() => {
-    if (roleId !== 1 || !companies.length) return students;
-    return students.filter((student) =>
-      companies.includes(Number(student.section?.companie))
-    );
-  }, [students, roleId, companies]);
+    let filtered = students;
+
+    // Filter by company for role 1
+    if (roleId === 1 && companies.length) {
+      filtered = filtered.filter((student) =>
+        companies.includes(Number(student.section?.companie))
+      );
+    }
+
+    // Client-side search filtering
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase().trim();
+      filtered = filtered.filter((student) => {
+        switch (searchType) {
+          case "matricule":
+            return String(student.matricule || "").toLowerCase().includes(term);
+          case "nom":
+            return String(student.nom || "").toLowerCase().includes(term);
+          case "grade":
+            return String(student.grade || "").toLowerCase().includes(term);
+          case "companie":
+            return String(student.section?.companie || "").toLowerCase().includes(term);
+          case "section":
+            return String(student.section?.code || student.section?.id || "").toLowerCase().includes(term);
+          default:
+            return true;
+        }
+      });
+    }
+
+    return filtered;
+  }, [students, roleId, companies, searchTerm, searchType]);
 
   return (
     <div className="min-h-screen weekend-page text-slate-900">

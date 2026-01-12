@@ -21,7 +21,8 @@ class StudentFactory extends Factory
         return [
             "name" => fake()->word(),
             "grade" => fake()->randomElement([1, 2, 3]),
-            "password" => Hash::make('usser'), // You don't need to randomize password
+            // SECURITY: Use stronger default password for factories
+            "password" => Hash::make('Student#Test2024!'),
             "deleted_at" => null,
             "consigned" => fake()->randomElement([0, 1]),
             "section_id" => Section::inRandomOrder()->first()?->id ?? 1, // Add this

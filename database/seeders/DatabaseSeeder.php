@@ -13,11 +13,9 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             SectionSeeder::class,
             StudentSeeder::class,
+            ReportSeeder::class,
             SanctionSeeder::class,
-            ExemptionSeeder::class,
-            ConvoncuSeeder::class,
-            ListeRdvSeeder::class,
-            PatientSeeder::class,
+            NotificationSeeder::class,
             ListLockSeeder::class,
         ]);
     }

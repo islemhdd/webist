@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Cahier des Charges - SGEMM</title>
+        <style>
+            @page {
+                size: A4;
+                margin: 2cm;
+            }
+
+            body {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                line-height: 1.6;
+                color: #333;
+                max-width: 210mm;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #fff;
+            }
+
+            .header {
+                text-align: center;
+                border-bottom: 3px solid #2c3e50;
+                padding-bottom: 20px;
+                margin-bottom: 30px;
+            }
+
+            h1 {
+                color: #2c3e50;
+                font-size: 28px;
+                margin-bottom: 10px;
+            }
+
+            h2 {
+                color: #3498db;
+                border-bottom: 2px solid #3498db;
+                padding-bottom: 5px;
+                margin-top: 30px;
+                font-size: 22px;
+            }
+
+            h3 {
+                color: #2c3e50;
+                margin-top: 25px;
+                font-size: 18px;
+            }
+
+            .project-info {
+                background-color: #f8f9fa;
+                border-left: 4px solid #3498db;
+                padding: 15px;
+                margin: 20px 0;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+            }
+
+            th {
+                background-color: #2c3e50;
+                color: white;
+                padding: 12px;
+                text-align: left;
+            }
+
+            td {
+                padding: 10px;
+                border: 1px solid #ddd;
+            }
+
+            tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+
+            .code-block {
+                background-color: #f4f4f4;
+                border-left: 3px solid #3498db;
+                padding: 15px;
+                font-family: "Courier New", monospace;
+                margin: 15px 0;
+                overflow-x: auto;
+            }
+
+            .section {
+                page-break-inside: avoid;
+                margin-bottom: 30px;
+            }
+
+            .validation-table {
+                margin-top: 50px;
+                page-break-inside: avoid;
+            }
+
+            .footer {
+                text-align: center;
+                margin-top: 50px;
+                font-size: 12px;
+                color: #7f8c8d;
+                border-top: 1px solid #eee;
+                padding-top: 20px;
+            }
+
+            .page-break {
+                page-break-before: always;
+            }
+
+            .important {
+                background-color: #fff3cd;
+                border-left: 4px solid #ffc107;
+                padding: 15px;
+                margin: 15px 0;
+            }
+
+            @media print {
+                .no-print {
+                    display: none;
+                }
+
+                body {
+                    padding: 0;
+                }
+
+                .print-btn {
+                    display: none;
+                }
+            }
+
+            .print-btn {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background-color: #3498db;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+                z-index: 1000;
+            }
+
+            .print-btn:hover {
+                background-color: #2980b9;
+            }
+        </style>
+    </head>
+    <body>
+        <button class="print-btn no-print" onclick="window.print()">
+            📄 Imprimer/Enregistrer PDF
+        </button>
+
+        <div class="header">
+            <h1>CAHIER DES CHARGES</h1>
+            <h2>
+                Système de Gestion d'Élèves en Milieu Académique/Militaire
+                (SGEMM)
+            </h2>
+            <p>
+                <strong
+                    >Projet Développement Web - Année Universitaire
+                    2025-2026</strong
+                >
+            </p>
+            <p>Version 1.0 | Date: <span id="current-date"></span></p>
+        </div>
+        <div class="project-info">
+            <h3>Informations du Projet</h3>
+            <table>
+                <tr>
+                    <td><strong>Nom du projet:</strong></td>
+                    <td>
+                        SGEMM - Système de Gestion des Élèves en Milieu
+                        Militaire
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Type:</strong></td>
+                    <td>Application Web Académique</td>
+                </tr>
+                <tr>
+                    <td><strong>Module:</strong></td>
+                    <td>Développement Web</td>
+                </tr>
+                <tr>
+                    <td><strong>Équipe:</strong></td>
+                    <td>4 étudiants</td>
+                </tr>
+                <tr>
+                    <td><strong>Serveur local:</strong></td>
+                    <td>XAMPP avec Laravel</td>
+                </tr>
+                <tr>
+                    <td><strong>Langue:</strong></td>
+                    <td>Français</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>1. Contexte et Objectifs</h2>
+
+            <h3>1.1 Contexte</h3>
+            <p>
+                Dans le cadre d'un établissement de type académie militaire ou
+                internat discipliné, il est nécessaire de gérer efficacement :
+            </p>
+            <ul>
+                <li>Les élèves répartis en sections hiérarchisées</li>
+                <li>Le suivi disciplinaire et sanitaire</li>
+                <li>Les autorisations de sortie</li>
+                <li>Les rapports d'incidents</li>
+                <li>La gestion des sanctions et récompenses</li>
+            </ul>
+
+            <h3>1.2 Objectifs Pédagogiques</h3>
+            <ul>
+                <li>
+                    Concevoir une application web fonctionnelle avec
+                    architecture MVC
+                </li>
+                <li>
+                    Implémenter des opérations CRUD complètes sur 4 modules
+                    minimum
+                </li>
+                <li>Manipuler une base de données relationnelle complexe</li>
+                <li>
+                    Gérer un système d'authentification avec rôles multiples
+                </li>
+                <li>Produire des états de sortie pertinents et filtrés</li>
+                <li>Respecter les bonnes pratiques de développement web</li>
+            </ul>
+        </div>
+
+        <div class="page-break"></div>
+
+        <div class="section">
+            <h2>2. Analyse des Besoins</h2>
+
+            <h3>2.1 Utilisateurs Cibles</h3>
+            <table>
+                <tr>
+                    <th>Rôle</th>
+                    <th>Permissions</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><strong>Administrateur</strong></td>
+                    <td>Tous les droits</td>
+                    <td>Supervise tout le système, gère les utilisateurs</td>
+                </tr>
+                <tr>
+                    <td><strong>Officier</strong></td>
+                    <td>Gestion élèves, sanctions, rapports</td>
+                    <td>Encadrant des sections, responsable disciplinaire</td>
+                </tr>
+                <tr>
+                    <td><strong>Médecin</strong></td>
+                    <td>Consultation et validation dossiers médicaux</td>
+                    <td>Personnel médical de l'établissement</td>
+                </tr>
+                <tr>
+                    <td><strong>Élève</strong></td>
+                    <td>Consultation personnelle, dépôt rapports</td>
+                    <td>
+                        Utilisateur de base, sujet aux sanctions et rapports
+                    </td>
+                </tr>
+            </table>
+
+            <h3>2.2 Besoins Fonctionnels</h3>
+
+            <h4>Module 1 : Gestion des Utilisateurs & Rôles (CRUD)</h4>
+            <ul>
+                <li>
+                    <strong>Créer:</strong> Ajouter des utilisateurs avec rôle
+                    spécifique
+                </li>
+                <li>
+                    <strong>Lire:</strong> Consulter la liste des utilisateurs
+                    avec filtres par rôle
+                </li>
+                <li>
+                    <strong>Modifier:</strong> Changer rôle, mot de passe,
+                    informations personnelles
+                </li>
+                <li>
+                    <strong>Supprimer:</strong> Désactiver/archiver un compte
+                    utilisateur
+                </li>
+            </ul>
+
+            <h4>Module 2 : Gestion des Élèves (CRUD)</h4>
+        </div>
+<ul>
+            <li><strong>Créer:</strong> Ajouter un élève avec matricule unique et attribution de section</li>
+            <li><strong>Lire:</strong> Fiche complète élève + historique disciplinaire et médical</li>
+            <li><strong>Modifier:</strong> Changer section, grade, statut (consigné/libre)</li>
+            <li><strong>Supprimer:</strong> Archiver un élève (sortie définitive avec justification)</li>
+        </ul>
+
+        <h4>Module 3 : Gestion des Sanctions & Rapports (CRUD)</h4>
+        <ul>
+            <li><strong>Créer:</strong> Enregistrer sanction ou rapport disciplinaire</li>
+            <li><strong>Lire:</strong> Historique disciplinaire complet par élève</li>
+            <li><strong>Modifier:</strong> Mettre à jour statut des rapports (en cours/traité/classé)</li>
+            <li><strong>Supprimer:</strong> Supprimer des entrées erronées (avec log d'audit)</li>
+        </ul>
+
+        <h4>Module 4 : Gestion Médicale & Sorties (CRUD)</h4>
+        <ul>
+            <li><strong>Créer:</strong> Dossier médical / demande de sortie avec justificatif</li>
+            <li><strong>Lire:</strong> Consultation certificats médicaux / autorisations de sortie</li>
+            <li><strong>Modifier:</strong> Valider/invalider certificats médicaux par le médecin</li>
+            <li><strong>Supprimer:</strong> Nettoyer données médicales obsolètes (après expiration)</li>
+        </ul>
+
+        <h3>2.3 Besoins Non-Fonctionnels</h3>
+        <table>
+            <tr>
+                <th>Critère</th>
+                <th>Exigence</th>
+            </tr>
+            <tr>
+                <td><strong>Performance</strong></td>
+                <td>Temps de réponse < 2 secondes sur serveur local</td>
+            </tr>
+            <tr>
+                <td><strong>Sécurité</strong></td>
+                <td>Authentification obligatoire, hashage mots de passe (bcrypt), protection CSRF</td>
+            </tr>
+            <tr>
+                <td><strong>Fiabilité</strong></td>
+                <td>Sauvegarde automatique quotidienne des données</td>
+            </tr>
+            <tr>
+                <td><strong>Maintenabilité</strong></td>
+                <td>Code commenté, architecture MVC respectée, documentation technique</td>
+            </tr>
+            <tr>
+                <td><strong>Utilisabilité</strong></td>
+                <td>Interface intuitive en français, responsive design</td>
+            </tr>
+            <tr>
+                <td><strong>Compatibilité</strong></td>
+                <td>Fonctionnement sur Chrome, Firefox, Edge (dernières versions)</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="page-break"></div>
+
+    <div class="section">
+        <h2>3. Architecture Technique</h2>
+
+        <h3>3.1 Stack Technologique</h3>
+        <table>
+            <tr>
+                <th>Composant</th>
+                <th>Technologie</th>
+                <th>Version</th>
+            </tr>
+            <tr>
+                <td><strong>Frontend</strong></td>
+                <td>HTML5, CSS3, JavaScript, Bootstrap 5</td>
+                <td>Dernière stable</td>
+            </tr>
+            <tr>
+                <td><strong>Backend</strong></td>
+                <td>Laravel (PHP)</td>
+                <td>10.x</td>
+            </tr>
+            <tr>
+                <td><strong>Base de données</strong></td>
+                <td>MySQL</td>
+                <td>8.0+</td>
+            </tr>
+            <tr>
+                <td><strong>Serveur local</strong></td>
+                <td>XAMPP</td>
+                <td>3.3.0+</td>
+            </tr>
+            <tr>
+                <td><strong>Versionning</strong></td>
+                <td>Git</td>
+                <td>-</td>
+            </tr>
+            <tr>
+<td><strong>Éditeur</strong></td>
+                <td>VS Code / PHPStorm</td>
+                <td>-</td>
+            </tr>
+        </table>
+
+        <h3>3.2 Architecture Logicielle</h3>
+        <div class="code-block">
+┌─────────────────────────────────────┐
+│         Couche Présentation         │
+│  (Views - Blade Templates)          │
+└──────────────────┬──────────────────┘
+                   │
+┌──────────────────▼──────────────────┐
+│         Contrôleurs Laravel         │
+│  (Routing, Logique Métier)          │
+└──────────────────┬──────────────────┘
+                   │
+┌──────────────────▼──────────────────┐
+│         Modèles Éloquents           │
+│  (ORM Laravel)                      │
+└──────────────────┬──────────────────┘
+                   │
+┌──────────────────▼──────────────────┐
+│         Base de Données MySQL       │
+│  (Structure fournie)                │
+└─────────────────────────────────────┘
+        </div>
+
+        <h3>3.3 Structure de la Base de Données</h3>
+        <p><strong>Schéma relationnel validé :</strong></p>
+        <div class="code-block">
+roles (1) ──── (0,n) users (1) ──── (0,n) sections
+    │                                   │
+    │                                   │
+(0,n) reports                       (1,n) students (1) ──── (0,n) sanctions
+    │                                   │
+    │                              (0,n) patients
+    │                                   │
+    └───────────────────────────── (0,n) sorties
+                                   (0,n) expulsions
+        </div>
+
+        <p><strong>Détails des tables :</strong></p>
+        <ul>
+            <li><strong>13 tables</strong> au total (dont 4 techniques Laravel)</li>
+            <li><strong>8 relations étrangères</strong> avec contraintes d'intégrité</li>
+            <li><strong>Triggers MySQL</strong> pour calcul automatique d'ID sections</li>
+            <li><strong>Soft Deletes</strong> activés sur la table reports</li>
+        </ul>
+    </div>
+
+    <div class="page-break"></div>
+
+    <div class="section">
+        <h2>4. Spécifications Détaillées</h2>
+
+        <h3>4.1 Pages Principales (6 pages)</h3>
+        <table>
+            <tr>
+                <th>Page</th>
+                <th>URL</th>
+                <th>Description</th>
+                <th>Accès</th>
+            </tr>
+            <tr>
+                <td>Connexion</td>
+                <td>/login</td>
+                <td>Authentification des utilisateurs</td>
+                <td>Public</td>
+            </tr>
+            <tr>
+                <td>Tableau de Bord</td>
+                <td>/dashboard</td>
+                <td>Vue d'ensemble personnalisée par rôle</td>
+                <td>Authentifié</td>
+            </tr>
+            <tr>
+                <td>Gestion Élèves</td>
+                <td>/students</td>
+                <td>CRUD complet des élèves</td>
+                <td>Admin, Officier</td>
+            </tr>
+            <tr>
+                <td>Module Disciplinaire</td>
+                <td>/sanctions</td>
+                <td>Sanctions et rapports disciplinaires</td>
+                <td>Admin, Officier</td>
+            </tr>
+            <tr>
+                <td>Module Médical/Sorties</td>
+                <td>/medical</td>
+                <td>Dossiers médicaux et autorisations sortie</td>
+                <td>Admin, Médecin, Officier</td>
+            </tr>
+            <tr>
+                <td>Rapports/États</td>
+                <td>/reports</td>
+                <td>Listings avec filtres avancés</td>
+                <td>Tous rôles (selon permissions)</td>
+            </tr>
+        </table>
+
+        <h3>4.2 Fonctionnalités CRUD Obligatoires</h3>
+
+        <h4>CRUD 1 : Gestion Élèves</h4>
+        <div class="code-block">
+            // Routes Laravel pour le module élèves
+Route::resource('students', StudentController::class);
+// GET /students → Liste paginée avec filtres
+// POST /students → Création nouvelle fiche
+// GET /students/{id} → Détails complets élève
+// PUT/PATCH /students/{id} → Modification fiche
+// DELETE /students/{id} → Suppression/archivage
+        </div>
+
+        <h4>CRUD 2 : Gestion Sanctions</h4>
+        <ul>
+            <li>Types de sanction prédéfinis avec durées associées</li>
+            <li>Historique visuel chronologique par élève</li>
+            <li>Export PDF des sanctions en cours</li>
+            <li>Alertes pour sanctions arrivant à expiration</li>
+        </ul>
+
+        <h4>CRUD 3 : Gestion Rapports</h4>
+        <ul>
+            <li>Dépôt de rapports par les officiers avec pièces jointes optionnelles</li>
+            <li>Workflow : création → validation → traitement → archivage</li>
+            <li>Recherche multicritères (élève, date, type, statut)</li>
+            <li>Notifications pour rapports nécessitant traitement</li>
+        </ul>
+
+        <h4>CRUD 4 : Gestion Médicale</h4>
+        <ul>
+            <li>Certificats médicaux avec dates de validité</li>
+            <li>Validation par le médecin avec signature électronique</li>
+            <li>Alertes automatiques pour certificats expirant dans 15 jours</li>
+            <li>Historique médical complet par élève</li>
+        </ul>
+
+        <h3>4.3 Système d'Authentification</h3>
+        <ul>
+            <li><strong>Middleware auth</strong> sur toutes les routes protégées</li>
+            <li><strong>Middleware role:admin,officer</strong> pour permissions granulaires</li>
+            <li>Sessions Laravel sécurisées avec chiffrement</li>
+            <li>Déconnexion automatique après 30 minutes d'inactivité</li>
+            <li>Journalisation des tentatives de connexion échouées</li>
+        </ul>
+
+        <h3>4.4 États de Sortie (Reports)</h3>
+        <ol>
+            <li><strong>Liste des élèves par section</strong> avec pagination et tri multiple</li>
+            <li><strong>Élèves actuellement consignés</strong> avec motifs et durées</li>
+            <li><strong>Sanctions en cours</strong> triées par gravité et date de fin</li>
+            <li><strong>Sorties autorisées cette semaine</strong> avec détails complets</li>
+            <li><strong>Statistiques générales</strong> (dashboard admin avec Chart.js)</li>
+            <li><strong>Rapport médical mensuel</strong> par section et par pathologie</li>
+        </ol>
+    </div>
+
+    <div class="page-break"></div>
+
+    <div class="section">
+        <h2>5. Planning de Développement</h2>
+
+        <h3>5.1 Répartition des Tâches (4 étudiants)</h3>
+        <table>
+            <tr>
+                <th>Étudiant</th>
+                <th>Modules Responsables</th>
+                <th>Tâches principales</th>
+            </tr>
+            <tr>
+                <td><strong>Étudiant 1</strong></td>
+                <td>Authentification + Gestion Utilisateurs</td>
+                <td>Modèles User/Role, contrôleurs auth, views login/register, middleware permissions</td>
+            </tr>
+            <tr>
+                <td><strong>Étudiant 2</strong></td>
+                <td>Module Élèves + Sections</td>
+                <td>CRUD élèves, relations sections, triggers BD, import/export données</td>
+            </tr>
+            <tr>
+                <td><strong>Étudiant 3</strong></td>
+                <td>Module Disciplinaire</td>
+                <td>Sanctions, rapports, expulsions, workflows, notifications</td>
+            </tr>
+            <tr>
+                <td><strong>Étudiant 4</strong></td>
+                <td>Module Médical + Sorties + Frontend</td>
+                <td>Patients, sorties, interface UI/UX, dashboard, responsive design</td>
+</tr>
+        </table>
+
+        <p><em>Note: Chaque étudiant participe également aux tests, documentation et présentation.</em></p>
+
+        <h3>5.2 Étapes de Développement</h3>
+        <table>
+            <tr>
+                <th>Semaine</th>
+                <th>Objectifs</th>
+                <th>Livrables intermédiaires</th>
+            </tr>
+            <tr>
+                <td><strong>Semaine 1</strong></td>
+                <td>Configuration environnement + Modèles</td>
+                <td>Projet Laravel installé, migrations créées, relations définies</td>
+            </tr>
+            <tr>
+                <td><strong>Semaine 2</strong></td>
+                <td>Authentification + CRUD de base</td>
+                <td>Système auth fonctionnel, CRUD élèves opérationnel</td>
+            </tr>
+            <tr>
+                <td><strong>Semaine 3</strong></td>
+                <td>Relations complexes + Validation</td>
+                <td>Tous les modules CRUD fonctionnels, validation données</td>
+            </tr>
+            <tr>
+                <td><strong>Semaine 4</strong></td>
+                <td>Interface utilisateur + États</td>
+                <td>Frontend complet, rapports générés, dashboard fonctionnel</td>
+            </tr>
+            <tr>
+                <td><strong>Semaine 5</strong></td>
+                <td>Tests + Documentation + Vidéo</td>
+                <td>Tests unitaires, documentation technique, vidéo démo, préparation soutenance</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="page-break"></div>
+
+    <div class="section">
+        <h2>6. Livrables Conformes au Sujet</h2>
+
+        <h3>6.1 Document de Conception (ce cahier des charges)</h3>
+        <table>
+            <tr>
+                <th>Élément requis</th>
+                <th>État</th>
+                <th>Section correspondante</th>
+            </tr>
+            <tr>
+                <td>Description du projet</td>
+                <td>✅ Complété</td>
+                <td>Sections 1 et 2</td>
+            </tr>
+            <tr>
+                <td>Besoins fonctionnels/non-fonctionnels</td>
+                <td>✅ Complété</td>
+                <td>Section 2.2 et 2.3</td>
+            </tr>
+            <tr>
+                <td>Schéma de base de données</td>
+                <td>✅ Complété</td>
+                <td>Section 3.3</td>
+            </tr>
+            <tr>
+                <td>Architecture 2-3 couches</td>
+                <td>✅ Complété</td>
+                <td>Section 3.2</td>
+            </tr>
+        </table>
+
+        <h3>6.2 Code Source Complet</h3>
+        <p><strong>Structure Laravel standard :</strong></p>
+        <div class="code-block">
+sgemm-project/
+├── app/
+│   ├── Http/Controllers/
+│   │   ├── AuthController.php
+│   │   ├── StudentController.php
+│   │   ├── SanctionController.php
+│   │   └── MedicalController.php
+│   ├── Models/
+│   │   ├── User.php
+│   │   ├── Student.php
+│   │   ├── Sanction.php
+│   │   └── Patient.php
+│   └── Middleware/
+│       └── CheckRole.php
+├── database/
+│   ├── migrations/ (fichiers fournis)
+│   └── seeders/
+├── resources/
+│   └── views/
+│       ├── layouts/
+│       ├── auth/
+│       ├── students/
+│       └── dashboard/
+├── public/
+├── .env.example
+├── composer.json
+└── README.md
+        </div>
+
+        <h3>6.3 Documentation</h3>
+
+        <h4>Guide d'installation :</h4>
+        <div class="code-block">
+1. Installer XAMPP (Apache + MySQL + PHP)
+2. Cloner le dépôt Git : git clone [url-du-projet]
+3. Naviguer dans le dossier : cd sgemm-project
+4. Installer les dépendances : composer install
+5. Copier le fichier .env : cp .env.example .env
+6. Générer la clé d'application : php artisan key:generate
+7. Configurer la base de données dans .env :
+   DB_DATABASE=sgemm
+   DB_USERNAME=root
+   DB_PASSWORD=
+8. Créer la base : php artisan migrate
+9. Lancer les seeders : php artisan db:seed
+10. Démarrer le serveur : php artisan serve
+11. Accéder à l'application : http://localhost:8000
+        </div>
+
+        <h4>Comptes de test par défaut :</h4>
+        <ul>
+            <li><strong>Administrateur :</strong> admin@esmm.local / password</li>
+            <li><strong>Officier :</strong> officer@esmm.local / password</li>
+            <li><strong>Médecin :</strong> doctor@esmm.local / password</li>
+        </ul>
+
+        <h3>6.4 Déploiement Local</h3>
+        <ul>
+            <li>Serveur Apache via XAMPP sur port 80</li>
+            <li>Base MySQL accessible via phpMyAdmin (port 3306)</li>
+            <li>Application Laravel accessible sur http://localhost:8000</li>
+            <li>Environment de développement uniquement (pas de production)</li>
+        </ul>
+    </div>
+
+    <div class="page-break"></div>
+
+    <div class="section">
+        <h2>7. Critères d'Évaluation Couverts</h2>
+
+        <table>
+            <tr>
+                <th>Critère</th>
+                <th>Pondération</th>
+                <th>Comment nous le couvrons</th>
+                <th>Note visée</th>
+            </tr>
+            <tr>
+                <td><strong>Cahier des charges & conception</strong></td>
+                <td>15%</td>
+                <td>Document complet, structuré, cohérent avec la BD existante</td>
+                <td>15/15</td>
+            </tr>
+            <tr>
+                <td><strong>Front-end</strong></td>
+                <td>15%</td>
+                <td>Bootstrap 5, interface responsive, intuitive, bon UX</td>
+                <td>14/15</td>
+            </tr>
+            <tr>
+                <td><strong>Back-end</strong></td>
+                <td>20%</td>
+                <td>Laravel MVC, code organisé, sécurité, validation</td>
+                <td>18/20</td>
+            </tr>
+            <tr>
+                <td><strong>Base de données</strong></td>
+                <td>10%</td>
+                <td>Structure complexe avec relations, triggers, intégrité</td>
+                <td>10/10</td>
+            </tr>
+            <tr>
+                <td><strong>CRUD</strong></td>
+                <td>10%</td>
+                <td>4 modules complets avec validation et bonnes pratiques</td>
+                <td>10/10</td>
+            </tr>
+            <tr>
+                <td><strong>États de sortie</strong></td>
+                <td>10%</td>
+                <td>5 rapports avec filtres, pagination, export possible</td>
+                <td>9/10</td>
+            </tr>
+            <tr>
+                <td><strong>Déploiement local</strong></td>
+                <td>10%</td>
+                <td>XAMPP fonctionnel, guide d'installation clair</td>
+                <td>10/10</td>
+            </tr>
+            <tr>
+                <td><strong>Vidéo démonstrative</strong></td>
+                <td>10%</td>
+                <td>Script professionnel de 5-8 minutes couvrant tous les aspects</td>
+                <td>9/10</td>
+            </tr>
+            <tr>
+                <td><strong>Présentation orale</strong></td>
+                <td>10%</td>
+                <td>Répartition équitable, maîtrise technique, démo fluide</td>
+                <td>9/10</td>
+            </tr>
+            <tr>
+                <td><strong>TOTAL</strong></td>
+                <td><strong>100%</strong></td>
+                <td><strong>Projet complet respectant toutes les exigences</strong></td>
+                <td><strong>104/100</strong></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="page-break"></div>
+
+    <div class="section">
+        <h2>8. Annexes Techniques</h2>
+
+        <h3>8.1 Configuration Environnement</h3>
+        <div class="code-block">
+# Fichier .env
+APP_NAME="SGEMM"
+APP_ENV=local
+APP_KEY=[généré automatiquement]
+APP_DEBUG=true
+APP_URL=http://localhost
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=sgemm
+DB_USERNAME=root
+DB_PASSWORD=
+        </div>
+
+        <h3>8.2 Données de Test Initiales</h3>
+        <div class="code-block">
+-- Insertion des rôles par défaut
+INSERT INTO roles (name, description) VALUES
+('admin', 'Administrateur système complet'),
+('officer', 'Officier encadrant - gestion sections'),
+('doctor', 'Médecin - gestion dossiers médicaux'),
+('student', 'Élève - consultation personnelle');
+
+-- Sections exemple avec ID calculé automatiquement
+-- ID = bat × 100 + companie × 10 + num
+INSERT INTO sections (bat, companie, num, officer_id) VALUES
+(1, 1, 1, NULL), -- ID = 111
+(1, 1, 2, NULL), -- ID = 112
+(1, 2, 1, NULL), -- ID = 121
+(2, 1, 1, NULL); -- ID = 211
+        </div>
+
+        <h3>8.3 Script de Migration Principal</h3>
+        <div class="code-block">
+// Migration simplifiée pour la table students
+Schema::create('students', function (Blueprint $table) {
+    $table->unsignedBigInteger('matricule')->primary();
+    $table->string('nom');
+    $table->string('prenom');
+    $table->enum('grade', ['1', '2', '3']);
+    $table->unsignedBigInteger('section_id');
+    $table->boolean('consigned')->default(false);
+    $table->string('choix')->nullable();
+    $table->timestamps();
+
+    $table->foreign('section_id')
+          ->references('id')
+          ->on('sections')
+          ->onDelete('cascade');
+});
+        </div>
+
+        <h3>8.4 Références Techniques</h3>
+        <ul>
+            <li><strong>Documentation Laravel 10.x :</strong> https://laravel.com/docs/10.x</li>
+            <li><strong>Bootstrap 5 Documentation :</strong> https://getbootstrap.com/docs/5.0/</li>
+            <li><strong>MySQL Triggers :</strong> https://dev.mysql.com/doc/refman/8.0/en/triggers.html</li>
+            <li><strong>Chart.js pour graphiques :</strong> https://www.chartjs.org/</li>
+            <li><strong>XAMPP Installation Guide :</strong> https://www.apachefriends.org/</li>
+        </ul>
+    </div>
+
+    <div class="validation-table section">
+        <h2>9. Validation du Cahier des Charges</h2>
+        <p>Ce cahier des charges est validé par l'ensemble de l'équipe de développement :</p>
+
+        <table>
+            <tr>
+                <th>Nom et Prénom</th>
+                <th>Rôle dans le projet</th>
+                <th>Signature</th>
+                <th>Date</th>
+            </tr>
+            <tr>
+                <td>[Nom Étudiant 1]</td>
+                <td>Responsable Authentification & Sécurité</td>
+                <td>______</td>
+                <td>//2025</td>
+            </tr>
+            <tr>
+                <td>[Nom Étudiant 2]</td>
+                <td>Responsable Module Élèves & BD</td>
+                <td>______</td>
+                <td>//2025</td>
+            </tr>
+            <tr>
+                <td>[Nom Étudiant 3]</td>
+                <td>Responsable Module Disciplinaire</td>
+                <td>______</td>
+                <td>//2025</td>
+            </tr>
+            <tr>
+                <td>[Nom Étudiant 4]</td>
+                <td>Responsable Frontend & Module Médical</td>
+                <td>______</td>
+                <td>//202
+
+
+                    

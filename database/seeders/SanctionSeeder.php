@@ -2,36 +2,58 @@
 
 namespace Database\Seeders;
 
-use App\Models\Sanction;
-use App\Models\Student;
 use Illuminate\Database\Seeder;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class SanctionSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     * Data from webist.sql - sanctions table
      */
     public function run(): void
     {
-        // Get a subset of students
-        $students = Student::inRandomOrder()->limit(20)->get();
+        $sanctions = [
+            [
+                'id' => 1,
+                'matricule' => 2022003,
+                'type' => 'arret',
+                'motif' => 'sdlcjskldv',
+                'date_debut' => '2025-12-04',
+                'date_fin' => '2026-01-04',
+                'created_at' => '2025-12-29 17:19:55',
+                'updated_at' => '2025-12-29 17:19:55',
+                'report_id' => 28
+            ],
+            [
+                'id' => 2,
+                'matricule' => 2022003,
+                'type' => 'arret',
+                'motif' => 'hizedilqzehrfioqehrfoiqhzm',
+                'date_debut' => '2026-01-10',
+                'date_fin' => '2026-01-11',
+                'created_at' => '2025-12-30 02:28:04',
+                'updated_at' => '2025-12-30 02:28:04',
+                'report_id' => 28
+            ],
+            [
+                'id' => 3,
+                'matricule' => 2022005,
+                'type' => 'arret',
+                'motif' => '1234567890',
+                'date_debut' => '2025-12-31',
+                'date_fin' => '2026-01-11',
+                'created_at' => '2025-12-30 02:43:51',
+                'updated_at' => '2025-12-30 02:43:51',
+                'report_id' => 29
+            ],
+        ];
 
-        foreach ($students as $student) {
-            // Create 1-3 sanctions per selected student
-            $sanctionCount = rand(1, 3);
-
-            for ($i = 0; $i < $sanctionCount; $i++) {
-                $startDate = Carbon::now()->subDays(rand(1, 60));
-                $endDate = (clone $startDate)->addDays(rand(1, 14));
-
-                Sanction::create([
-                    'matricule' => $student->matricule,
-                    'motif' => fake()->sentence(),
-                    'date_debut' => $startDate,
-                    'date_fin' => $endDate,
-                ]);
-            }
+        foreach ($sanctions as $sanction) {
+            DB::table('sanctions')->updateOrInsert(
+                ['id' => $sanction['id']],
+                $sanction
+            );
         }
     }
 }

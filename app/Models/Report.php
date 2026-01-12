@@ -12,7 +12,38 @@ class Report extends Model
 {
 
     use SoftDeletes;
-    protected $guarded = [];
+
+    /**
+     * SECURITY: Explicitly define fillable fields to prevent mass assignment attacks.
+     */
+    protected $fillable = [
+        'student_id',
+        'title',
+        'corps',
+        'status',
+        'destination',
+        'is_medical',
+        'motif',
+        'refused',
+        'arret',
+        'AvisChef_de_compagnie',
+        'AvisChef_de_batallaint',
+        'AvisChef_de_brigade',
+        'AvisChef_division',
+        'AvisMedecin',
+        'AvisDirecteur_général'
+    ];
+
+    /**
+     * SECURITY: Guard sensitive fields.
+     */
+    protected $guarded = [
+        'id',
+        'officer_id',
+        'created_at',
+        'updated_at',
+        'deleted_at'
+    ];
     public function student()
     {
         return $this->belongsTo(Student::class, 'student_id', 'matricule');
@@ -20,7 +51,7 @@ class Report extends Model
 
     public function sanction()
     {
-        
+
         return $this->hasOne(Sanction::class, 'report_id', 'id');
     }
     public function owner(): BelongsTo

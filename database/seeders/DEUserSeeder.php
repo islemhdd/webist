@@ -18,11 +18,12 @@ class DEUserSeeder extends Seeder
         $deRole = Role::firstOrCreate(['name' => 'DE']);
 
         // Créer l'utilisateur DE avec les identifiants spécifiés
+        // SECURITY WARNING: Use strong passwords in production!
         User::updateOrCreate(
             ['username' => 'DE'],
             [
                 'username' => 'DE',
-                'password' => '123456789',
+                'password' => 'DEAdmin#Secure2024!',  // SECURITY: Stronger password
                 'phone' => 12345678,
                 'role_id' => $deRole->id,
                 'bat' => '0',

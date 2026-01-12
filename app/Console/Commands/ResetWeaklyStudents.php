@@ -3,16 +3,15 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 
-class LOL extends Command
+class ResetWeaklyStudents extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'LOL {id}';
+    protected $signature = 'app:reset-weakly-students';
 
     /**
      * The console command description.
@@ -24,11 +23,5 @@ class LOL extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
-    {
-        $bat = $this->argument("id");
-        DB::table('students')
-            ->where('grade', $bat)
-            ->update(['choix' => NULL]);
-    }
+    public function handle() {}
 }

@@ -2,7 +2,10 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import Aside from "./Aside";
 import LoginNotice from "./LoginNotice";
 
+// verifie si l'ID officier est vide
 const isMissingOfficerId = (value) => value === null || value === undefined || value === "";
+
+// construit le gradient pour le donut chart
 const buildConic = (segments) => {
   const total = segments.reduce((sum, item) => sum + item.value, 0);
   if (!total) {
@@ -20,6 +23,7 @@ const buildConic = (segments) => {
   return `conic-gradient(${parts.join(", ")})`;
 };
 
+// graphique en donut - affiche weekends/sanctions/reports
 function DonutChart({ title, totalLabel, segments }) {
   const total = segments.reduce((sum, item) => sum + item.value, 0);
   const background = useMemo(() => buildConic(segments), [segments]);
@@ -32,7 +36,7 @@ function DonutChart({ title, totalLabel, segments }) {
       <div className="flex justify-center">
         <div className="relative w-48 h-48">
           <div className="absolute inset-0 rounded-full" style={{ background }} />
-          <div className="absolute inset-4 rounded-full bg-white" />
+          <div className="absolute inset-4 rounded-full bg-white" /> {/* trou du donut */}
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center">
               <div className="text-2xl font-bold text-slate-900">
@@ -43,6 +47,7 @@ function DonutChart({ title, totalLabel, segments }) {
           </div>
         </div>
       </div>
+      {/* legende */}
       <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
         {segments.map((item) => (
           <div
@@ -66,6 +71,7 @@ function DonutChart({ title, totalLabel, segments }) {
   );
 }
 
+// animation de comptage (0 -> valeur finale)
 const CountUp = ({ value, duration = 1500 }) => {
   const [display, setDisplay] = useState(0);
   const previousRef = useRef(0);
@@ -94,6 +100,7 @@ const CountUp = ({ value, duration = 1500 }) => {
   return <>{display}</>;
 };
 
+// mini graphique de tendance dans les cartes KPI
 const Sparkline = ({ data, color = "#f59e0b" }) => {
   const width = 120;
   const height = 36;
@@ -123,6 +130,7 @@ const Sparkline = ({ data, color = "#f59e0b" }) => {
   );
 };
 
+// carte KPI (les 4 en haut: Etudiants, Weekends, Sanctions, Reports)
 const KpiCard = ({ title, value, subtitle, accent, trend, spark }) => {
   return (
     <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm hover-lift animate-fade-up">
@@ -148,6 +156,7 @@ const KpiCard = ({ title, value, subtitle, accent, trend, spark }) => {
   );
 };
 
+// barre de progression horizontale
 const MetricBar = ({ label, value, max, color }) => {
   const percent = max ? Math.min(100, Math.round((value / max) * 100)) : 0;
   return (
@@ -168,6 +177,7 @@ const MetricBar = ({ label, value, max, color }) => {
   );
 };
 
+// barre sticky en haut avec recherche et boutons
 const TopBar = () => {
   return (
     <div className="sticky top-0 z-30 border-b border-slate-100 bg-white/80 backdrop-blur">
@@ -200,18 +210,21 @@ const TopBar = () => {
   );
 };
 
+// === PAGE PRINCIPALE DES STATS ===
 function Stats() {
   const [data, setData] = useState(null);
-  const [grade, setGrade] = useState("all");
+  const [grade, setGrade] = useState("all"); // filtre par annee
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // recup ID officier depuis URL ou localStorage
   const params = new URLSearchParams(window.location.search);
   const storedId = localStorage.getItem("auth_user_id");
   const storedRoleId = Number(localStorage.getItem("auth_role_id") || 0);
   const officerId = params.get("id") || storedId;
-  const canFilter = [3, 4, 5, 6].includes(storedRoleId);
+  const canFilter = [3, 4, 5, 6].includes(storedRoleId); // seuls ces roles peuvent filtrer
 
+  // chargement des stats depuis l'API
   useEffect(() => {
     const loadStats = async () => {
       if (isMissingOfficerId(officerId)) {
@@ -249,6 +262,7 @@ function Stats() {
     loadStats();
   }, [grade, officerId]);
 
+  // config des 4 cartes KPI en haut
   const summaryCards = [
     {
       label: "Etudiants",
@@ -280,6 +294,7 @@ function Stats() {
     },
   ];
 
+  // genere des fausses donnees pour le sparkline (juste pour le look)
   const makeSeries = (base) => {
     const value = Number.isFinite(base) ? base : 0;
     return [
@@ -299,6 +314,7 @@ function Stats() {
     reports: makeSeries(data?.patineStats?.total),
   };
 
+  // segments pour le donut weekends
   const weekendSegments = [
     {
       label: "Vendredi",
@@ -322,6 +338,7 @@ function Stats() {
     },
   ];
 
+  // segments pour le donut sanctions
   const sanctionSegments = [
     {
       label: "Consigne",
@@ -345,6 +362,7 @@ function Stats() {
     },
   ];
 
+  // segments pour le donut reports
   const reportSegments = [
     {
       label: "Valides",
@@ -397,17 +415,8 @@ function Stats() {
                   </p>
                 </div>
                 <div className="flex flex-col items-end gap-3 animate-fade-up animate-delay-450">
-                  <div className="text-sm text-slate-500">
-                    {new Date().toLocaleDateString("fr-FR")}
-                  </div>
-                  <div className="flex gap-2">
-                    <button className="btn btn-sm bg-amber-500 text-white border-0 hover:bg-amber-600">
-                      Exporter
-                    </button>
-                    <button className="btn btn-sm btn-outline border-amber-500 text-amber-700 hover:bg-amber-50">
-                      Actualiser
-                    </button>
-                  </div>
+
+
                 </div>
               </div>
             </div>
@@ -653,25 +662,6 @@ function Stats() {
                   </div>
                 </div>
 
-                <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
-                  <h3 className="text-lg font-semibold text-slate-900">
-                    Taches rapides
-                  </h3>
-                  <div className="mt-4 space-y-3 text-sm text-slate-700">
-                    <label className="flex items-center gap-3">
-                      <input type="checkbox" className="checkbox checkbox-sm" />
-                      <span>Valider les reports en attente</span>
-                    </label>
-                    <label className="flex items-center gap-3">
-                      <input type="checkbox" className="checkbox checkbox-sm" />
-                      <span>Verifier sanctions actives</span>
-                    </label>
-                    <label className="flex items-center gap-3">
-                      <input type="checkbox" className="checkbox checkbox-sm" />
-                      <span>Confirmer weekends</span>
-                    </label>
-                  </div>
-                </div>
 
                 <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
                   <h3 className="text-lg font-semibold text-slate-900">

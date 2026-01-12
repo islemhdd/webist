@@ -9,17 +9,21 @@ class ListLockSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     * Data from webist.sql - list_lock table
      */
     public function run(): void
     {
-        $locks = [
+        $listLocks = [
             ['id' => 1, 'status' => 0],
             ['id' => 2, 'status' => 0],
             ['id' => 3, 'status' => 0],
         ];
 
-        foreach ($locks as $lock) {
-            DB::table('list_lock')->insert($lock);
+        foreach ($listLocks as $lock) {
+            DB::table('list_lock')->updateOrInsert(
+                ['id' => $lock['id']],
+                $lock
+            );
         }
     }
 }

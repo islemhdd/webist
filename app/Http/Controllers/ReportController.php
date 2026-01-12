@@ -18,18 +18,59 @@ use Illuminate\Support\Str;
 class ReportController extends Controller
 {
     /**
+     * SECURITY: Verify the authenticated user matches the route parameter officer.
+     * This prevents IDOR (Insecure Direct Object Reference) attacks.
+     */
+    private function authorizeOfficerAccess($officer): void
+    {
+        $authenticatedUser = auth()->user();
+        if (!$authenticatedUser || $authenticatedUser->id != $officer->id) {
+            abort(403, 'Unauthorized: You can only access your own data');
+        }
+    }
+
+    /**
+     * SECURITY: Check if officer can access a specific report.
+     */
+    private function canAccessReport($officer, $report): bool
+    {
+        // Owner can always access
+        if ($report->officer_id === $officer->id) {
+            return true;
+        }
+
+        // Destination officer can access
+        if ($report->destination === $officer->id) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index($officer, Request $request)
     {
+        // SECURITY: Verify authorization
+        $this->authorizeOfficerAccess($officer);
 
 
 
         $query = $officer->reports()->with(['student']);
 
+        // SECURITY: Validate search input to prevent XSS and SQL issues
+        $request->validate([
+            'search' => ['nullable', 'string', 'max:255'],
+            'status' => ['nullable', 'string', 'in:all,refused,done,pending'],
+            'date_from' => ['nullable', 'date'],
+            'date_to' => ['nullable', 'date'],
+            'is_medical' => ['nullable', 'boolean']
+        ]);
+
         // Apply filters
         if ($request->filled('search')) {
-            $search = $request->get('search');
+            $search = trim($request->get('search'));
             $query->where(function ($q) use ($search) {
                 // Search in report title
                 $q->where('title', 'like', "%{$search}%")
@@ -74,9 +115,9 @@ class ReportController extends Controller
             return response()->json([
                 'reports' => $reports->map(function ($report) {
                     return [
-                        'arret'=>$report->arret,
-                        'sanction'=>$report->sanction,
-                        
+                        'arret' => $report->arret,
+                        'sanction' => $report->sanction,
+
                         'id' => $report->id,
                         'title' => $report->title,
                         'status' => $report->status,
@@ -104,6 +145,8 @@ class ReportController extends Controller
      */
     public function create($officer)
     {
+        // SECURITY: Verify authorization
+        $this->authorizeOfficerAccess($officer);
 
         return view('report.create', ["officer" => $officer]);
     }
@@ -114,6 +157,9 @@ class ReportController extends Controller
     public function store(Officer $id, Request $request)
     {
         $officer = $id;
+
+        // SECURITY: Verify authorization
+        $this->authorizeOfficerAccess($officer);
 
         $validated = $request->validate([
             'mat' => ['required', 'exists:students,matricule'],
@@ -181,9 +227,15 @@ class ReportController extends Controller
      */
     public function show($officer, $report_id)
     {
-
+        // SECURITY: Verify authorization
+        $this->authorizeOfficerAccess($officer);
 
         $report = Report::with(['student.section', 'sanction'])->findOrFail($report_id);
+
+        // SECURITY: Verify officer can access this specific report
+        if (!$this->canAccessReport($officer, $report)) {
+            abort(403, 'Unauthorized: You do not have access to this report');
+        }
 
         if (request()->ajax()) {
             $roles = [
@@ -278,10 +330,21 @@ class ReportController extends Controller
 
     public function avis(Officer $id, Report $report, Request $request)
     {
-
-
         $officer = $id;
-        // TODO : check if the officer is the owner of the report
+
+        // SECURITY: Verify authorization - officer must be the destination of the report
+        $this->authorizeOfficerAccess($officer);
+
+        // SECURITY: Check if the officer is authorized to give avis on this report
+        if ($report->destination !== $officer->id && $report->officer_id !== $officer->id) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'message' => 'Non autorisé: Vous ne pouvez pas donner un avis sur ce rapport.',
+                ], 403);
+            }
+            abort(403, 'Unauthorized: You cannot give avis on this report');
+        }
+
         $avis = $request->input('avis');
 
         // if()
@@ -338,6 +401,10 @@ class ReportController extends Controller
     public function received(Officer $id)
     {
         $officer = $id;
+
+        // SECURITY: Verify authorization
+        $this->authorizeOfficerAccess($officer);
+
         $reports = Report::where('destination', $officer->id)
             ->with(['student'])
             ->orderBy('created_at', 'desc')
@@ -368,7 +435,22 @@ class ReportController extends Controller
     }
     public function refuse(Officer $id, Report $report, Request $request)
     {
-        $officer = $id;        $officer->refuse($report, $request->input('motif'));
+        $officer = $id;
+
+        // SECURITY: Verify authorization
+        $this->authorizeOfficerAccess($officer);
+
+        // SECURITY: Verify officer can refuse this report (must be destination)
+        if ($report->destination !== $officer->id) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'message' => 'Non autorisé: Vous ne pouvez pas refuser ce rapport.',
+                ], 403);
+            }
+            abort(403, 'Unauthorized: You cannot refuse this report');
+        }
+
+        $officer->refuse($report, $request->input('motif'));
 
         if ($request->ajax()) {
             return response()->json([
@@ -385,6 +467,9 @@ class ReportController extends Controller
     public function search(Request $request, $id)
     {
         $officer = Officer::find($id);
+
+        // SECURITY: Verify authorization
+        $this->authorizeOfficerAccess($officer);
 
         $request->validate([
             'search' => ['nullable', 'string', 'max:255'],

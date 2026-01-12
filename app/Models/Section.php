@@ -8,7 +8,24 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Section extends Model
 {
-    public $guarded = [];
+    /**
+     * SECURITY: Explicitly define fillable fields.
+     */
+    protected $fillable = [
+        'bat',
+        'companie',
+        'num',
+        'officer_id'
+    ];
+
+    /**
+     * SECURITY: Guard sensitive fields.
+     */
+    protected $guarded = [
+        'id',
+        'created_at',
+        'updated_at'
+    ];
     // public $primaryKey = ['id', 'companie', 'num', 'bat'];
 
     public function code(): int

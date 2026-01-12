@@ -11,16 +11,26 @@ class User extends Authenticatable
 {
     use Notifiable;
     protected $table = 'users';
-    
-    // Fix typo and add proper fillable fields
-    protected $guarded = [];
-    
+
+    /**
+     * SECURITY: Use $fillable to explicitly allow only safe fields.
+     * Never use $guarded = [] as it allows mass assignment of any field.
+     */
     protected $fillable = [
         'username',
         'password',
         'phone',
-        'role_id',
         'bat'
+    ];
+
+    /**
+     * SECURITY: Guard sensitive fields that should never be mass-assigned.
+     */
+    protected $guarded = [
+        'id',
+        'role_id',
+        'created_at',
+        'updated_at'
     ];
 
     // Cacher le mot de passe lors de l'affichage de l'utilisateur

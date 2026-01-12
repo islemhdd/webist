@@ -23,12 +23,16 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            // SECURITY: Add security headers to all responses
+            \App\Http\Middleware\SecurityHeaders::class,
         ]);
 
         // Aliases
         $middleware->alias([
             'auth'  => \Illuminate\Auth\Middleware\Authenticate::class,
             'guest' => \Illuminate\Auth\Middleware\RedirectIfAuthenticated::class,
+            // SECURITY: Middleware to verify route parameter matches authenticated user
+            'verify.route.param' => \App\Http\Middleware\VerifyRouteParameter::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

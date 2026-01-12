@@ -31,7 +31,9 @@ class Student extends Model
         'nom',
         'prenom',
         'section_id',
-        'grade'
+        'grade',
+        'consigned',
+        'choix'
     ];
 
     /**
@@ -68,34 +70,16 @@ class Student extends Model
     }
     public function sorties(): HasMany
     {
-        return $this->hasMany(Sortie::class, 'matricule', 'student_id');
+        // Foreign key 'matricule' in sorties table references 'matricule' primary key in students
+        return $this->hasMany(Sortie::class, 'matricule', 'matricule');
     }
 
-    public function sortie(): Sortie
+    /**
+     * Get the most recent sortie for this student.
+     */
+    public function sortie(): ?Sortie
     {
-        // Get the most recent sortie
-        $mostRecentSortie = $this->sorties->sortByDesc('created_at')->first();
-
-        if (!$mostRecentSortie) {
-            return new Sortie([
-                "student_id" => $this->matricule,
-                'from' => null,
-                'to' => null,
-                'comment' => 'No sortie for the week',
-            ]);
-        }
-
-        // If you want to find any overlapping sorties within the same time period
-        // you might want something like this instead:
-        $overlappingSortie = $this->sorties()
-            ->where(function ($query) use ($mostRecentSortie) {
-                $query->whereBetween('from', [$mostRecentSortie->from, $mostRecentSortie->to])
-                    ->orWhereBetween('to', [$mostRecentSortie->from, $mostRecentSortie->to]);
-            })
-            ->orderBy('created_at', 'desc')
-            ->first();
-
-        return $overlappingSortie ?? $mostRecentSortie;
+        return $this->sorties()->latest('created_at')->first();
     }
     /* this filters a student collection(used in the search)
     * @param Collection $collection
@@ -132,13 +116,5 @@ class Student extends Model
     public function exemption(): HasMany
     {
         return $this->hasMany(Exemption::class, "matricule", "matricule");
-    }
-
- 
-
-    // Relationship with expulsions table
-    public function expulsions(): HasMany
-    {
-        return $this->hasMany(Expulsion::class, 'student_id', 'id');
     }
 }

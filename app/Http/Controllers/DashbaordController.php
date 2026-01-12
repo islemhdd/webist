@@ -187,13 +187,22 @@ class DashbaordController extends Controller
         }
 
         [$from, $to] = $this->buildWeekendRange($validated['choix']);
-        $currentSortie = Sortie::where('student_id', $student->matricule)
+        $currentSortie = Sortie::where('matricule', $student->matricule)
             ->latest('created_at')
             ->first();
 
         if (!$currentSortie) {
             $sortie = Sortie::create([
-                'student_id' => $student->matricule,
+                'matricule' => $student->matricule,
+                'choix' => $validated['choix'],
+                'from' => $from,
+                'to' => $to,
+            ]);
+            $student->choix = $validated['choix'];
+            $student->save();
+        } elseif ($validated['choix'] !== $student->choix) {
+            // Update the existing sortie
+            $currentSortie->update([
                 'choix' => $validated['choix'],
                 'from' => $from,
                 'to' => $to,
@@ -201,27 +210,10 @@ class DashbaordController extends Controller
             $student->choix = $validated['choix'];
             $student->save();
         } else {
-            if ($validated['choix'] !== $student->choix) {
-                $sortie = Sortie::updateOrCreate(
-                    [
-                        'student_id' => $student->matricule,
-                        'choix' => $currentSortie->choix,
-                        'from' => $currentSortie->from,
-                        'to' => $currentSortie->to,
-                    ],
-                    [
-                        'choix' => $validated['choix'],
-                        'from' => $from,
-                        'to' => $to,
-                    ]
-                );
-                $student->choix = $validated['choix'];
-                $student->save();
-            } else {
-                $currentSortie->delete();
-                $student->choix = null;
-                $student->save();
-            }
+            // Same choice - toggle off (delete)
+            $currentSortie->delete();
+            $student->choix = null;
+            $student->save();
         }
 
         $payloadStudent = [
@@ -273,6 +265,4 @@ class DashbaordController extends Controller
 
         return [$from, $to];
     }
-
-  
 }
